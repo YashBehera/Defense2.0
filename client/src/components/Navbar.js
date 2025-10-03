@@ -75,7 +75,7 @@ const Navbar = () => {
       <nav className={`sticky top-0 w-full z-50 transition-all duration-500 ${
         scrolled 
           ? 'bg-white/98 backdrop-blur-xl shadow-lg border-b border-gray-200 py-3' 
-          : 'bg-white border-b border-gray-200 py-4'
+          : 'bg-transparent text-white py-4'
       }`}>
         <div className="container mx-auto px-6">
           <div className="flex justify-between items-center">
@@ -99,10 +99,10 @@ const Navbar = () => {
               
               <div className="border-l-2 border-red-600 pl-4">
                 <h1 className="text-xl font-bold tracking-tight leading-tight">
-                  <span className="text-black">hi</span>
+                  <span className="text-white">hi</span>
                   <span className="text-red-600 font-extrabold">ve+</span>
                 </h1>
-                <p className="text-[10px] text-gray-500 tracking-[0.2em] uppercase font-medium">
+                <p className="text-[10px] text-gray-300 tracking-[0.2em] uppercase font-medium">
                   INDUSTRIES
                 </p>
               </div>
@@ -123,8 +123,8 @@ const Navbar = () => {
                       onClick={(e) => handleNavigation(link.href, e)}
                       className={`px-5 py-3 text-[13px] font-semibold tracking-wide transition-all duration-300 flex items-center space-x-2 relative group ${
                         isActiveLink(link.href) 
-                          ? 'text-black' 
-                          : 'text-gray-600 hover:text-black'
+                          ? scrolled ? 'text-black' : 'text-white' 
+                          : scrolled ? 'text-gray-600 hover:text-black' : 'text-gray-300 hover:text-white'
                       }`}
                     >
                       <span>{link.label}</span>
@@ -180,7 +180,7 @@ const Navbar = () => {
               {/* CTA Section */}
               <div className="ml-8 flex items-center space-x-4 border-l-2 border-gray-200 pl-8">
                 <button 
-                  className="text-gray-600 hover:text-red-600 transition-colors duration-300"
+                  className={`${scrolled ? 'text-gray-600 hover:text-red-600' : 'text-gray-300 hover:text-white'} transition-colors duration-300`}
                   aria-label="Search"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -201,13 +201,13 @@ const Navbar = () => {
             <div className="lg:hidden">
               <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="text-black p-2 focus:outline-none hover:bg-gray-100 rounded-lg transition-colors"
+                className={`${scrolled ? 'text-black' : 'text-white'} p-2 focus:outline-none hover:bg-gray-100/20 rounded-lg transition-colors`}
                 aria-label="Toggle menu"
               >
                 <div className="w-6 h-5 flex flex-col justify-between">
-                  <span className={`block w-full h-0.5 bg-black transition-all duration-300 origin-left ${isOpen ? 'rotate-45 translate-y-0.5' : ''}`}></span>
+                  <span className={`block w-full h-0.5 ${scrolled ? 'bg-black' : 'bg-white'} transition-all duration-300 origin-left ${isOpen ? 'rotate-45 translate-y-0.5' : ''}`}></span>
                   <span className={`block w-full h-0.5 bg-red-600 transition-all duration-300 ${isOpen ? 'opacity-0' : ''}`}></span>
-                  <span className={`block w-full h-0.5 bg-black transition-all duration-300 origin-left ${isOpen ? '-rotate-45 -translate-y-0.5' : ''}`}></span>
+                  <span className={`block w-full h-0.5 ${scrolled ? 'bg-black' : 'bg-white'} transition-all duration-300 origin-left ${isOpen ? '-rotate-45 -translate-y-0.5' : ''}`}></span>
                 </div>
               </button>
             </div>

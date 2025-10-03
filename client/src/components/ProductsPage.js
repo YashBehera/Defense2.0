@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo, useRef, Suspense } from 'react';
+import React,{ useState, useEffect, useCallback, useMemo, useRef, Suspense } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform, useInView, useSpring, useMotionValue } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
@@ -7,6 +7,7 @@ import trainingDroneImg from '../img/2.png';
 import vtol from '../img/3.png';
 import cruiseKamikaze from '../img/4.png';
 import fixedWingKamikaze from '../img/5.png';
+import { debounce } from 'lodash'; // Ensure lodash is installed or use a custom debounce
 
 // Custom hooks
 const useDocumentMeta = ({ title, description }) => {
@@ -99,438 +100,433 @@ const ProductCard = ({ product, index, onCompare, isComparing, onShare }) => {
     const [copiedToClipboard, setCopiedToClipboard] = useState(false);
     const [isHovered, setIsHovered] = useState(false);
     const cardRef = useRef(null);
-    const isInView = useInView(cardRef, { once: true, amount: 0.2 });
-
-    const handleDownloadSpecs = async () => {
-        const specs = Object.entries(product.specifications)
-            .map(([key, value]) => `${key}: ${value}`)
-            .join('\n');
-
-        const content = `
-            HIVE+ INDUSTRIES
-            ${product.name}
-            Model: ${product.model}
-            
-            TECHNICAL SPECIFICATIONS
-            ${specs}
-            
-            KEY FEATURES
-            ${product.features.map(f => `• ${f}`).join('\n')}
-            
-            APPLICATIONS
-            ${product.applications.map(a => `• ${a}`).join('\n')}
-            
-            For more information:
-            Contact: Krish Chandhok
-            Email: krishchandhok149@gmail.com
-            Phone: +91 9920887455
-        `.trim();
-
-        const blob = new Blob([content], { type: 'text/plain' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `${product.model}-specifications.txt`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-
-        setCopiedToClipboard(true);
-        setTimeout(() => setCopiedToClipboard(false), 2000);
-    };
-
-    return (
-        <>
-            <motion.article
-                ref={cardRef}
-                initial={{ opacity: 0, y: 50 }}
-                animate={isInView ? { opacity: 1, y: 0 } : {}}
-                transition={{
-                    duration: 0.6,
-                    delay: index * 0.1,
-                    ease: [0.23, 1, 0.32, 1]
-                }}
-                onHoverStart={() => setIsHovered(true)}
-                onHoverEnd={() => setIsHovered(false)}
-                className={`bg-white rounded-2xl overflow-hidden border border-gray-200 hover:border-gray-300 transition-all duration-500 relative group flex flex-col ${isComparing ? 'ring-4 ring-red-500 ring-opacity-50 shadow-2xl shadow-red-500/20' : 'shadow-lg hover:shadow-2xl'}`}
-                aria-label={`Product card for ${product.name} ${product.model}`}
-                tabIndex={0}
-            >
-                {/* Animated gradient border effect on hover */}
-                <motion.div
-                    className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-                    style={{
-                        background: 'linear-gradient(45deg, rgba(220,38,38,0.1), rgba(0,0,0,0.1), rgba(220,38,38,0.1))',
-                        backgroundSize: '200% 200%',
-                    }}
-                    animate={isHovered ? {
-                        backgroundPosition: ['0% 50%', '100% 50%', '0% 50%']
-                    } : {}}
-                    transition={{ duration: 3, repeat: Infinity }}
-                />
-
-                {/* In Production Badge with enhanced animation */}
-                <motion.div
-                    initial={{ y: -100, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.3 + index * 0.1, type: "spring", stiffness: 200 }}
-                    className="absolute top-4 right-4 z-20"
-                >
-                    <div className="relative">
-                        <div className="absolute inset-0 bg-red-500 blur-xl opacity-50 animate-pulse" />
-                        <motion.span
-                            className="relative px-3 py-1.5 bg-gradient-to-r from-red-600 via-red-500 to-red-600 text-white text-xs font-bold rounded-full shadow-xl flex items-center gap-2 backdrop-blur-md border border-red-400/30"
-                            animate={{
-                                boxShadow: [
-                                    '0 0 20px rgba(220,38,38,0.3)',
-                                    '0 0 30px rgba(220,38,38,0.5)',
-                                    '0 0 20px rgba(220,38,38,0.3)'
-                                ]
-                            }}
-                            transition={{ duration: 2, repeat: Infinity }}
-                        >
-                            <span className="relative flex h-2 w-2">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-                                <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
-                            </span>
-                            <span className="tracking-wider">IN PRODUCTION</span>
-                        </motion.span>
-                    </div>
-                </motion.div>
-
-                {/* Image Section with enhanced effects */}
-                <div className="relative w-full bg-gradient-to-br from-gray-950 via-gray-900 to-black overflow-hidden">
-                    <motion.div
-                        className="relative w-full aspect-[2/1] h-[300px] overflow-hidden"
-                        animate={isHovered ? { scale: 1.05 } : { scale: 1 }}
-                        transition={{ duration: 0.6, ease: "easeOut" }}
-                    >
-                        {/* Action buttons with better positioning */}
-                        <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
-                            <motion.button
-                                onClick={() => onCompare(product)}
-                                className={`p-2.5 rounded-xl backdrop-blur-md transition-all duration-300 shadow-lg ${isComparing
-                                        ? 'bg-red-500 text-white shadow-red-500/50 ring-2 ring-white/30'
-                                        : 'bg-white/95 text-gray-800 hover:bg-white hover:shadow-xl'
-                                    }`}
-                                whileHover={{ scale: 1.15, rotate: isComparing ? 0 : 8 }}
-                                whileTap={{ scale: 0.92 }}
-                                aria-label={`Compare ${product.name}`}
-                                title="Compare product"
-                            >
-                                <motion.svg
-                                    className="w-5 h-5"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                    animate={isComparing ? { rotate: [0, -10, 10, -10, 0] } : {}}
-                                    transition={{ duration: 0.5 }}
-                                >
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                                </motion.svg>
-                            </motion.button>
-
-                            <motion.button
-                                onClick={() => onShare(product)}
-                                className="p-2.5 bg-white/95 backdrop-blur-md text-gray-800 rounded-xl shadow-lg hover:bg-white hover:shadow-xl transition-all duration-300"
-                                whileHover={{ scale: 1.15, rotate: -8 }}
-                                whileTap={{ scale: 0.92 }}
-                                aria-label={`Share ${product.name}`}
-                                title="Share product"
-                            >
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m9.632 4.684C18.114 15.938 18 15.482 18 15c0-.482.114-.938.316-1.342m0 2.684a3 3 0 110-2.684M9.316 8.658a3 3 0 110 2.684" />
-                                </svg>
-                            </motion.button>
-                        </div>
-
-                        {/* Enhanced loading state */}
-                        {!imageLoaded && (
-                            <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950">
-                                <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/10 to-transparent" style={{
-                                    backgroundSize: '200% 100%',
-                                    animation: 'shimmer 2s infinite'
-                                }} />
-                            </div>
-                        )}
-
-                        <motion.img
-                            src={product.image || '/api/placeholder/1000/500'}
-                            alt={`${product.name} - ${product.model}`}
-                            className={`w-full h-full object-fill transition-all duration-700 ${imageLoaded ? 'opacity-100 blur-0 scale-100' : 'opacity-0 blur-xl scale-110'
-                                }`}
-                            loading="lazy"
-                            onLoad={() => setImageLoaded(true)}
-                            onError={(e) => {
-                                e.target.src = '/fallback-image.jpg';
-                                setImageLoaded(true);
-                            }}
-                        />
-
-                        {/* Multi-layered gradient overlays */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-60 pointer-events-none" />
-                        <div className="absolute inset-0 bg-gradient-to-r from-red-900/20 via-transparent to-black/20 pointer-events-none" />
-
-                        {/* Hover overlay effect */}
-                        <motion.div
-                            className="absolute inset-0 bg-gradient-to-t from-red-600/30 to-transparent pointer-events-none"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: isHovered ? 1 : 0 }}
-                            transition={{ duration: 0.4 }}
-                        />
-
-                        {/* Quick stats overlay on hover */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: isHovered ? 1 : 0, y: isHovered ? 0 : 20 }}
-                            transition={{ duration: 0.3 }}
-                            className="absolute bottom-4 left-4 right-4 flex justify-between items-end gap-2 pointer-events-none"
-                        >
-                            {Object.entries(product.specifications).slice(0, 3).map(([key, value], idx) => (
-                                <motion.div
-                                    key={idx}
-                                    initial={{ opacity: 0, x: -20 }}
-                                    animate={{ opacity: isHovered ? 1 : 0, x: isHovered ? 0 : -20 }}
-                                    transition={{ duration: 0.3, delay: idx * 0.1 }}
-                                    className="bg-black/80 backdrop-blur-md px-3 py-2 rounded-lg border border-white/10"
-                                >
-                                    <p className="text-white/60 text-xs font-medium uppercase tracking-wider mb-0.5">{key}</p>
-                                    <p className="text-white text-sm font-bold">{value}</p>
-                                </motion.div>
-                            ))}
-                        </motion.div>
-                    </motion.div>
-                </div>
-
-                {/* Details Section with enhanced layout */}
-                <div className="w-full p-6 bg-gradient-to-br from-gray-50 via-white to-gray-50/50 flex flex-col justify-between flex-grow relative overflow-hidden">
-                    {/* Subtle background pattern */}
-                    <div className="absolute inset-0 opacity-[0.02]" style={{
-                        backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-                    }} />
-
-                    <div className="space-y-4 relative z-10">
-                        <div>
-                            <div className="flex items-start justify-between gap-3 mb-3">
-                                <div className="flex-1">
-                                    <h3 className="text-2xl font-bold text-gray-900 mb-2 leading-tight">
-                                        {product.name}
-                                    </h3>
-                                    <div className="flex items-center gap-2 flex-wrap">
-                                        <span className="text-gray-500 font-medium text-xs uppercase tracking-wider">Model:</span>
-                                        <span className="px-3 py-1 bg-gradient-to-r from-gray-900 to-black text-white text-xs font-mono font-bold rounded-lg shadow-md border border-gray-700/20">
-                                            {product.model}
-                                        </span>
-                                    </div>
-                                </div>
-
-                                {/* Category badge */}
-                                <span className="px-2 py-1 bg-red-50 text-red-600 text-xs font-bold rounded-md border border-red-100 uppercase tracking-wider">
-                                    {product.category}
-                                </span>
-                            </div>
-
-                            <p className="text-gray-600 text-sm leading-relaxed line-clamp-3">
-                                {product.overview}
-                            </p>
-                        </div>
-
-                        {/* Key specs preview */}
-                        <div className="grid grid-cols-2 gap-2 pt-3 border-t border-gray-200">
-                            {Object.entries(product.specifications).slice(0, 2).map(([key, value], idx) => (
-                                <motion.div
-                                    key={idx}
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 0.5 + idx * 0.1 }}
-                                    className="bg-white rounded-lg p-3 border border-gray-100 hover:border-gray-300 transition-colors"
-                                >
-                                    <p className="text-gray-400 text-xs font-semibold uppercase tracking-wide mb-1">{key}</p>
-                                    <p className="text-gray-900 text-sm font-bold">{value}</p>
-                                </motion.div>
-                            ))}
-                        </div>
-
-                        <motion.button
-                            onClick={() => navigate(`/product/${product.id}`)}
-                            className="mt-3 w-full text-red-600 hover:text-red-700 text-sm font-bold flex items-center justify-center gap-2 group px-4 py-2.5 rounded-xl hover:bg-red-50 transition-all border border-transparent hover:border-red-100"
-                            whileHover={{ scale: 1.01 }}
-                            whileTap={{ scale: 0.99 }}
-                            aria-label="View full product details"
-                        >
-                            <span>VIEW COMPLETE SPECIFICATIONS</span>
-                            <motion.svg
-                                className="w-4 h-4"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                                animate={{ x: [0, 4, 0] }}
-                                transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                            >
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" />
-                            </motion.svg>
-                        </motion.button>
-                    </div>
-
-                    {/* Action buttons with enhanced design */}
-                    <motion.div
-                        className="mt-6 pt-4 border-t border-gray-200"
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.7 }}
-                    >
-                        <div className="grid grid-cols-2 gap-3">
-                            {/* Get Quote button */}
-                            <motion.button
-                                onClick={() => setShowContactModal(true)}
-                                className="col-span-2 w-full px-4 py-3.5 bg-gradient-to-r from-red-600 via-red-500 to-red-600 text-white font-bold rounded-xl hover:from-red-700 hover:via-red-600 hover:to-red-700 transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-red-500/30 flex items-center justify-center gap-3 group relative overflow-hidden"
-                                style={{ backgroundSize: '200% 100%' }}
-                                whileHover={{
-                                    scale: 1.02,
-                                    backgroundPosition: '100% 0'
-                                }}
-                                whileTap={{ scale: 0.98 }}
-                                aria-label="Get a quote for this product"
-                            >
-                                <motion.div
-                                    className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0"
-                                    animate={{ x: ['-100%', '100%'] }}
-                                    transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                                />
-                                <span className="relative text-sm tracking-wider font-extrabold">REQUEST QUOTE</span>
-                                <motion.svg
-                                    className="w-5 h-5 relative"
-                                    animate={{ x: [0, 5, 0] }}
-                                    transition={{ duration: 1.5, repeat: Infinity }}
-                                    fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                >
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                                </motion.svg>
-                            </motion.button>
-
-                            {/* Download Specs button */}
-                            <motion.button
-                                onClick={handleDownloadSpecs}
-                                className="relative px-3 py-3 bg-white border-2 border-gray-900 text-gray-900 font-bold rounded-xl hover:bg-gray-900 hover:text-white transition-all duration-300 flex items-center justify-center gap-2 group overflow-hidden shadow-md hover:shadow-xl"
-                                whileHover={{ scale: 1.03, y: -2 }}
-                                whileTap={{ scale: 0.97 }}
-                                aria-label="Download product specifications"
-                            >
-                                <AnimatePresence>
-                                    {copiedToClipboard && (
-                                        <motion.div
-                                            initial={{ scale: 0, rotate: -180 }}
-                                            animate={{ scale: 1, rotate: 0 }}
-                                            exit={{ scale: 0, rotate: 180 }}
-                                            className="absolute inset-0 bg-green-500 text-white flex items-center justify-center font-bold rounded-xl"
-                                        >
-                                            <motion.svg
-                                                className="w-6 h-6"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                viewBox="0 0 24 24"
-                                                initial={{ pathLength: 0 }}
-                                                animate={{ pathLength: 1 }}
-                                                transition={{ duration: 0.3 }}
-                                            >
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
-                                            </motion.svg>
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-                                <motion.svg
-                                    className="w-5 h-5 group-hover:animate-bounce"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                </motion.svg>
-                                <span className="text-xs tracking-wider font-extrabold">SPECS</span>
-                            </motion.button>
-
-                            {/* Call button */}
-                            <motion.a
-                                href={`tel:+919920887455`}
-                                className="px-3 py-3 bg-white border-2 border-gray-900 text-gray-900 font-bold rounded-xl hover:bg-gray-900 hover:text-white transition-all duration-300 flex items-center justify-center gap-2 group shadow-md hover:shadow-xl"
-                                whileHover={{ scale: 1.03, y: -2 }}
-                                whileTap={{ scale: 0.97 }}
-                                aria-label="Call for more information"
-                            >
-                                <motion.svg
-                                    className="w-5 h-5"
-                                    animate={{ rotate: [0, -15, 15, -15, 0] }}
-                                    transition={{ duration: 1, repeat: Infinity, repeatDelay: 3 }}
-                                    fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                >
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                                </motion.svg>
-                                <span className="text-xs tracking-wider font-extrabold">CALL</span>
-                            </motion.a>
-                        </div>
-
-                        {/* Trust indicators */}
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 0.9 }}
-                            className="mt-4 flex items-center justify-center gap-4 text-xs text-gray-500"
-                        >
-                            <div className="flex items-center gap-1">
-                                <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                                </svg>
-                                <span className="font-semibold">Verified</span>
-                            </div>
-                            <div className="flex items-center gap-1">
-                                <svg className="w-4 h-4 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
-                                </svg>
-                                <span className="font-semibold">Quick Response</span>
-                            </div>
-                        </motion.div>
-                    </motion.div>
-                </div>
-
-                {/* Hover glow effect */}
-                <motion.div
-                    className="absolute inset-0 rounded-2xl pointer-events-none"
-                    style={{
-                        background: 'radial-gradient(circle at 50% 50%, rgba(220,38,38,0.1), transparent 70%)',
-                    }}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: isHovered ? 1 : 0 }}
-                    transition={{ duration: 0.3 }}
-                />
-            </motion.article>
-
-            {showContactModal && (
-                <Suspense fallback={
-                    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center">
-                        <div className="relative">
-                            <motion.div
-                                className="w-16 h-16 border-4 border-white/20 border-t-white rounded-full"
-                                animate={{ rotate: 360 }}
-                                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                            />
-                            <motion.div
-                                className="absolute inset-0 w-16 h-16 border-4 border-red-500/40 border-b-red-500 rounded-full"
-                                animate={{ rotate: -360 }}
-                                transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-                            />
-                        </div>
-                    </div>
-                }>
-                    <ContactModal
-                        product={product}
-                        onClose={() => setShowContactModal(false)}
-                    />
-                </Suspense>
-            )}
-        </>
+    const isInView = useInView(cardRef, { once: true, amount: 0.3, margin: '0px 0px -50px 0px' });
+  
+    // Debounce hover state to prevent rapid toggling
+    const debouncedSetIsHovered = useCallback(
+      debounce((value) => setIsHovered(value), 100),
+      []
     );
-};
+  
+    const handleDownloadSpecs = async () => {
+      const specs = Object.entries(product.specifications)
+        .map(([key, value]) => `${key}: ${value}`)
+        .join('\n');
+  
+      const content = `
+        HIVE+ INDUSTRIES
+        ${product.name}
+        Model: ${product.model}
+        
+        TECHNICAL SPECIFICATIONS
+        ${specs}
+        
+        KEY FEATURES
+        ${product.features.map(f => `• ${f}`).join('\n')}
+        
+        APPLICATIONS
+        ${product.applications.map(a => `• ${a}`).join('\n')}
+        
+        For more information:
+        Contact: Krish Chandhok
+        Email: krishchandhok149@gmail.com
+        Phone: +91 9920887455
+      `.trim();
+  
+      const blob = new Blob([content], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${product.model}-specifications.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+  
+      setCopiedToClipboard(true);
+      setTimeout(() => setCopiedToClipboard(false), 2000);
+    };
+  
+    return (
+      <>
+        <motion.article
+          ref={cardRef}
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ duration: 0.6, delay: index * 0.1, ease: 'easeOut' }}
+          onHoverStart={() => debouncedSetIsHovered(true)}
+          onHoverEnd={() => debouncedSetIsHovered(false)}
+          className={`bg-white rounded-2xl overflow-hidden border border-gray-200 hover:border-gray-300 transition-colors duration-300 relative group flex flex-col ${
+            isComparing ? 'ring-4 ring-red-500 ring-opacity-50 shadow-2xl' : 'shadow-lg hover:shadow-2xl'
+          }`}
+          aria-label={`Product card for ${product.name} ${product.model}`}
+          tabIndex={0}
+          style={{ willChange: 'transform, opacity, box-shadow' }}
+        >
+          {/* Simplified gradient border effect */}
+          <motion.div
+            className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+            style={{
+              background: 'linear-gradient(45deg, rgba(220,38,38,0.1), transparent)',
+            }}
+          />
+  
+          {/* In Production Badge */}
+          <motion.div
+            initial={{ y: -100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.3 + index * 0.1, type: 'spring', stiffness: 200 }}
+            className="absolute top-4 right-4 z-20"
+          >
+            <div className="relative">
+              <div className="absolute inset-0 bg-red-500 blur-xl opacity-50 animate-pulse" />
+              <motion.span
+                className="relative px-3 py-1.5 bg-gradient-to-r from-red-600 via-red-500 to-red-600 text-white text-xs font-bold rounded-full shadow-xl flex items-center gap-2 backdrop-blur-md border border-red-400/30"
+                animate={{
+                  boxShadow: [
+                    '0 0 20px rgba(220,38,38,0.3)',
+                    '0 0 30px rgba(220,38,38,0.5)',
+                    '0 0 20px rgba(220,38,38,0.3)',
+                  ],
+                }}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+                </span>
+                <span className="tracking-wider">IN PRODUCTION</span>
+              </motion.span>
+            </div>
+          </motion.div>
+  
+          {/* Image Section */}
+          <div className="relative w-full bg-gradient-to-br from-gray-950 via-gray-900 to-black overflow-hidden">
+            <motion.div
+              className="relative w-full aspect-[2/1] h-[300px] overflow-hidden"
+              animate={isHovered ? { scale: 1.05 } : { scale: 1 }}
+              transition={{ duration: 0.6, ease: 'easeOut' }}
+            >
+              {/* Action buttons */}
+              <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
+                <motion.button
+                  onClick={() => onCompare(product)}
+                  className={`p-2.5 rounded-xl backdrop-blur-md transition-all duration-300 shadow-lg ${
+                    isComparing
+                      ? 'bg-red-500 text-white shadow-red-500/50 ring-2 ring-white/30'
+                      : 'bg-white/95 text-gray-800 hover:bg-white hover:shadow-xl'
+                  }`}
+                  whileHover={{ scale: 1.15, rotate: isComparing ? 0 : 8 }}
+                  whileTap={{ scale: 0.92 }}
+                  aria-label={`Compare ${product.name}`}
+                  title="Compare product"
+                >
+                  <motion.svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    animate={isComparing ? { rotate: [0, -10, 10, -10, 0] } : {}}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2.5"
+                      d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                    />
+                  </motion.svg>
+                </motion.button>
+  
+                <motion.button
+                  onClick={() => onShare(product)}
+                  className="p-2.5 bg-white/95 backdrop-blur-md text-gray-800 rounded-xl shadow-lg hover:bg-white hover:shadow-xl transition-all duration-300"
+                  whileHover={{ scale: 1.15, rotate: -8 }}
+                  whileTap={{ scale: 0.92 }}
+                  aria-label={`Share ${product.name}`}
+                  title="Share product"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2.5"
+                      d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m9.632 4.684C18.114 15.938 18 15.482 18 15c0-.482.114-.938.316-1.342m0 2.684a3 3 0 110-2.684M9.316 8.658a3 3 0 110 2.684"
+                    />
+                  </svg>
+                </motion.button>
+              </div>
+  
+              <motion.img
+                src={product.image || '/api/placeholder/1000/500'}
+                alt={`${product.name} - ${product.model}`}
+                className="w-full h-full object-fill"
+                loading="lazy"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: imageLoaded ? 1 : 0.5 }}
+                transition={{ duration: 0.7 }}
+                onLoad={() => setImageLoaded(true)}
+                onError={(e) => {
+                  e.target.src = '/fallback-image.jpg';
+                  setImageLoaded(true);
+                }}
+                style={{ willChange: 'opacity, transform' }}
+              />
+  
+              {/* Gradient overlays */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-60 pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-r from-red-900/20 via-transparent to-black/20 pointer-events-none" />
+  
+              {/* Quick stats overlay on hover */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: isHovered ? 1 : 0, y: isHovered ? 0 : 20 }}
+                transition={{ duration: 0.3 }}
+                className="absolute bottom-4 left-4 right-4 flex justify-between items-end gap-2 pointer-events-none"
+              >
+                {Object.entries(product.specifications).slice(0, 3).map(([key, value], idx) => (
+                  <motion.div
+                    key={idx}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: isHovered ? 1 : 0, x: isHovered ? 0 : -20 }}
+                    transition={{ duration: 0.3, delay: idx * 0.1 }}
+                    className="bg-black/80 backdrop-blur-md px-3 py-2 rounded-lg border border-white/10"
+                  >
+                    <p className="text-white/60 text-xs font-medium uppercase tracking-wider mb-0.5">{key}</p>
+                    <p className="text-white text-sm font-bold">{value}</p>
+                  </motion.div>
+                ))}
+              </motion.div>
+            </motion.div>
+          </div>
+  
+          {/* Details Section */}
+          <div className="w-full p-6 bg-gradient-to-br from-gray-50 via-white to-gray-50/50 flex flex-col justify-between flex-grow relative overflow-hidden">
+            <div
+              className="absolute inset-0 opacity-[0.02]"
+              style={{
+                backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+              }}
+            />
+  
+            <div className="space-y-4 relative z-10">
+              <div>
+                <div className="flex items-start justify-between gap-3 mb-3">
+                  <div className="flex-1">
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2 leading-tight">{product.name}</h3>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-gray-500 font-medium text-xs uppercase tracking-wider">Model:</span>
+                      <span className="px-3 py-1 bg-gradient-to-r from-gray-900 to-black text-white text-xs font-mono font-bold rounded-lg shadow-md border border-gray-700/20">
+                        {product.model}
+                      </span>
+                    </div>
+                  </div>
+                  <span className="px-2 py-1 bg-red-50 text-red-600 text-xs font-bold rounded-md border border-red-100 uppercase tracking-wider">
+                    {product.category}
+                  </span>
+                </div>
+                <p className="text-gray-600 text-sm leading-relaxed line-clamp-3">{product.overview}</p>
+              </div>
+  
+              <div className="grid grid-cols-2 gap-2 pt-3 border-t border-gray-200">
+                {Object.entries(product.specifications).slice(0, 2).map(([key, value], idx) => (
+                  <motion.div
+                    key={idx}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 + idx * 0.1 }}
+                    className="bg-white rounded-lg p-3 border border-gray-100 hover:border-gray-300 transition-colors"
+                  >
+                    <p className="text-gray-400 text-xs font-semibold uppercase tracking-wide mb-1">{key}</p>
+                    <p className="text-gray-900 text-sm font-bold">{value}</p>
+                  </motion.div>
+                ))}
+              </div>
+  
+              <motion.button
+                onClick={() => navigate(`/product/${product.id}`)}
+                className="mt-3 w-full text-red-600 hover:text-red-700 text-sm font-bold flex items-center justify-center gap-2 group px-4 py-2.5 rounded-xl hover:bg-red-50 transition-all border border-transparent hover:border-red-100"
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.99 }}
+                aria-label="View full product details"
+              >
+                <span>VIEW COMPLETE SPECIFICATIONS</span>
+                <motion.svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  animate={{ x: [0, 4, 0] }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" />
+                </motion.svg>
+              </motion.button>
+            </div>
+  
+            <motion.div
+              className="mt-6 pt-4 border-t border-gray-200"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.7 }}
+            >
+              <div className="grid grid-cols-2 gap-3">
+                <motion.button
+                  onClick={() => setShowContactModal(true)}
+                  className="col-span-2 w-full px-4 py-3.5 bg-gradient-to-r from-red-600 via-red-500 to-red-600 text-white font-bold rounded-xl hover:from-red-700 hover:via-red-600 hover:to-red-700 transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-red-500/30 flex items-center justify-center gap-3 group relative overflow-hidden"
+                  style={{ backgroundSize: '200% 100%' }}
+                  whileHover={{
+                    scale: 1.02,
+                    backgroundPosition: '100% 0',
+                  }}
+                  whileTap={{ scale: 0.98 }}
+                  aria-label="Get a quote for this product"
+                >
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0"
+                    animate={{ x: ['-100%', '100%'] }}
+                    transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+                  />
+                  <span className="relative text-sm tracking-wider font-extrabold">REQUEST QUOTE</span>
+                  <motion.svg
+                    className="w-5 h-5 relative"
+                    animate={{ x: [0, 5, 0] }}
+                    transition={{ duration: 1.5, repeat: Infinity }}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </motion.svg>
+                </motion.button>
+  
+                <motion.button
+                  onClick={handleDownloadSpecs}
+                  className="relative px-3 py-3 bg-white border-2 border-gray-900 text-gray-900 font-bold rounded-xl hover:bg-gray-900 hover:text-white transition-all duration-300 flex items-center justify-center gap-2 group overflow-hidden shadow-md hover:shadow-xl"
+                  whileHover={{ scale: 1.03, y: -2 }}
+                  whileTap={{ scale: 0.97 }}
+                  aria-label="Download product specifications"
+                >
+                  <AnimatePresence>
+                    {copiedToClipboard && (
+                      <motion.div
+                        initial={{ scale: 0, rotate: -180 }}
+                        animate={{ scale: 1, rotate: 0 }}
+                        exit={{ scale: 0, rotate: 180 }}
+                        className="absolute inset-0 bg-green-500 text-white flex items-center justify-center font-bold rounded-xl"
+                      >
+                        <motion.svg
+                          className="w-6 h-6"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          initial={{ pathLength: 0 }}
+                          animate={{ pathLength: 1 }}
+                          transition={{ duration: 0.3 }}
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
+                        </motion.svg>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                  <motion.svg
+                    className="w-5 h-5 group-hover:animate-bounce"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2.5"
+                      d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    />
+                  </motion.svg>
+                  <span className="text-xs tracking-wider font-extrabold">SPECS</span>
+                </motion.button>
+  
+                <motion.a
+                  href={`tel:+919920887455`}
+                  className="px-3 py-3 bg-white border-2 border-gray-900 text-gray-900 font-bold rounded-xl hover:bg-gray-900 hover:text-white transition-all duration-300 flex items-center justify-center gap-2 group shadow-md hover:shadow-xl"
+                  whileHover={{ scale: 1.03, y: -2 }}
+                  whileTap={{ scale: 0.97 }}
+                  aria-label="Call for more information"
+                >
+                  <motion.svg
+                    className="w-5 h-5"
+                    animate={{ rotate: [0, -15, 15, -15, 0] }}
+                    transition={{ duration: 1, repeat: Infinity, repeatDelay: 3 }}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2.5"
+                      d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                    />
+                  </motion.svg>
+                  <span className="text-xs tracking-wider font-extrabold">CALL</span>
+                </motion.a>
+              </div>
+  
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.9 }}
+                className="mt-4 flex items-center justify-center gap-4 text-xs text-gray-500"
+              >
+                <div className="flex items-center gap-1">
+                  <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  <span className="font-semibold">Verified</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <svg className="w-4 h-4 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
+                  </svg>
+                  <span className="font-semibold">Quick Response</span>
+                </div>
+              </motion.div>
+            </motion.div>
+          </div>
+  
+          {/* Hover glow effect */}
+          <motion.div
+            className="absolute inset-0 rounded-2xl pointer-events-none"
+            style={{
+              background: 'radial-gradient(circle at 50% 50%, rgba(220,38,38,0.1), transparent 70%)',
+            }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: isHovered ? 1 : 0 }}
+            transition={{ duration: 0.3 }}
+          />
+        </motion.article>
+  
+        {showContactModal && (
+          <React.Suspense
+            fallback={
+              <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center">
+                <motion.div
+                  className="w-12 h-12 border-4 border-white/20 border-t-white rounded-full"
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                />
+              </div>
+            }
+          >
+            <ContactModal product={product} onClose={() => setShowContactModal(false)} />
+          </React.Suspense>
+        )}
+      </>
+    );
+  };
 
 
 ProductCard.propTypes = {
