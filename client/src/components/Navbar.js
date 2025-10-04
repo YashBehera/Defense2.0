@@ -45,7 +45,6 @@ const Navbar = () => {
       default:
         // Handle section navigation (for dropdown items)
         if (href.startsWith('#')) {
-          // Navigate to products page with section hash
           navigate('/products' + href);
         }
     }
@@ -74,8 +73,8 @@ const Navbar = () => {
     <>
       <nav className={`sticky top-0 w-full z-50 transition-all duration-500 ${
         scrolled 
-          ? 'bg-white/98 backdrop-blur-xl shadow-lg border-b border-gray-200 py-3' 
-          : 'bg-transparent text-white py-4'
+          ? 'bg-white shadow-lg border-b border-gray-200 py-3' 
+          : 'bg-transparent py-4'
       }`}>
         <div className="container mx-auto px-6">
           <div className="flex justify-between items-center">
@@ -87,22 +86,13 @@ const Navbar = () => {
                 window.scrollTo(0, 0);
               }}
             >
-              {/* hive+ Inspired Logo */}
-              <div className="relative">
-                <div className="w-12 h-12 relative flex items-center justify-center">
-                  {/* Inner H symbol */}
-                  <div className="relative z-10">
-                    <span className="text-white font-bold text-xl">H</span>
-                  </div>
-                </div>
-              </div>
-              
+
               <div className="border-l-2 border-red-600 pl-4">
                 <h1 className="text-xl font-bold tracking-tight leading-tight">
-                  <span className="text-white">hi</span>
+                  <span className={`${scrolled ? 'text-gray-900' : 'text-gray-900'}`}>hi</span>
                   <span className="text-red-600 font-extrabold">ve+</span>
                 </h1>
-                <p className="text-[10px] text-gray-300 tracking-[0.2em] uppercase font-medium">
+                <p className={`text-[10px] tracking-[0.2em] uppercase font-medium ${scrolled ? 'text-gray-600' : 'text-gray-300'}`}>
                   INDUSTRIES
                 </p>
               </div>
@@ -123,8 +113,10 @@ const Navbar = () => {
                       onClick={(e) => handleNavigation(link.href, e)}
                       className={`px-5 py-3 text-[13px] font-semibold tracking-wide transition-all duration-300 flex items-center space-x-2 relative group ${
                         isActiveLink(link.href) 
-                          ? scrolled ? 'text-black' : 'text-white' 
-                          : scrolled ? 'text-gray-600 hover:text-black' : 'text-gray-300 hover:text-white'
+                          ? 'text-red-600' 
+                          : scrolled 
+                            ? 'text-gray-900 hover:text-red-600' 
+                            : 'text-black hover:text-red-600'
                       }`}
                     >
                       <span>{link.label}</span>
@@ -134,7 +126,7 @@ const Navbar = () => {
                         </svg>
                       )}
                       {/* Hover Line - Red accent */}
-                      <span className={`absolute bottom-0 left-0 w-full h-[3px] bg-gradient-to-r from-red-600 to-red-700 transform transition-transform duration-300 ${
+                      <span className={`absolute bottom-0 left-0 w-full h-[3px] bg-red-600 transform transition-transform duration-300 ${
                         isActiveLink(link.href) 
                           ? 'scale-x-100' 
                           : 'scale-x-0 group-hover:scale-x-100'
@@ -157,10 +149,10 @@ const Navbar = () => {
                                   {item.icon}
                                 </span>
                                 <div>
-                                  <h3 className="text-black font-bold text-sm tracking-wide group-hover:text-red-600 transition-colors">
+                                  <h3 className="text-gray-900 font-bold text-sm tracking-wide group-hover:text-red-600 transition-colors">
                                     {item.label}
                                   </h3>
-                                  <p className="text-gray-500 text-xs mt-1">
+                                  <p className="text-gray-600 text-xs mt-1">
                                     {item.description}
                                   </p>
                                 </div>
@@ -180,7 +172,7 @@ const Navbar = () => {
               {/* CTA Section */}
               <div className="ml-8 flex items-center space-x-4 border-l-2 border-gray-200 pl-8">
                 <button 
-                  className={`${scrolled ? 'text-gray-600 hover:text-red-600' : 'text-gray-300 hover:text-white'} transition-colors duration-300`}
+                  className={`transition-colors duration-300 ${scrolled ? 'text-gray-900 hover:text-red-600' : 'text-white hover:text-red-600'}`}
                   aria-label="Search"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -190,7 +182,7 @@ const Navbar = () => {
                 
                 <button
                   onClick={() => navigate('/contact')}
-                  className="px-5 py-2 bg-gradient-to-r from-red-600 to-red-700 text-white text-sm font-bold rounded-lg hover:from-red-700 hover:to-red-800 transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
+                  className="px-5 py-2 bg-red-600 text-white text-sm font-bold rounded-lg hover:bg-red-700 transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
                 >
                   GET QUOTE
                 </button>
@@ -201,13 +193,13 @@ const Navbar = () => {
             <div className="lg:hidden">
               <button
                 onClick={() => setIsOpen(!isOpen)}
-                className={`${scrolled ? 'text-black' : 'text-white'} p-2 focus:outline-none hover:bg-gray-100/20 rounded-lg transition-colors`}
+                className={`p-2 focus:outline-none hover:bg-gray-100/20 rounded-lg transition-colors ${scrolled ? 'text-gray-900' : 'text-white'}`}
                 aria-label="Toggle menu"
               >
                 <div className="w-6 h-5 flex flex-col justify-between">
-                  <span className={`block w-full h-0.5 ${scrolled ? 'bg-black' : 'bg-white'} transition-all duration-300 origin-left ${isOpen ? 'rotate-45 translate-y-0.5' : ''}`}></span>
+                  <span className={`block w-full h-0.5 ${scrolled ? 'bg-gray-900' : 'bg-white'} transition-all duration-300 origin-left ${isOpen ? 'rotate-45 translate-y-0.5' : ''}`}></span>
                   <span className={`block w-full h-0.5 bg-red-600 transition-all duration-300 ${isOpen ? 'opacity-0' : ''}`}></span>
-                  <span className={`block w-full h-0.5 ${scrolled ? 'bg-black' : 'bg-white'} transition-all duration-300 origin-left ${isOpen ? '-rotate-45 -translate-y-0.5' : ''}`}></span>
+                  <span className={`block w-full h-0.5 ${scrolled ? 'bg-gray-900' : 'bg-white'} transition-all duration-300 origin-left ${isOpen ? '-rotate-45 -translate-y-0.5' : ''}`}></span>
                 </div>
               </button>
             </div>
@@ -224,8 +216,8 @@ const Navbar = () => {
                     href={link.href}
                     className={`block px-6 py-4 text-sm font-semibold tracking-wide transition-colors duration-200 ${
                       isActiveLink(link.href)
-                        ? 'text-black bg-red-50 border-l-4 border-red-600'
-                        : 'text-gray-600 hover:text-black hover:bg-gray-50'
+                        ? 'text-red-600 bg-red-50 border-l-4 border-red-600'
+                        : 'text-gray-900 hover:text-red-600 hover:bg-red-50'
                     }`}
                     onClick={(e) => {
                       if (!link.dropdown) {
@@ -233,7 +225,6 @@ const Navbar = () => {
                         setIsOpen(false);
                       } else {
                         e.preventDefault();
-                        // Toggle dropdown in mobile
                         setActiveDropdown(activeDropdown === link.label ? null : link.label);
                       }
                     }}
@@ -253,7 +244,7 @@ const Navbar = () => {
                         <a
                           key={item.href}
                           href={item.href}
-                          className="block px-8 py-3 text-xs text-gray-600 hover:text-red-600 hover:bg-red-50 transition-colors"
+                          className="block px-8 py-3 text-xs text-gray-900 hover:text-red-600 hover:bg-red-50 transition-colors"
                           onClick={(e) => {
                             handleNavigation(item.href, e);
                             setIsOpen(false);
@@ -276,7 +267,7 @@ const Navbar = () => {
                     navigate('/contact');
                     setIsOpen(false);
                   }}
-                  className="w-full px-5 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white text-sm font-bold rounded-lg hover:from-red-700 hover:to-red-800 transition-all duration-300 shadow-md"
+                  className="w-full px-5 py-3 bg-red-600 text-white text-sm font-bold rounded-lg hover:bg-red-700 transition-all duration-300 shadow-md"
                 >
                   GET QUOTE
                 </button>
