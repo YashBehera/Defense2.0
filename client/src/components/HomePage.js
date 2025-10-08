@@ -121,9 +121,8 @@ const HomePage = () => {
             autoPlay
             muted
             loop
-            controls={false}
-            className="w-full h-auto"
-            style={{ pointerEvents: 'none' }} // Prevents interaction with video element
+            playsInline
+            className="w-full h-full object-cover"
           />
           {/* Mobile overlay for better text readability */}
           <div className="absolute inset-0 bg-black/20 md:bg-transparent" />
@@ -373,7 +372,7 @@ const HomePage = () => {
                   whileHover={{ x: 0 }}
                   transition={{ duration: 0.3 }}
                 />
-                <span className="relative z-10 flex items-center gap-2">
+                                <span className="relative z-10 flex items-center gap-2">
                   Get Technical Specs
                   <motion.span
                     animate={{ x: [0, 4, 0] }}
@@ -787,7 +786,7 @@ const HomePage = () => {
         />
 
         <div className="container mx-auto px-4 sm:px-6 relative z-10">
-          <motion.div
+        <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-100px' }}
