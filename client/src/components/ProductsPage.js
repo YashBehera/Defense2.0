@@ -36,6 +36,34 @@ const useDocumentMeta = ({ title, description }) => {
     }, [title, description]);
 };
 
+// Add lightweight helpers to detect reduced-motion and mobile to avoid expensive animations on small devices
+const usePrefersReducedMotion = () => {
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const handleChange = () => setPrefersReducedMotion(mq.matches);
+    handleChange();
+    if (mq.addEventListener) mq.addEventListener('change', handleChange);
+    else mq.addListener(handleChange);
+    return () => {
+      if (mq.removeEventListener) mq.removeEventListener('change', handleChange);
+      else mq.removeListener(handleChange);
+    };
+  }, []);
+  return prefersReducedMotion;
+};
+
+const useIsMobile = (breakpoint = 640) => {
+  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' ? window.innerWidth <= breakpoint : false);
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth <= breakpoint);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, [breakpoint]);
+  return isMobile;
+};
+
 // Enhanced Icons with animations
 const CheckIcon = () => (
     <motion.svg
@@ -540,209 +568,136 @@ ProductCard.propTypes = {
 // Hero Section with Parallax and 3D Effects
 const HeroSection = () => {
     const { scrollY } = useScroll();
-    const y1 = useTransform(scrollY, [0, 300], [0, -50]);
-    const y2 = useTransform(scrollY, [0, 300], [0, -100]);
+    const y1 = useTransform(scrollY, [0, 300], [0, -30]); // less aggressive on mobile
+    const y2 = useTransform(scrollY, [0, 300], [0, -60]);
     const opacity = useTransform(scrollY, [0, 300], [1, 0]);
-    const scale = useTransform(scrollY, [0, 300], [1, 0.95]);
+    const scale = useTransform(scrollY, [0, 300], [1, 0.98]);
+
+    const prefersReducedMotion = usePrefersReducedMotion();
+    const isMobile = useIsMobile();
+
+    const orbCount = (!isMobile && !prefersReducedMotion) ? 8 : 0; // limit on desktop only
 
     return (
-        <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden bg-white">
-            {/* Enhanced Animated Background Pattern */}
+        <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden bg-white">
+            {/* Background: use lightweight static pattern on mobile / reduced-motion */}
             <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                <motion.div
-                    className="absolute inset-0"
-                    style={{ y: y2 }}
-                >
-                    {/* Geometric grid */}
-                    <div className="absolute inset-0 opacity-[0.03]" style={{
-                        backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M 0 0 L 0 100 L 100 100 L 100 0 Z' fill='none' stroke='%23000000' stroke-width='0.5'/%3E%3Cpath d='M 50 0 L 50 100 M 0 50 L 100 50' stroke='%23000000' stroke-width='0.5'/%3E%3C/svg%3E")`,
-                    }} />
+                {!isMobile && !prefersReducedMotion ? (
+                    <motion.div className="absolute inset-0" style={{ y: y2 }}>
+                        <div className="absolute inset-0 opacity-[0.03]" style={{
+                            backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M 0 0 L 0 100 L 100 100 L 100 0 Z' fill='none' stroke='%23000000' stroke-width='0.5'/%3E%3Cpath d='M 50 0 L 50 100 M 0 50 L 100 50' stroke='%23000000' stroke-width='0.5'/%3E%3C/svg%3E")`,
+                        }} />
 
-                    {/* Animated orbs */}
-                    {[...Array(15)].map((_, i) => (
-                        <motion.div
-                            key={i}
-                            className="absolute rounded-full mix-blend-multiply filter blur-2xl"
-                            style={{
-                                background: i % 3 === 0
-                                    ? 'radial-gradient(circle, rgba(220, 38, 38, 0.15) 0%, transparent 70%)'
-                                    : i % 3 === 1
-                                        ? 'radial-gradient(circle, rgba(0, 0, 0, 0.15) 0%, transparent 70%)'
-                                        : 'radial-gradient(circle, rgba(220, 38, 38, 0.08) 0%, transparent 70%)',
-                                width: `${Math.random() * 500 + 200}px`,
-                                height: `${Math.random() * 500 + 200}px`,
-                                left: `${Math.random() * 100}%`,
-                                top: `${Math.random() * 100}%`,
-                            }}
-                            animate={{
-                                x: [0, Math.random() * 100 - 50, 0],
-                                y: [0, Math.random() * 100 - 50, 0],
-                                scale: [1, 1.3, 1],
-                                opacity: [0.3, 0.6, 0.3],
-                            }}
-                            transition={{
-                                duration: 20 + i * 2,
-                                repeat: Infinity,
-                                ease: "easeInOut",
-                                delay: i * 0.5,
-                            }}
-                        />
-                    ))}
-                </motion.div>
+                        {/* Reduced number of orbs and simpler animations (GPU transform only) */}
+                        {Array.from({ length: orbCount }).map((_, i) => {
+                            const size = 120 + (i * 30);
+                            const left = 5 + (i * 12) % 90;
+                            const top = 8 + (i * 9) % 85;
+                            const delay = i * 0.6;
+                            return (
+                                <motion.div
+                                    key={i}
+                                    className="absolute rounded-full mix-blend-multiply filter"
+                                    style={{
+                                        background: i % 3 === 0
+                                            ? 'radial-gradient(circle, rgba(220, 38, 38, 0.12) 0%, transparent 70%)'
+                                            : i % 3 === 1
+                                                ? 'radial-gradient(circle, rgba(0, 0, 0, 0.08) 0%, transparent 70%)'
+                                                : 'radial-gradient(circle, rgba(220, 38, 38, 0.06) 0%, transparent 70%)',
+                                        width: `${size}px`,
+                                        height: `${size}px`,
+                                        left: `${left}%`,
+                                        top: `${top}%`,
+                                        willChange: 'transform, opacity',
+                                        transform: 'translateZ(0)'
+                                    }}
+                                    animate={{
+                                        x: [0, (i % 2 === 0 ? -30 : 30), 0],
+                                        y: [0, (i % 2 === 0 ? -20 : 20), 0],
+                                        opacity: [0.35, 0.65, 0.35],
+                                        scale: [1, 1.08, 1]
+                                    }}
+                                    transition={{
+                                        duration: 18 + i,
+                                        repeat: Infinity,
+                                        repeatType: 'mirror',
+                                        ease: "easeInOut",
+                                        delay
+                                    }}
+                                />
+                            );
+                        })}
+                    </motion.div>
+                ) : (
+                    // static lightweight background for mobile / reduced-motion devices
+                    <div className="absolute inset-0 opacity-[0.03] bg-white bg-repeat" />
+                )}
             </div>
 
             {/* Content */}
             <motion.div
-                className="relative z-10 text-center px-4 max-w-7xl mx-auto py-12"
+                className="relative z-10 text-center px-4 max-w-5xl mx-auto py-12"
                 style={{ y: y1, opacity, scale }}
             >
-                {/* Logo Animation with enhanced effects */}
+                {/* Logo / heading */}
                 <motion.div
-                    initial={{ opacity: 0, scale: 0.3, y: 50 }}
+                    initial={{ opacity: 0, scale: 0.6, y: 30 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     transition={{
-                        duration: 1.2,
+                        duration: 0.9,
                         type: "spring",
-                        stiffness: 100,
-                        damping: 15
+                        stiffness: 120,
+                        damping: 16
                     }}
-                    className="mb-10 relative"
+                    className="mb-8 relative"
                 >
-                    <motion.div
-                        className="absolute inset-0 blur-3xl"
-                        animate={{
-                            opacity: [0.2, 0.4, 0.2],
-                        }}
-                        transition={{ duration: 3, repeat: Infinity }}
-                        style={{
-                            background: 'radial-gradient(circle, rgba(220,38,38,0.3) 0%, transparent 70%)',
-                        }}
-                    />
-                    <h1 className="text-7xl sm:text-8xl md:text-[12rem] font-black tracking-tighter relative">
-                        <motion.span
-                            className="text-black inline-block"
-                            initial={{ x: -100, opacity: 0 }}
-                            animate={{ x: 0, opacity: 1 }}
-                            transition={{ duration: 0.8, delay: 0.2 }}
-                        >
+                    <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter">
+                        <motion.span className="text-black inline-block" initial={{ x: -60, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: 0.6 }}>
                             hi
                         </motion.span>
-                        <motion.span
-                            className="text-red-600 inline-block"
-                            initial={{ x: 100, opacity: 0 }}
-                            animate={{ x: 0, opacity: 1 }}
-                            transition={{ duration: 0.8, delay: 0.4 }}
-                        >
+                        <motion.span className="text-red-600 inline-block" initial={{ x: 60, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: 0.6, delay: 0.15 }}>
                             ve+
                         </motion.span>
                     </h1>
 
-                    {/* Underline decoration */}
+                    {/* Underline decoration (non-layout changing) */}
                     <motion.div
-                        className="h-2 bg-gradient-to-r from-transparent via-red-600 to-transparent mx-auto mt-4"
-                        initial={{ width: 0, opacity: 0 }}
-                        animate={{ width: '60%', opacity: 1 }}
-                        transition={{ duration: 1, delay: 0.8 }}
+                        className="h-1.5 bg-gradient-to-r from-transparent via-red-600 to-transparent mx-auto mt-4 w-3/5"
+                        initial={{ scaleX: 0 }}
+                        animate={{ scaleX: 1 }}
+                        transition={{ duration: 0.9, delay: 0.2 }}
+                        style={{ transformOrigin: 'left' }}
                     />
                 </motion.div>
 
-                {/* Tagline with enhanced typography */}
-                <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, delay: 0.6 }}
-                    className="space-y-4 mb-10"
-                >
-                    <p className="text-2xl sm:text-3xl md:text-4xl text-gray-900 max-w-4xl mx-auto font-bold tracking-tight">
+                {/* Tagline */}
+                <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.25 }} className="space-y-3 mb-8">
+                    <p className="text-lg sm:text-2xl md:text-3xl text-gray-900 max-w-3xl mx-auto font-bold tracking-tight">
                         ADVANCED TACTICAL DRONE SYSTEMS
                     </p>
-                    <motion.p
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: 0.8, delay: 1 }}
-                        className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto font-medium"
-                    >
+                    <p className="text-sm sm:text-base text-gray-600 max-w-2xl mx-auto font-medium">
                         Precision-engineered for modern defense • Field-tested • Mission-ready
-                    </motion.p>
+                    </p>
                 </motion.div>
 
-                {/* CTA Buttons */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, delay: 1 }}
-                    className="flex flex-col sm:flex-row gap-4 justify-center items-center"
-                >
+                {/* CTA Buttons (keep animations subtle on mobile) */}
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6, delay: 0.4 }} className="flex flex-col sm:flex-row gap-3 justify-center items-center">
                     <motion.button
-                        className="px-8 py-4 bg-black text-white font-bold rounded-xl shadow-2xl hover:shadow-red-500/20 transition-all inline-flex items-center gap-3 group relative overflow-hidden"
-                        whileHover={{ scale: 1.05, y: -2 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={() => document.getElementById('products').scrollIntoView({ behavior: 'smooth' })}
+                        className="px-6 sm:px-8 py-3 bg-black text-white font-bold rounded-lg shadow-lg inline-flex items-center gap-3"
+                        whileHover={!prefersReducedMotion && !isMobile ? { scale: 1.04, y: -2 } : {}}
+                        whileTap={!prefersReducedMotion ? { scale: 0.97 } : {}}
+                        onClick={() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })}
                     >
-                        <motion.div
-                            className="absolute inset-0 bg-gradient-to-r from-red-600 to-black"
-                            initial={{ x: '-100%' }}
-                            whileHover={{ x: 0 }}
-                            transition={{ duration: 0.3 }}
-                        />
                         <span className="relative z-10 tracking-wider">EXPLORE PRODUCTS</span>
-                        <motion.svg
-                            className="w-5 h-5 relative z-10"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                            animate={{ y: [0, 3, 0] }}
-                            transition={{ duration: 1.5, repeat: Infinity }}
-                        >
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                        </motion.svg>
                     </motion.button>
 
                     <motion.a
                         href="tel:+919920887455"
-                        className="px-8 py-4 bg-white text-black font-bold rounded-xl border-2 border-black hover:bg-black hover:text-white shadow-lg transition-all inline-flex items-center gap-3 group"
-                        whileHover={{ scale: 1.05, y: -2 }}
-                        whileTap={{ scale: 0.95 }}
+                        className="px-6 sm:px-8 py-3 bg-white text-black font-bold rounded-lg border-2 border-black inline-flex items-center gap-3"
+                        whileHover={!prefersReducedMotion && !isMobile ? { scale: 1.04, y: -2 } : {}}
                     >
-                        <motion.svg
-                            className="w-5 h-5"
-                            animate={{ rotate: [0, -15, 15, -15, 0] }}
-                            transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 2 }}
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                        </motion.svg>
-                        <span className="tracking-wider">CONTACT NOW</span>
+                        <span>CONTACT NOW</span>
                     </motion.a>
-                </motion.div>
-
-                {/* Trust badges */}
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.8, delay: 1.8 }}
-                    className="mt-12 flex flex-wrap justify-center items-center gap-6"
-                >
-                    {[
-                        { icon: '🛡️', text: 'Field Tested' },
-                        { icon: '⚡', text: 'Rapid Deploy' },
-                        { icon: '🎯', text: 'Precision Systems' },
-                        { icon: '🔧', text: 'Full Support' }
-                    ].map((badge, idx) => (
-                        <motion.div
-                            key={idx}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 2 + idx * 0.1 }}
-                            className="flex items-center gap-2 px-4 py-2 bg-white/60 backdrop-blur-sm rounded-full border border-gray-200 shadow-sm hover:shadow-md transition-all"
-                            whileHover={{ scale: 1.05 }}
-                        >
-                            <span className="text-lg">{badge.icon}</span>
-                            <span className="text-sm font-semibold text-gray-700">{badge.text}</span>
-                        </motion.div>
-                    ))}
                 </motion.div>
             </motion.div>
         </section>
