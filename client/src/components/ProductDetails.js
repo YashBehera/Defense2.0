@@ -906,7 +906,7 @@ Phone: ${CONSTANTS.CONTACT_PHONE}
                                     <img
                                         src={imageError ? '/api/placeholder/600/500' : product.image}
                                         alt={`${product.name} - ${product.model}`}
-                                        className={`w-full h-[250px] sm:h-[350px] lg:h-[400px] object-fill transition-all duration-700 ${imageLoading ? 'opacity-0 scale-110' : 'opacity-100 scale-100'
+                                        className={`w-full h-[220px] sm:h-[350px] lg:h-[420px] object-cover transition-all duration-700 ${imageLoading ? 'opacity-0 scale-110' : 'opacity-100 scale-100'
                                             }`}
                                         loading="lazy"
                                         onError={(e) => {
