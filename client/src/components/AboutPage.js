@@ -42,13 +42,13 @@ const AboutPage = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-black text-white">
+        <div className="min-h-screen bg-white text-gray-900">
             {/* Hero Section */}
             <section className="relative h-screen flex items-center justify-center overflow-hidden">
                 <div className="absolute inset-0">
-                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/50 to-black"></div>
-                    <div className="absolute top-20 left-10 w-96 h-96 bg-orange-600/10 rounded-full blur-3xl"></div>
-                    <div className="absolute bottom-20 right-10 w-96 h-96 bg-green-600/10 rounded-full blur-3xl"></div>
+                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/80 to-white"></div>
+                    <div className="absolute top-20 left-10 w-96 h-96 bg-orange-100 rounded-full blur-3xl opacity-80"></div>
+                    <div className="absolute bottom-20 right-10 w-96 h-96 bg-red-100 rounded-full blur-3xl opacity-80"></div>
                 </div>
 
                 <div className="relative z-10 text-center max-w-4xl mx-auto px-6">
@@ -56,10 +56,10 @@ const AboutPage = () => {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8 }}
-                        className="text-5xl md:text-7xl font-bold mb-6"
+                        className="text-5xl md:text-7xl font-bold mb-6 text-gray-900"
                     >
                         DEFENDING THE NATION'S
-                        <span className="block text-transparent bg-gradient-to-r from-orange-500 to-green-500 bg-clip-text">
+                        <span className="block text-transparent bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text">
                             SOVEREIGNTY
                         </span>
                     </motion.h1>
@@ -67,7 +67,7 @@ const AboutPage = () => {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8, delay: 0.2 }}
-                        className="text-xl text-gray-400 mb-8"
+                        className="text-xl text-gray-700 mb-8"
                     >
                         Pioneering indigenous defense technology for a self-reliant India
                     </motion.p>
@@ -75,7 +75,7 @@ const AboutPage = () => {
             </section>
 
             {/* Mission & Vision */}
-            <section className="py-20 border-t border-gray-900">
+            <section className="py-20 border-t border-gray-100">
                 <div className="container mx-auto px-6">
                     <div className="grid lg:grid-cols-2 gap-12">
                         <motion.div
@@ -88,7 +88,7 @@ const AboutPage = () => {
                                 <h2 className="text-4xl font-bold mb-4">
                                     OUR <span className="text-gray-500">MISSION</span>
                                 </h2>
-                                <p className="text-gray-400 text-lg">
+                                <p className="text-gray-700 text-lg">
                                     To develop and deliver cutting-edge autonomous defense systems that enhance
                                     India's strategic capabilities while maintaining the highest standards of
                                     reliability, innovation, and operational excellence.
@@ -99,7 +99,7 @@ const AboutPage = () => {
                                 <h2 className="text-4xl font-bold mb-4">
                                     OUR <span className="text-gray-500">VISION</span>
                                 </h2>
-                                <p className="text-gray-400 text-lg">
+                                <p className="text-gray-700 text-lg">
                                     To be the leading indigenous defense technology company, making India
                                     self-reliant in critical defense systems and establishing our nation as
                                     a global leader in autonomous military platforms.
@@ -111,9 +111,9 @@ const AboutPage = () => {
                             initial={{ opacity: 0, x: 50 }}
                             whileInView={{ opacity: 1, x: 0 }}
                             transition={{ duration: 0.8 }}
-                            className="bg-gradient-to-br from-gray-900 to-black border border-gray-800 rounded-lg p-8"
+                            className="bg-white border border-gray-200 rounded-lg p-8 shadow-sm"
                         >
-                            <h3 className="text-2xl font-bold mb-6">Core Values</h3>
+                            <h3 className="text-2xl font-bold mb-6 text-gray-900">Core Values</h3>
                             <div className="space-y-4">
                                 {[
                                     { icon: '🛡️', title: 'National Security First', desc: 'Unwavering commitment to India\'s defense' },
@@ -124,8 +124,8 @@ const AboutPage = () => {
                                     <div key={idx} className="flex items-start space-x-4">
                                         <span className="text-2xl">{value.icon}</span>
                                         <div>
-                                            <h4 className="text-white font-semibold">{value.title}</h4>
-                                            <p className="text-gray-500 text-sm">{value.desc}</p>
+                                            <h4 className="text-gray-900 font-semibold">{value.title}</h4>
+                                            <p className="text-gray-600 text-sm">{value.desc}</p>
                                         </div>
                                     </div>
                                 ))}
@@ -136,19 +136,19 @@ const AboutPage = () => {
             </section>
 
             {/* Journey Timeline */}
-            <section className="py-20 bg-gradient-to-b from-transparent via-gray-950 to-transparent">
+            <section className="py-20 bg-gradient-to-b from-transparent via-gray-50 to-transparent">
                 <div className="container mx-auto px-6">
                     <motion.h2
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8 }}
-                        className="text-4xl font-bold text-center mb-16"
+                        className="text-4xl font-bold text-center mb-16 text-gray-900"
                     >
                         OUR <span className="text-gray-500">JOURNEY</span>
                     </motion.h2>
 
                     <div className="relative">
-                        <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-0.5 bg-gradient-to-b from-orange-600 via-white to-green-600"></div>
+                        <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-0.5 bg-red-100"></div>
 
                         {milestones.map((milestone, index) => (
                             <motion.div
@@ -161,12 +161,12 @@ const AboutPage = () => {
                             >
                                 <div className={`w-1/2 ${index % 2 === 0 ? 'pr-8 text-right' : 'pl-8'}`}>
                                     <div className={`inline-block ${index % 2 === 0 ? 'text-right' : ''}`}>
-                                        <span className="text-3xl font-bold text-orange-500">{milestone.year}</span>
-                                        <h3 className="text-xl font-semibold mt-2 mb-2">{milestone.event}</h3>
-                                        <p className="text-gray-400">{milestone.description}</p>
+                                        <span className="text-3xl font-bold text-red-500">{milestone.year}</span>
+                                        <h3 className="text-xl font-semibold mt-2 mb-2 text-gray-900">{milestone.event}</h3>
+                                        <p className="text-gray-600">{milestone.description}</p>
                                     </div>
                                 </div>
-                                <div className="absolute left-1/2 transform -translate-x-1/2 w-4 h-4 bg-white rounded-full border-4 border-black"></div>
+                                <div className="absolute left-1/2 transform -translate-x-1/2 w-4 h-4 bg-white rounded-full border-4 border-red-200"></div>
                             </motion.div>
                         ))}
                     </div>
@@ -180,7 +180,7 @@ const AboutPage = () => {
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8 }}
-                        className="text-4xl font-bold text-center mb-16"
+                        className="text-4xl font-bold text-center mb-16 text-gray-900"
                     >
                         LEADERSHIP <span className="text-gray-500">TEAM</span>
                     </motion.h2>
@@ -192,15 +192,15 @@ const AboutPage = () => {
                                 initial={{ opacity: 0, y: 30 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                                className="bg-gradient-to-br from-gray-900 to-black border border-gray-800 rounded-lg p-6 text-center"
+                                className="bg-white border border-gray-200 rounded-lg p-6 text-center shadow-sm"
                             >
-                                <div className="w-32 h-32 mx-auto mb-4 rounded-full overflow-hidden bg-gray-800">
+                                <div className="w-32 h-32 mx-auto mb-4 rounded-full overflow-hidden bg-gray-100">
                                     <img src={leader.image} alt={leader.name} className="w-full h-full object-cover" />
                                 </div>
-                                <h3 className="text-xl font-semibold text-white mb-1">{leader.name}</h3>
-                                <p className="text-orange-500 text-sm mb-3">{leader.position}</p>
-                                <p className="text-gray-400 text-sm mb-4">{leader.bio}</p>
-                                <a href={leader.linkedin} className="text-gray-500 hover:text-white transition-colors">
+                                <h3 className="text-xl font-semibold text-gray-900 mb-1">{leader.name}</h3>
+                                <p className="text-red-500 text-sm mb-3">{leader.position}</p>
+                                <p className="text-gray-600 text-sm mb-4">{leader.bio}</p>
+                                <a href={leader.linkedin} className="text-gray-500 hover:text-gray-900 transition-colors">
                                     <svg className="w-5 h-5 mx-auto" fill="currentColor" viewBox="0 0 24 24">
                                         <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
                                     </svg>
@@ -212,16 +212,16 @@ const AboutPage = () => {
             </section>
 
             {/* Call to Action */}
-            <section className="py-20 border-t border-gray-900">
+            <section className="py-20 border-t border-gray-100">
                 <div className="container mx-auto px-6 text-center">
-                    <h2 className="text-3xl font-bold mb-8">
+                    <h2 className="text-3xl font-bold mb-8 text-gray-900">
                         Join Us in Building India's Defense Future
                     </h2>
                     <div className="flex flex-wrap gap-4 justify-center">
-                        <a href="#careers" className="px-8 py-3 bg-gradient-to-r from-orange-600 to-orange-500 text-white font-semibold hover:from-orange-700 hover:to-orange-600 transition-all">
+                        <a href="#careers" className="px-8 py-3 bg-gradient-to-r from-orange-500 to-orange-400 text-white font-semibold hover:from-orange-600 hover:to-orange-500 transition-all rounded-md shadow">
                             View Careers
                         </a>
-                        <a href="/contact" className="px-8 py-3 border border-gray-700 text-white font-semibold hover:bg-gray-800 transition-all">
+                        <a href="/contact" className="px-8 py-3 border border-gray-300 text-gray-900 font-semibold hover:bg-gray-50 transition-all rounded-md">
                             Partner With Us
                         </a>
                     </div>
