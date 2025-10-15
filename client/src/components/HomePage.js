@@ -733,7 +733,7 @@ const HomePage = () => {
               {...motionConfig}
               variants={slideInVariants.right}
               whileInView="animate"
-              viewport={viewportOptions}s
+              viewport={viewportOptions}
               className="relative mt-8 lg:mt-0"
             >
               <ProfessionalRadar shouldReduceMotion={shouldReduceMotion} />

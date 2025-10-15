@@ -203,7 +203,7 @@ const ProductCard = ({ product, index, onCompare, isComparing, onShare }) => {
           {/* Image Section */}
           <div className="relative w-full bg-gradient-to-br from-gray-950 via-gray-900 to-black overflow-hidden">
             <motion.div
-              className="relative w-full aspect-[2/1] h-[300px] overflow-hidden"
+              className="relative w-full aspect-video sm:aspect-[2/1] h-[220px] sm:h-[300px] overflow-hidden"
               animate={isHovered ? { scale: 1.05 } : { scale: 1 }}
               transition={{ duration: 0.6, ease: 'easeOut' }}
             >
@@ -260,7 +260,7 @@ const ProductCard = ({ product, index, onCompare, isComparing, onShare }) => {
               <motion.img
                 src={product.image || '/api/placeholder/1000/500'}
                 alt={`${product.name} - ${product.model}`}
-                className="w-full h-full object-fill"
+                className="w-full h-full object-cover"
                 loading="lazy"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: imageLoaded ? 1 : 0.5 }}

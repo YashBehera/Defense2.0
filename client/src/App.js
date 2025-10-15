@@ -20,7 +20,7 @@ function App() {
         </Routes>
         
         {/* Global Footer */}
-        <footer className="bg-gray-950 border-t border-gray-900 py-8">
+        <footer className="bg-gray-950 border-t border-gray-900 py-8 pb-[max(1rem,env(safe-area-inset-bottom))]">
           <div className="container mx-auto px-6">
             <div className="flex flex-wrap justify-between items-center">
               <div>

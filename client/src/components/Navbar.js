@@ -71,12 +71,12 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className={`sticky top-0 w-full z-50 transition-all duration-500 ${
+      <nav className={`sticky top-0 w-full z-50 transition-all duration-500 pt-[max(0.75rem,env(safe-area-inset-top))] ${
         scrolled 
           ? 'bg-white shadow-lg border-b border-gray-200 py-3' 
           : 'bg-transparent py-4'
       }`}>
-        <div className="container mx-auto px-6">
+        <div className="container mx-auto px-4 sm:px-6">
           <div className="flex justify-between items-center">
             {/* Logo Section - Also clickable to go home */}
             <div 
@@ -89,7 +89,7 @@ const Navbar = () => {
 
               <div className="border-l-2 border-red-600 pl-4">
                 <h1 className="text-xl font-bold tracking-tight leading-tight">
-                  <span className={`${scrolled ? 'text-gray-900' : 'text-gray-900'}`}>hi</span>
+                  <span className={`${scrolled ? 'text-gray-900' : 'text-white'}`}>hi</span>
                   <span className="text-red-600 font-extrabold">ve+</span>
                 </h1>
                 <p className={`text-[10px] tracking-[0.2em] uppercase font-medium ${scrolled ? 'text-gray-600' : 'text-gray-300'}`}>
@@ -116,7 +116,7 @@ const Navbar = () => {
                           ? 'text-red-600' 
                           : scrolled 
                             ? 'text-gray-900 hover:text-red-600' 
-                            : 'text-black hover:text-red-600'
+                            : 'text-white hover:text-red-600'
                       }`}
                     >
                       <span>{link.label}</span>
