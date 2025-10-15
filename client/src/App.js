@@ -76,33 +76,6 @@ function App() {
                 </ul>
               </div>
 
-              {/* Products */}
-              <div>
-                <h4 className="text-white font-semibold mb-4">Our Solutions</h4>
-                <ul className="space-y-2">
-                  <li>
-                    <a href="/products" className="text-sm hover:text-red-500 transition-colors">
-                      Cruise Kamikaze Drone
-                    </a>
-                  </li>
-                  <li>
-                    <a href="/products" className="text-sm hover:text-red-500 transition-colors">
-                      Surveillance Systems
-                    </a>
-                  </li>
-                  <li>
-                    <a href="/products" className="text-sm hover:text-red-500 transition-colors">
-                      Autonomous Platforms
-                    </a>
-                  </li>
-                  <li>
-                    <a href="/products" className="text-sm hover:text-red-500 transition-colors">
-                      Custom Solutions
-                    </a>
-                  </li>
-                </ul>
-              </div>
-
               {/* Contact Info */}
               <div>
                 <h4 className="text-white font-semibold mb-4">Get in Touch</h4>
@@ -153,7 +126,7 @@ function App() {
             <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
               <div className="text-center md:text-left">
                 <p className="text-gray-500 text-sm">
-                  © 2024 FlyHive Technologies Pvt Ltd. All rights reserved.
+                  © 2025 FlyHive Technologies Pvt Ltd. All rights reserved.
                 </p>
                 <p className="text-gray-600 text-xs mt-1">
                   For product demonstrations, technical support, or deployment inquiries

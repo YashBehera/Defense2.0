@@ -800,65 +800,9 @@ const HomePage = () => {
           </motion.div>
         </div>
       </section>
-
-      {/* Partners Section */}
-      <section className="py-12 sm:py-16 md:py-20 bg-white relative overflow-hidden">
-        {!shouldReduceMotion && (
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 50, repeat: Infinity, ease: 'linear' }}
-            className="absolute top-0 right-0 w-64 h-64 sm:w-96 sm:h-96 bg-gradient-to-br from-red-100 to-transparent rounded-full blur-3xl opacity-10"
-          />
-        )}
-
-        <div className="container mx-auto px-4 sm:px-6 relative z-10">
-          <motion.div
-            {...motionConfig}
-            variants={fadeInUpVariants}
-            whileInView="animate"
-            viewport={viewportOptions}
-            className="text-center"
-          >
-            <motion.p
-              className="text-gray-400 text-xs sm:text-sm tracking-wider mb-8 sm:mb-12 font-semibold"
-              whileHover={!shouldReduceMotion ? { scale: 1.05 } : {}}
-              transition={transitions.default}
-            >
-              TRUSTED BY INDIA'S DEFENSE FORCES
-            </motion.p>
-            <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10 md:gap-14">
-              {[
-                { name: 'INDIAN ARMY', abbr: 'IA', gradient: 'from-green-600 to-green-800' },
-                { name: 'INDIAN NAVY', abbr: 'IN', gradient: 'from-blue-600 to-blue-800' },
-                { name: 'INDIAN AIR FORCE', abbr: 'IAF', gradient: 'from-sky-600 to-sky-800' },
-                { name: 'DRDO', abbr: 'DRDO', gradient: 'from-purple-600 to-purple-800' },
-                { name: 'HAL', abbr: 'HAL', gradient: 'from-orange-600 to-orange-800' },
-                { name: 'BDL', abbr: 'BDL', gradient: 'from-red-600 to-red-800' },
-              ].map((partner, index) => (
-                <motion.div
-                  key={index}
-                  {...motionConfig}
-                  variants={scaleVariants}
-                  whileInView="animate"
-                  viewport={viewportOptions}
-                  transition={{ ...transitions.spring, delay: shouldReduceMotion ? 0 : index * 0.08 }}
-                  whileHover={!shouldReduceMotion ? { scale: 1.08, y: -6 } : {}}
-                  className="group cursor-pointer w-28 sm:w-32"
-                >
-                  <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 font-bold text-xs sm:text-sm shadow-md relative overflow-hidden mx-auto">
-                    <div className={`absolute inset-0 bg-gradient-to-br ${partner.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
-                    <span className="relative z-10 group-hover:text-white transition-colors duration-300">{partner.abbr}</span>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-2 sm:mt-3 text-center font-medium">{partner.name}</p>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
+      
       {/* Contact Section */}
-      <section id="contact" className="py-12 sm:py-16 md:py-20 lg:py-24 bg-gray-50 relative overflow-hidden">
+      <section id="contact" className="py-12 sm:py-16 md:py-20 lg:py-24 bg-white-50 relative overflow-hidden">
         {!shouldReduceMotion && (
           <motion.div
             animate={{
