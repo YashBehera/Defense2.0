@@ -1,0 +1,72 @@
+/* smoothAnimations.css */
+
+/* Enable hardware acceleration for all animated elements */
+* {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* Optimize will-change for animated elements */
+  .will-change-transform {
+    will-change: transform;
+  }
+  
+  .will-change-opacity {
+    will-change: opacity;
+  }
+  
+  /* Remove will-change after animation completes */
+  .animation-complete {
+    will-change: auto;
+  }
+  
+  /* Smooth scrolling */
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  /* Prevent layout shift during animations */
+  img, video {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  /* GPU acceleration for transforms */
+  .gpu-accelerated {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+  }
+  
+  /* Smooth transitions for interactive elements */
+  button, a, input, textarea {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  /* Reduce motion for users who prefer it */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+  
+  /* Optimize for mobile devices */
+  @media (max-width: 768px) {
+    * {
+      /* Reduce animation complexity on mobile */
+      animation-timing-function: ease-out !important;
+    }
+  }
+  
+  /* Prevent flickering on iOS */
+  @supports (-webkit-touch-callout: none) {
+    * {
+      -webkit-transform: translateZ(0);
+      -webkit-backface-visibility: hidden;
+    }
+  }
