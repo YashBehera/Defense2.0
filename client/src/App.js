@@ -6,9 +6,13 @@ import ProductsPage from './components/ProductsPage';
 import AboutPage from './components/AboutPage';
 import ContactPage from './components/ContactPage';
 import ProductDetails from './components/ProductDetails';
+import ScrollToTop from './components/ScrollToTop';
+
 function App() {
   return (
     <Router>
+      {/* scroll to top on navigation / reload */}
+      <ScrollToTop />
       <div className="min-h-screen">
         <Navbar />
         <Routes>
