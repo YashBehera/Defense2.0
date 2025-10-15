@@ -58,9 +58,9 @@ const AboutPage = () => {
                         transition={{ duration: 0.8 }}
                         className="text-5xl md:text-7xl font-bold mb-6 text-gray-900"
                     >
-                        DEFENDING THE NATION'S
+                        NEXT - GEN TACTICAL UAV SOULTIONS
                         <span className="block text-transparent bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text">
-                            SOVEREIGNTY
+                            FOR INDIA'S SECURITY
                         </span>
                     </motion.h1>
                     <motion.p

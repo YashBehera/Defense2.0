@@ -158,7 +158,6 @@ const HomePage = () => {
           className="w-full h-full object-cover gpu-accelerated"
           style={{ pointerEvents: 'none' }}
         />
-        <div className="absolute inset-0 bg-black/20 md:bg-transparent" />
       </motion.div>
 
       {/* Hero Section - RESPONSIVE */}
@@ -437,98 +436,65 @@ const HomePage = () => {
           </div>
 
           {/* Advanced Capabilities */}
-          <motion.div
+          <motion.section
             {...motionConfig}
             variants={fadeInUpVariants}
             whileInView="animate"
             viewport={viewportOptions}
-            className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-6 sm:p-8 md:p-10 lg:p-12 border border-gray-200 relative overflow-hidden"
+            className="bg-white rounded-2xl p-6 sm:p-8 md:p-10 lg:p-12 border border-gray-200 relative overflow-hidden"
+            aria-labelledby="advanced-capabilities-heading"
           >
+            {/* Decorative background kept minimal on smaller screens to preserve performance */}
             {!shouldReduceMotion && (
-              <motion.div
-                animate={{
-                  backgroundPosition: ['0% 0%', '100% 100%'],
-                }}
-                transition={{ duration: 20, repeat: Infinity, repeatType: 'reverse' }}
-                className="absolute inset-0 opacity-5"
+              <div
+                aria-hidden="true"
+                className="hidden md:block absolute inset-0 opacity-5"
                 style={{
-                  backgroundImage:
-                    'radial-gradient(circle at 2px 2px, #dc2626 1px, transparent 0)',
+                  backgroundImage: `radial-gradient(circle at 2px 2px, rgba(220,38,38,0.9) 1px, transparent 0)`,
                   backgroundSize: '40px 40px',
                 }}
               />
             )}
-            <motion.h3
-              className="text-2xl sm:text-3xl font-bold mb-8 sm:mb-12 text-center text-gray-900 relative z-10"
-              {...motionConfig}
-              variants={scaleVariants}
-              whileInView="animate"
-              viewport={viewportOptions}
-            >
+
+            <h3 id="advanced-capabilities-heading" className="text-2xl sm:text-3xl font-bold mb-6 text-center text-gray-900 relative z-10">
               Advanced Capabilities
-            </motion.h3>
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={shouldReduceMotion ? 'static' : activeFeature}
-                {...motionConfig}
-                variants={fadeInVariants}
-                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8 relative z-10"
-              >
-                {featuredProduct.keyFeatures
-                  .slice(shouldReduceMotion ? 0 : activeFeature, shouldReduceMotion ? 4 : activeFeature + 4)
-                  .map((feature, index) => (
-                    <motion.div
-                      key={index}
-                      {...motionConfig}
-                      variants={fadeInUpVariants}
-                      transition={{ ...transitions.default, delay: shouldReduceMotion ? 0 : index * 0.1 }}
-                      whileHover={!shouldReduceMotion ? { y: -10, scale: 1.05 } : {}}
-                      className="bg-white rounded-xl p-5 sm:p-6 shadow-md border border-gray-100 cursor-pointer relative overflow-hidden group gpu-accelerated"
-                    >
-                      <motion.div
-                        className="absolute inset-0 bg-gradient-to-br from-red-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                      />
-                      <motion.div
-                        className="text-3xl sm:text-4xl mb-3 sm:mb-4 relative z-10"
-                        whileHover={!shouldReduceMotion ? { scale: 1.3 } : {}}
-                        transition={transitions.spring}
-                      >
-                        {feature.icon}
-                      </motion.div>
-                      <h4 className="text-gray-900 font-bold text-base sm:text-lg mb-2 relative z-10">
-                        {feature.title}
-                      </h4>
-                      <p className="text-gray-600 text-xs sm:text-sm leading-relaxed relative z-10">
-                        {feature.description}
-                      </p>
-                    </motion.div>
-                  ))}
-              </motion.div>
-            </AnimatePresence>
-          </motion.div>
+            </h3>
+
+            <div className="relative z-10">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
+                {featuredProduct.keyFeatures.map((feature, index) => (
+                  <motion.div
+                    key={index}
+                    initial={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
+                    whileInView={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.45, delay: shouldReduceMotion ? 0 : index * 0.06 }}
+                    whileHover={!shouldReduceMotion ? { y: -6, scale: 1.03 } : {}}
+                    className="bg-white rounded-xl p-5 sm:p-6 shadow-sm border border-gray-100 cursor-default relative overflow-hidden"
+                    aria-hidden={false}
+                  >
+                    <div className="flex items-start gap-4">
+                      <div className="text-3xl sm:text-4xl flex-shrink-0">{feature.icon}</div>
+                      <div>
+                        <div className="text-sm sm:text-base font-bold text-gray-900">{feature.title}</div>
+                        <p className="text-xs sm:text-sm text-gray-600 mt-1 leading-relaxed">{feature.description}</p>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </motion.section>
         </div>
       </section>
 
       {/* Technology Section */}
       <section id="technology" className="py-12 sm:py-16 md:py-20 lg:py-24 bg-gradient-to-b from-white to-gray-50 relative overflow-hidden">
+        {/* Decorative elements hidden on small screens to improve performance */}
         {!shouldReduceMotion && (
           <>
-            <motion.div
-              animate={{
-                y: [0, -20, 0],
-                rotateZ: [0, 5, 0],
-              }}
-              transition={{ duration: 10, repeat: Infinity, ease: easings.smooth }}
-              className="absolute top-20 right-10 w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-red-200 to-red-400 rounded-full blur-3xl opacity-10"
-            />
-            <motion.div
-              animate={{
-                y: [0, 20, 0],
-                rotateZ: [0, -5, 0],
-              }}
-              transition={{ duration: 12, repeat: Infinity, ease: easings.smooth }}
-              className="absolute bottom-20 left-10 w-32 h-32 sm:w-40 sm:h-40 bg-gradient-to-br from-gray-200 to-gray-400 rounded-full blur-3xl opacity-10"
-            />
+            <div className="hidden lg:block absolute top-20 right-10 w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-red-200 to-red-400 rounded-full blur-3xl opacity-10" aria-hidden="true" />
+            <div className="hidden lg:block absolute bottom-20 left-10 w-32 h-32 sm:w-40 sm:h-40 bg-gradient-to-br from-gray-200 to-gray-400 rounded-full blur-3xl opacity-10" aria-hidden="true" />
           </>
         )}
 
@@ -572,7 +538,7 @@ const HomePage = () => {
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
             {[
               {
                 title: 'AI-Powered Autonomy',
@@ -733,7 +699,7 @@ const HomePage = () => {
               {...motionConfig}
               variants={slideInVariants.right}
               whileInView="animate"
-              viewport={viewportOptions}s
+              viewport={viewportOptions}
               className="relative mt-8 lg:mt-0"
             >
               <ProfessionalRadar shouldReduceMotion={shouldReduceMotion} />
@@ -812,29 +778,21 @@ const HomePage = () => {
             <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 justify-center px-4">
               <motion.a
                 href="#contact"
-                whileHover={!shouldReduceMotion ? { scale: 1.08, y: -4 } : {}}
-                whileTap={!shouldReduceMotion ? { scale: 0.95 } : {}}
+                whileHover={!shouldReduceMotion ? { scale: 1.04, y: -2 } : {}}
+                whileTap={!shouldReduceMotion ? { scale: 0.98 } : {}}
                 transition={transitions.default}
-                className="px-8 sm:px-10 py-3 sm:py-4 bg-red-600 text-white rounded-lg font-bold shadow-lg relative overflow-hidden group text-center gpu-accelerated"
+                className="w-full sm:w-auto px-6 sm:px-10 py-3 sm:py-4 bg-red-600 text-white rounded-lg font-bold shadow-lg relative overflow-hidden group text-center gpu-accelerated"
+                aria-label="Schedule Demonstration"
               >
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-red-700 to-red-800"
-                  initial={{ x: '-100%' }}
-                  whileHover={!shouldReduceMotion ? { x: 0 } : {}}
-                  transition={transitions.default}
-                />
                 <span className="relative z-10">Schedule Demonstration</span>
               </motion.a>
               <motion.a
                 href="#download"
-                whileHover={!shouldReduceMotion ? {
-                  scale: 1.08,
-                  y: -4,
-                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                } : {}}
-                whileTap={!shouldReduceMotion ? { scale: 0.95 } : {}}
+                whileHover={!shouldReduceMotion ? { scale: 1.04, y: -2 } : {}}
+                whileTap={!shouldReduceMotion ? { scale: 0.98 } : {}}
                 transition={transitions.default}
-                className="px-8 sm:px-10 py-3 sm:py-4 border-2 border-white text-white rounded-lg font-bold shadow-lg text-center gpu-accelerated"
+                className="w-full sm:w-auto px-6 sm:px-10 py-3 sm:py-4 border-2 border-white text-white rounded-lg font-bold shadow-lg text-center gpu-accelerated"
+                aria-label="Download Brochure"
               >
                 Download Brochure
               </motion.a>
@@ -868,7 +826,7 @@ const HomePage = () => {
             >
               TRUSTED BY INDIA'S DEFENSE FORCES
             </motion.p>
-            <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-12 md:gap-16">
+            <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10 md:gap-14">
               {[
                 { name: 'INDIAN ARMY', abbr: 'IA', gradient: 'from-green-600 to-green-800' },
                 { name: 'INDIAN NAVY', abbr: 'IN', gradient: 'from-blue-600 to-blue-800' },
@@ -883,29 +841,15 @@ const HomePage = () => {
                   variants={scaleVariants}
                   whileInView="animate"
                   viewport={viewportOptions}
-                  transition={{
-                    ...transitions.spring,
-                    delay: shouldReduceMotion ? 0 : index * 0.1,
-                  }}
-                  whileHover={!shouldReduceMotion ? { scale: 1.15, y: -10 } : {}}
-                  className="group cursor-pointer"
+                  transition={{ ...transitions.spring, delay: shouldReduceMotion ? 0 : index * 0.08 }}
+                  whileHover={!shouldReduceMotion ? { scale: 1.08, y: -6 } : {}}
+                  className="group cursor-pointer w-28 sm:w-32"
                 >
-                  <motion.div
-                    className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 font-bold text-xs sm:text-sm shadow-md relative overflow-hidden gpu-accelerated"
-                  >
-                    <motion.div
-                      className={`absolute inset-0 bg-gradient-to-br ${partner.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`}
-                    />
-                    <span className="relative z-10 group-hover:text-white transition-colors duration-300">
-                      {partner.abbr}
-                    </span>
-                  </motion.div>
-                  <motion.p
-                    className="text-xs text-gray-500 mt-2 sm:mt-3 text-center font-medium"
-                    whileHover={!shouldReduceMotion ? { scale: 1.1 } : {}}
-                  >
-                    {partner.name}
-                  </motion.p>
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 font-bold text-xs sm:text-sm shadow-md relative overflow-hidden mx-auto">
+                    <div className={`absolute inset-0 bg-gradient-to-br ${partner.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
+                    <span className="relative z-10 group-hover:text-white transition-colors duration-300">{partner.abbr}</span>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-2 sm:mt-3 text-center font-medium">{partner.name}</p>
                 </motion.div>
               ))}
             </div>
@@ -927,7 +871,7 @@ const HomePage = () => {
         )}
 
         <div className="container mx-auto px-4 sm:px-6 relative z-10">
-          <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 md:gap-16">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 md:gap-16">
             <motion.div
               {...motionConfig}
               variants={slideInVariants.left}
@@ -1046,13 +990,7 @@ const HomePage = () => {
               </div>
             </motion.div>
 
-            <motion.div
-              {...motionConfig}
-              variants={slideInVariants.right}
-              whileInView="animate"
-              viewport={viewportOptions}
-              className="mt-8 lg:mt-0"
-            >
+            <motion.div {...motionConfig} variants={slideInVariants.right} whileInView="animate" viewport={viewportOptions} className="mt-6 lg:mt-0">
               <ProfessionalContactForm shouldReduceMotion={shouldReduceMotion} />
             </motion.div>
           </div>

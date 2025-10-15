@@ -32,9 +32,6 @@ function App() {
               {/* Company Info */}
               <div className="space-y-4">
                 <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
-                    <span className="text-red-600 font-bold text-xl">H+</span>
-                  </div>
                   <div>
                     <h3 className="text-white font-bold text-lg">HIVE+ INDUSTRIES</h3>
                   </div>

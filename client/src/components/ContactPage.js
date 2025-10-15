@@ -1,7 +1,9 @@
-import { useState } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 
 const ContactPage = () => {
+  const prefersReducedMotion = useReducedMotion();
+
   const [formData, setFormData] = useState({
     name: '',
     organization: '',
@@ -13,36 +15,11 @@ const ContactPage = () => {
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState(null);
-
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    
-    // Simulate form submission
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setSubmitStatus('success');
-      setFormData({
-        name: '',
-        organization: '',
-        email: '',
-        phone: '',
-        subject: '',
-        message: '',
-        category: 'general'
-      });
-      
-      setTimeout(() => setSubmitStatus(null), 5000);
-    }, 2000);
-  };
+  const [submitStatus, setSubmitStatus] = useState(null); // 'success' | 'error' | null
+  const [errors, setErrors] = useState({});
+  const [mapVisible, setMapVisible] = useState(false);
+  const [toast, setToast] = useState(null);
+  const toastRef = useRef(null);
 
   const contactInfo = [
     {
@@ -92,127 +69,135 @@ const ContactPage = () => {
     }
   ];
 
-  return (
-    <div className="min-h-screen bg-black text-white">
-      {/* Hero Section */}
-      <section className="relative h-[50vh] flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black"></div>
-        
-        {/* Animated Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-          }}></div>
-        </div>
+  useEffect(() => {
+    if (toast) {
+      const id = setTimeout(() => setToast(null), 4000);
+      return () => clearTimeout(id);
+    }
+  }, [toast]);
 
-        <div className="relative z-10 text-center">
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-5xl md:text-7xl font-bold mb-4"
-          >
-            GET IN <span className="text-gray-500">TOUCH</span>
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-xl text-gray-400"
-          >
-            Connect with our defense specialists for consultation
-          </motion.p>
-        </div>
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.name.trim()) newErrors.name = 'Full name is required';
+    if (!formData.email.trim()) newErrors.email = 'Email is required';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) newErrors.email = 'Please enter a valid email address';
+    if (formData.phone && !/^[\+0-9\s\-\(\)]{7,}$/.test(formData.phone)) newErrors.phone = 'Please enter a valid phone number';
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+    if (errors[name]) setErrors(prev => ({ ...prev, [name]: undefined }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!validateForm()) {
+      setToast({ type: 'error', message: 'Please fix validation errors and try again.' });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Simulate submission — replace with API call in production
+      await new Promise(res => setTimeout(res, 900));
+
+      // open mail client as fallback / integration point
+      const subject = `Inquiry: ${formData.subject || 'General Inquiry'}`;
+      const body = `${formData.message}\n\nName: ${formData.name}\nOrg: ${formData.organization}\nEmail: ${formData.email}\nPhone: ${formData.phone}`;
+      window.location.href = `mailto:info@bharathdefence.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+      setSubmitStatus('success');
+      setToast({ type: 'success', message: 'Message sent — check your email client to complete the request.' });
+
+      // reset form (keeping category helpful)
+      setFormData(prev => ({ ...prev, name: '', organization: '', email: '', phone: '', subject: '', message: '' }));
+    } catch (err) {
+      console.error(err);
+      setSubmitStatus('error');
+      setToast({ type: 'error', message: 'Failed to send. Please try again later.' });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const heroVariants = {
+    initial: { opacity: 0, y: 8 },
+    enter: { opacity: 1, y: 0, transition: { duration: 0.7 } }
+  };
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: 8 },
+    visible: (i = 0) => ({ opacity: 1, y: 0, transition: { delay: i * 0.08, duration: 0.45 } })
+  };
+
+  return (
+    <div className="min-h-screen bg-white text-gray-900">
+      {/* Hero Section */}
+      <section className="relative h-[50vh] flex items-center justify-center overflow-hidden bg-gradient-to-b from-white to-gray-50">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white" aria-hidden="true" />
+
+        <motion.div
+          initial={prefersReducedMotion ? 'enter' : 'initial'}
+          animate="enter"
+          variants={heroVariants}
+          className="relative z-10 text-center px-6 max-w-4xl mx-auto"
+        >
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 text-gray-900">GET IN <span className="text-red-600">TOUCH</span></h1>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">Connect with our defense specialists for consultation — secure channels available on request.</p>
+
+          <div className="mt-6 flex gap-3 justify-center">
+            <a href="/products" className="px-5 py-3 bg-black text-white rounded-lg font-semibold shadow-sm hover:shadow-md transition">View Products</a>
+            <button onClick={() => setMapVisible(true)} className="px-5 py-3 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition">Show Map</button>
+          </div>
+        </motion.div>
       </section>
 
       {/* Main Content */}
-      <section className="py-20">
+      <section className="py-16">
         <div className="container mx-auto px-6">
           <div className="grid lg:grid-cols-3 gap-12">
             {/* Contact Form */}
             <div className="lg:col-span-2">
-              <motion.div
-                initial={{ opacity: 0, x: -50 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.8 }}
-                className="bg-gradient-to-br from-gray-900 to-black border border-gray-800 rounded-lg p-8"
-              >
-                <h2 className="text-3xl font-bold mb-8">Send us a Message</h2>
-                
-                <form onSubmit={handleSubmit} className="space-y-6">
+              <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="bg-white border border-gray-200 rounded-lg p-8">
+                <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-gray-900">Send us a Message</h2>
+
+                <form onSubmit={handleSubmit} className="space-y-6" noValidate>
                   <div className="grid md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-400 mb-2">
-                        Full Name *
-                      </label>
-                      <input
-                        type="text"
-                        name="name"
-                        required
-                        value={formData.name}
-                        onChange={handleChange}
-                        className="w-full px-4 py-3 bg-black border border-gray-800 rounded focus:border-orange-500 focus:outline-none transition-colors"
-                        placeholder="John Doe"
-                      />
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
+                      <input name="name" type="text" value={formData.name} onChange={handleChange} disabled={isSubmitting} className={`w-full px-4 py-3 rounded border ${errors.name ? 'border-red-400' : 'border-gray-200'} focus:outline-none focus:ring-2 focus:ring-red-500`} placeholder="John Doe" aria-invalid={!!errors.name} aria-describedby={errors.name ? 'name-error' : undefined} />
+                      {errors.name && <p id="name-error" className="mt-1 text-xs text-red-600">{errors.name}</p>}
                     </div>
-                    
+
                     <div>
-                      <label className="block text-sm font-medium text-gray-400 mb-2">
-                        Organization
-                      </label>
-                      <input
-                        type="text"
-                        name="organization"
-                        value={formData.organization}
-                        onChange={handleChange}
-                        className="w-full px-4 py-3 bg-black border border-gray-800 rounded focus:border-orange-500 focus:outline-none transition-colors"
-                        placeholder="Company/Agency Name"
-                      />
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Organization</label>
+                      <input name="organization" type="text" value={formData.organization} onChange={handleChange} disabled={isSubmitting} className="w-full px-4 py-3 rounded border border-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500" placeholder="Company/Agency" />
                     </div>
                   </div>
 
                   <div className="grid md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-400 mb-2">
-                        Email Address *
-                      </label>
-                      <input
-                        type="email"
-                        name="email"
-                        required
-                        value={formData.email}
-                        onChange={handleChange}
-                        className="w-full px-4 py-3 bg-black border border-gray-800 rounded focus:border-orange-500 focus:outline-none transition-colors"
-                        placeholder="john@example.com"
-                      />
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Email Address *</label>
+                      <input name="email" type="email" value={formData.email} onChange={handleChange} disabled={isSubmitting} className={`w-full px-4 py-3 rounded border ${errors.email ? 'border-red-400' : 'border-gray-200'} focus:outline-none focus:ring-2 focus:ring-red-500`} placeholder="john@example.com" aria-invalid={!!errors.email} aria-describedby={errors.email ? 'email-error' : undefined} />
+                      {errors.email && <p id="email-error" className="mt-1 text-xs text-red-600">{errors.email}</p>}
                     </div>
-                    
+
                     <div>
-                      <label className="block text-sm font-medium text-gray-400 mb-2">
-                        Phone Number
-                      </label>
-                      <input
-                        type="tel"
-                        name="phone"
-                        value={formData.phone}
-                        onChange={handleChange}
-                        className="w-full px-4 py-3 bg-black border border-gray-800 rounded focus:border-orange-500 focus:outline-none transition-colors"
-                        placeholder="+91 98765 43210"
-                      />
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                      <input name="phone" type="tel" value={formData.phone} onChange={handleChange} disabled={isSubmitting} className={`w-full px-4 py-3 rounded border ${errors.phone ? 'border-red-400' : 'border-gray-200'} focus:outline-none focus:ring-2 focus:ring-red-500`} placeholder="+91 98765 43210" aria-invalid={!!errors.phone} aria-describedby={errors.phone ? 'phone-error' : undefined} />
+                      {errors.phone && <p id="phone-error" className="mt-1 text-xs text-red-600">{errors.phone}</p>}
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-2">
-                      Inquiry Type *
-                    </label>
-                    <select
-                      name="category"
-                      required
-                      value={formData.category}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 bg-black border border-gray-800 rounded focus:border-orange-500 focus:outline-none transition-colors"
-                    >
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Inquiry Type *</label>
+                    <select name="category" value={formData.category} onChange={handleChange} disabled={isSubmitting} className="w-full px-4 py-3 rounded border border-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500">
                       <option value="general">General Inquiry</option>
                       <option value="sales">Sales & Procurement</option>
                       <option value="technical">Technical Support</option>
@@ -222,181 +207,117 @@ const ContactPage = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-2">
-                      Subject *
-                    </label>
-                    <input
-                      type="text"
-                      name="subject"
-                      required
-                      value={formData.subject}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 bg-black border border-gray-800 rounded focus:border-orange-500 focus:outline-none transition-colors"
-                      placeholder="Brief description of your inquiry"
-                    />
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Subject *</label>
+                    <input name="subject" type="text" value={formData.subject} onChange={handleChange} disabled={isSubmitting} className="w-full px-4 py-3 rounded border border-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500" placeholder="Brief description" />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-2">
-                      Message *
-                    </label>
-                    <textarea
-                      name="message"
-                      required
-                      rows={6}
-                      value={formData.message}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 bg-black border border-gray-800 rounded focus:border-orange-500 focus:outline-none transition-colors resize-none"
-                      placeholder="Provide detailed information about your requirements..."
-                    />
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Message *</label>
+                    <textarea name="message" rows={6} value={formData.message} onChange={handleChange} disabled={isSubmitting} className="w-full px-4 py-3 rounded border border-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500 resize-vertical" placeholder="Provide detailed information about your requirements..." />
                   </div>
 
-                  <div className="flex items-center space-x-4">
-                    <button
-                      type="submit"
-                      disabled={isSubmitting}
-                      className={`px-8 py-3 font-semibold rounded transition-all ${
-                        isSubmitting 
-                          ? 'bg-gray-700 text-gray-400 cursor-not-allowed' 
-                          : 'bg-gradient-to-r from-orange-600 to-orange-500 text-white hover:from-orange-700 hover:to-orange-600'
-                      }`}
-                    >
+                  <div className="flex items-center gap-3">
+                    <motion.button whileTap={{ scale: prefersReducedMotion ? 1 : 0.98 }} type="submit" disabled={isSubmitting} className={`px-6 py-3 rounded font-semibold text-white ${isSubmitting ? 'bg-gray-300 cursor-not-allowed' : 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800'}`}>
                       {isSubmitting ? 'Sending...' : 'Send Message'}
-                    </button>
+                    </motion.button>
 
-                    {submitStatus === 'success' && (
-                      <motion.span
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        className="text-green-500 text-sm"
-                      >
-                        ✓ Message sent successfully!
-                      </motion.span>
-                    )}
+                    <button type="button" onClick={() => { setFormData({ name: '', organization: '', email: '', phone: '', subject: '', message: '', category: 'general' }); setErrors({}); }} disabled={isSubmitting} className="px-4 py-3 rounded border border-gray-300">Reset</button>
+
+                    <div className="ml-auto text-sm text-gray-500">* Required fields</div>
                   </div>
-
-                  <p className="text-xs text-gray-500">
-                    * Required fields. We respect your privacy and will never share your information.
-                  </p>
                 </form>
               </motion.div>
             </div>
 
-            {/* Contact Information */}
+            {/* Contact Info Cards */}
             <div>
-              <motion.div
-                initial={{ opacity: 0, x: 50 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.8 }}
-                className="space-y-6"
-              >
-                {contactInfo.map((info, index) => (
-                  <div key={index} className="bg-gradient-to-br from-gray-900 to-black border border-gray-800 rounded-lg p-6">
+              <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} className="space-y-6">
+                {contactInfo.map((info, idx) => (
+                  <motion.div key={info.title} custom={idx} variants={cardVariants} className="bg-white border border-gray-200 rounded-lg p-6">
                     <div className="flex items-start space-x-4">
-                      <span className="text-3xl">{info.icon}</span>
+                      <div className="text-3xl">{info.icon}</div>
                       <div>
-                        <h3 className="text-xl font-semibold mb-3">{info.title}</h3>
-                        {info.details.map((detail, idx) => (
-                          <p key={idx} className="text-gray-400 text-sm">
-                            {detail}
-                          </p>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">{info.title}</h3>
+                        {info.details.map((d, i) => (
+                          <p key={i} className="text-gray-600 text-sm">{d}</p>
                         ))}
                       </div>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
 
-                {/* Business Hours */}
-                <div className="bg-gradient-to-br from-gray-900 to-black border border-gray-800 rounded-lg p-6">
-                  <h3 className="text-xl font-semibold mb-4">Business Hours</h3>
-                  <div className="space-y-2 text-gray-400 text-sm">
-                    <div className="flex justify-between">
-                      <span>Monday - Friday</span>
-                      <span>9:00 AM - 6:00 PM</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Saturday</span>
-                      <span>10:00 AM - 4:00 PM</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Sunday</span>
-                      <span className="text-gray-600">Closed</span>
-                    </div>
+                <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} className="bg-white border border-gray-200 rounded-lg p-6">
+                  <h3 className="text-lg font-semibold mb-3 text-gray-900">Business Hours</h3>
+                  <div className="space-y-2 text-gray-600 text-sm">
+                    <div className="flex justify-between"><span>Monday - Friday</span><span>9:00 AM - 6:00 PM</span></div>
+                    <div className="flex justify-between"><span>Saturday</span><span>10:00 AM - 4:00 PM</span></div>
+                    <div className="flex justify-between"><span>Sunday</span><span className="text-gray-500">Closed</span></div>
                   </div>
-                  <p className="text-xs text-gray-600 mt-4">
-                    24/7 Support available for critical defense operations
-                  </p>
-                </div>
+                  <p className="text-xs text-gray-500 mt-4">24/7 Support available for critical defense operations</p>
+                </motion.div>
               </motion.div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Other Locations */}
-      <section className="py-20 border-t border-gray-900">
+      {/* Offices */}
+      <section className="py-12 border-t border-gray-100">
         <div className="container mx-auto px-6">
-          <h2 className="text-3xl font-bold text-center mb-12">
-            OUR <span className="text-gray-500">FACILITIES</span>
-          </h2>
-          
-          <div className="grid md:grid-cols-3 gap-8">
-            {offices.map((office, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="bg-gradient-to-br from-gray-900 to-black border border-gray-800 rounded-lg p-6 text-center"
-              >
-                <div className="w-16 h-16 mx-auto mb-4 bg-orange-600/20 rounded-full flex items-center justify-center">
-                  <span className="text-2xl">🏢</span>
-                </div>
-                <h3 className="text-xl font-semibold mb-2">{office.location}</h3>
-                <p className="text-gray-400 text-sm mb-2">{office.address}</p>
-                <span className="inline-block px-3 py-1 bg-gray-800 text-gray-400 text-xs rounded-full">
-                  {office.type}
-                </span>
+          <h2 className="text-2xl font-bold text-center mb-6">OUR FACILITIES</h2>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} className="grid md:grid-cols-3 gap-8">
+            {offices.map((office, idx) => (
+              <motion.div key={office.location} custom={idx} variants={cardVariants} className="bg-white border border-gray-200 rounded-lg p-6 text-center">
+                <div className="w-16 h-16 mx-auto mb-4 bg-orange-100 rounded-full flex items-center justify-center"><span className="text-2xl">🏢</span></div>
+                <h3 className="text-lg font-semibold mb-2 text-gray-900">{office.location}</h3>
+                <p className="text-gray-600 text-sm mb-2">{office.address}</p>
+                <span className="inline-block px-3 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">{office.type}</span>
               </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* Map Section */}
-      <section className="h-96 relative">
-        <div className="absolute inset-0 bg-gray-900"></div>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-center">
-            <svg className="w-16 h-16 mx-auto mb-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round"               strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-            <p className="text-gray-500">Interactive Map</p>
-            <p className="text-gray-600 text-sm mt-2">Map integration available for authorized personnel only</p>
-          </div>
-        </div>
-      </section>
-
-      {/* Emergency Contact */}
-      <section className="py-12 bg-gradient-to-r from-red-900/20 to-orange-900/20 border-y border-red-900/50">
+      {/* Map (lazy) */}
+      <section className="py-12">
         <div className="container mx-auto px-6">
-          <div className="flex flex-wrap items-center justify-between">
-            <div>
-              <h3 className="text-xl font-semibold text-red-400 mb-1">24/7 Emergency Support</h3>
-              <p className="text-gray-400">For critical defense operations and urgent technical assistance</p>
-            </div>
-            <div className="mt-4 lg:mt-0">
-              <a href="tel:+911800123456" className="inline-flex items-center space-x-2 px-6 py-3 bg-red-900/50 text-red-400 rounded hover:bg-red-900/70 transition-all">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                </svg>
-                <span className="font-semibold">1800-123-456</span>
-              </a>
-            </div>
+          <h3 className="text-xl font-semibold mb-4">Location Map</h3>
+          <div className="rounded-lg overflow-hidden border border-gray-200 bg-gray-50 h-72 relative">
+            {!mapVisible ? (
+              <div className="h-full flex items-center justify-center">
+                <button onClick={() => setMapVisible(true)} className="px-6 py-3 bg-black text-white rounded">Load Map</button>
+              </div>
+            ) : (
+              <iframe title="Company locations" src="https://maps.google.com/maps?q=Bangalore&t=&z=11&ie=UTF8&iwloc=&output=embed" className="w-full h-full border-0" loading="lazy" />
+            )}
           </div>
         </div>
       </section>
+
+      {/* Emergency CTA */}
+      <section className="py-8 bg-gradient-to-r from-red-50 to-orange-50 border-y border-red-100 mt-8">
+        <div className="container mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div>
+            <h4 className="text-lg font-semibold text-red-600">24/7 Emergency Support</h4>
+            <p className="text-gray-600">For critical defense operations and urgent technical assistance</p>
+          </div>
+          <a href="tel:+911800123456" className="px-6 py-3 bg-red-600 text-white rounded font-semibold">1800-123-456</a>
+        </div>
+      </section>
+
+      {/* Toast */}
+      <AnimatePresence>
+        {toast && (
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 16 }} ref={toastRef} className={`fixed bottom-6 right-6 z-50 max-w-sm w-full rounded-lg p-4 shadow-xl ${toast.type === 'success' ? 'bg-white border border-green-100' : 'bg-white border border-red-100'}`} role="status" aria-live="polite">
+            <div className="flex items-start gap-3">
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${toast.type === 'success' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
+                {toast.type === 'success' ? '✓' : '!'}
+              </div>
+              <div className="text-sm text-gray-800">{toast.message}</div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
