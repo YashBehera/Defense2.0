@@ -367,41 +367,55 @@ const HomePage = () => {
               transition={{ duration: 0.8, ease: easings.smooth }}
               className="relative"
             >
-              <motion.div
-                className="relative w-full h-[500px] sm:h-[600px] md:h-[600px] rounded-2xl overflow-hidden  bg-white"
-                whileHover={!shouldReduceMotion ? { scale: 1.02 } : {}}
-                transition={transitions.spring}
-              >
-                {/* Fixed Canvas - No DOM elements inside */}
-                <Canvas
-                  shadows
-                  camera={{ position: isMobile ? [0, -0.2, 7] : [0, 0, 5], fov: isMobile ? 28 : 25, near: 0.1, far: 100 }}
-                  gl={{
-                    alpha: true,
-                    preserveDrawingBuffer: true,
-                    antialias: true,
-                    powerPreference: "high-performance"
-                  }}
-                  style={{ background: 'transparent', borderRadius: '1rem', pointerEvents: 'auto', touchAction: 'none' }}
-                  onCreated={({ gl }) => {
-                    // prevent default browser touch gestures inside the canvas
-                    gl.domElement.style.touchAction = 'none';
-                  }}
-                  // Stop propagation so parent scroll/handlers don't steal pointer/wheel events
-                  onPointerDownCapture={(e) => e.stopPropagation()}
-                  onPointerMoveCapture={(e) => e.stopPropagation()}
-                  onPointerUpCapture={(e) => e.stopPropagation()}
-                  onWheelCapture={(e) => e.stopPropagation()}
-                >
-                  <Suspense fallback={null}>
-                    <Hero3DModel
-                      modelPath="/models/drone.glb"
-                      shouldReduceMotion={shouldReduceMotion}
-                      isMobile={isMobile}
-                    />
-                  </Suspense>
-                </Canvas>
-              </motion.div>
+<motion.div
+  className="relative w-full h-[500px] sm:h-[600px] md:h-[600px] rounded-2xl overflow-hidden bg-white"
+  whileHover={!shouldReduceMotion ? { scale: 1.02 } : {}}
+  transition={transitions.spring}
+>
+  {/* Fixed Canvas - No DOM elements inside */}
+  <Canvas
+    shadows
+    camera={{ 
+      position: isMobile ? [0, -0.1, 6] : [0, 0, 5], // Adjusted camera for larger model
+      fov: isMobile ? 32 : 25, // Increased FOV for mobile to see more of the larger model
+      near: 0.1, 
+      far: 100 
+    }}
+    gl={{
+      alpha: true,
+      preserveDrawingBuffer: true,
+      antialias: true,
+      powerPreference: "high-performance"
+    }}
+    style={{ 
+      background: 'transparent', 
+      borderRadius: '1rem', 
+      pointerEvents: 'auto', 
+      touchAction: 'none',
+      cursor: isMobile ? 'default' : 'grab'
+    }}
+    onCreated={({ gl }) => {
+      gl.domElement.style.touchAction = 'none';
+      gl.domElement.style.cursor = isMobile ? 'default' : 'grab';
+    }}
+    // Prevent default touch behaviors
+    onTouchStart={(e) => {
+      e.stopPropagation();
+    }}
+    onTouchEnd={(e) => {
+      e.stopPropagation();
+    }}
+    onWheelCapture={(e) => e.stopPropagation()}
+  >
+    <Suspense fallback={null}>
+      <Hero3DModel
+        modelPath="/models/drone.glb"
+        shouldReduceMotion={shouldReduceMotion}
+        isMobile={isMobile}
+      />
+    </Suspense>
+  </Canvas>
+</motion.div>
             </motion.div>
 
           </motion.div>
@@ -1074,80 +1088,169 @@ const ModelLoader = ({ shouldReduceMotion }) => (
   </mesh>
 );
 
-// Enhanced Sensitivity Hero3DModel Component
+// Hero3DModel Component with Larger Size for Small Devices
 const Hero3DModel = ({ modelPath, shouldReduceMotion, isMobile }) => {
   const { scene } = useGLTF(modelPath);
   const modelRef = useRef();
   const controlsRef = useRef();
-  const frameRef = useRef();
 
-  // Enhanced sensitivity settings
-  const sensitivity = useRef({
-    rotation: isMobile ? 0.6 : 1.2,
-    vertical: isMobile ? 0.35 : 0.8,
-    interpolation: isMobile ? 0.08 : 0.15,
+  // State for drag interaction
+  const [isDragging, setIsDragging] = useState(false);
+  const dragState = useRef({
+    isDragging: false,
+    previousX: 0,
+    previousY: 0,
+    rotationX: 0,
+    rotationY: 0
   });
 
-  const mouseX = useRef(0);
-  const mouseY = useRef(0);
+  // Drag sensitivity settings - adjusted for touch vs mouse
+  const sensitivity = useRef({
+    dragSensitivity: isMobile ? 0.008 : 0.015 // Slightly lower sensitivity for touch
+  });
 
+  // Common drag start handler for both mouse and touch
+  const handleDragStart = (clientX, clientY) => {
+    if (shouldReduceMotion) return;
+
+    dragState.current.isDragging = true;
+    dragState.current.previousX = clientX;
+    dragState.current.previousY = clientY;
+    setIsDragging(true);
+
+    // Disable orbit controls while dragging
+    if (controlsRef.current) {
+      controlsRef.current.enabled = false;
+    }
+  };
+
+  // Common drag move handler for both mouse and touch
+  const handleDragMove = (clientX, clientY) => {
+    if (!dragState.current.isDragging || shouldReduceMotion) return;
+
+    const deltaX = clientX - dragState.current.previousX;
+    const deltaY = clientY - dragState.current.previousY;
+
+    // Apply drag movement to rotation
+    dragState.current.rotationY += deltaX * sensitivity.current.dragSensitivity;
+    dragState.current.rotationX += deltaY * sensitivity.current.dragSensitivity;
+
+    // Clamp vertical rotation to prevent over-rotation
+    dragState.current.rotationX = Math.max(
+      -Math.PI / 2.5,
+      Math.min(Math.PI / 2.5, dragState.current.rotationX)
+    );
+
+    // Apply rotation directly to model
+    if (modelRef.current) {
+      modelRef.current.rotation.y = dragState.current.rotationY;
+      modelRef.current.rotation.x = dragState.current.rotationX;
+    }
+
+    dragState.current.previousX = clientX;
+    dragState.current.previousY = clientY;
+  };
+
+  // Common drag end handler for both mouse and touch
+  const handleDragEnd = () => {
+    if (!dragState.current.isDragging) return;
+
+    dragState.current.isDragging = false;
+    setIsDragging(false);
+
+    // Re-enable orbit controls
+    if (controlsRef.current) {
+      controlsRef.current.enabled = true;
+    }
+  };
+
+  // Mouse event handlers
+  const handlePointerDown = (event) => {
+    event.stopPropagation();
+    handleDragStart(event.clientX, event.clientY);
+  };
+
+  const handlePointerMove = (event) => {
+    handleDragMove(event.clientX, event.clientY);
+  };
+
+  // Touch event handlers
+  const handleTouchStart = (event) => {
+    event.stopPropagation();
+    if (event.touches.length === 1) { // Only handle single touch for rotation
+      handleDragStart(event.touches[0].clientX, event.touches[0].clientY);
+    }
+  };
+
+  const handleTouchMove = (event) => {
+    if (event.touches.length === 1) { // Only handle single touch for rotation
+      handleDragMove(event.touches[0].clientX, event.touches[0].clientY);
+    }
+  };
+
+  const handleTouchEnd = (event) => {
+    handleDragEnd();
+  };
+
+  // Add global event listeners for drag
   useEffect(() => {
-    // Don't attach mouse listeners on mobile or when reduced-motion is enabled
-    if (shouldReduceMotion || isMobile) return;
-
-    let added = false;
-    const handleMouseMove = (event) => {
-      // Enhanced mouse mapping with exponential curve for more dramatic movement
-      const normalizedX = (event.clientX / window.innerWidth) * 2 - 1;
-      const normalizedY = (event.clientY / window.innerHeight) * 2 - 1;
-
-      // Apply exponential curve for more sensitivity at small movements
-      mouseX.current = Math.sign(normalizedX) * Math.pow(Math.abs(normalizedX), 0.7);
-      mouseY.current = Math.sign(normalizedY) * Math.pow(Math.abs(normalizedY), 0.7);
+    const handleGlobalPointerMove = (event) => {
+      handlePointerMove(event);
     };
 
-    window.addEventListener('mousemove', handleMouseMove, { passive: true });
-    added = true;
+    const handleGlobalPointerUp = () => {
+      handleDragEnd();
+    };
+
+    const handleGlobalTouchMove = (event) => {
+      handleTouchMove(event);
+    };
+
+    const handleGlobalTouchEnd = (event) => {
+      handleTouchEnd(event);
+    };
+
+    if (!shouldReduceMotion) {
+      // Mouse events
+      document.addEventListener('pointermove', handleGlobalPointerMove);
+      document.addEventListener('pointerup', handleGlobalPointerUp);
+
+      // Touch events
+      document.addEventListener('touchmove', handleGlobalTouchMove, { passive: false });
+      document.addEventListener('touchend', handleGlobalTouchEnd);
+      document.addEventListener('touchcancel', handleGlobalTouchEnd);
+    }
 
     return () => {
-      if (added) window.removeEventListener('mousemove', handleMouseMove);
-      if (frameRef.current) {
-        cancelAnimationFrame(frameRef.current);
-      }
+      // Clean up mouse events
+      document.removeEventListener('pointermove', handleGlobalPointerMove);
+      document.removeEventListener('pointerup', handleGlobalPointerUp);
+
+      // Clean up touch events
+      document.removeEventListener('touchmove', handleGlobalTouchMove);
+      document.removeEventListener('touchend', handleGlobalTouchEnd);
+      document.removeEventListener('touchcancel', handleGlobalTouchEnd);
     };
   }, [shouldReduceMotion]);
 
-  useFrame((state, delta) => {
-    if (!modelRef.current || shouldReduceMotion) return;
-
-    frameRef.current = requestAnimationFrame(() => {
-      // Apply enhanced sensitivity multipliers
-      const targetY = mouseX.current * sensitivity.current.rotation;
-      const targetX = mouseY.current * sensitivity.current.vertical;
-
-      // Faster interpolation for more immediate response
-      modelRef.current.rotation.y += (targetY - modelRef.current.rotation.y) * sensitivity.current.interpolation;
-      modelRef.current.rotation.x += (targetX - modelRef.current.rotation.x) * sensitivity.current.interpolation;
-
-      // Enhanced bobbing effect that's more noticeable
-      const t = state.clock.getElapsedTime();
-      // Adjust bobbing / base position for mobile vs desktop
-      const baseY = isMobile ? -0.7 : -0.5;
-      const bobAmplitude = isMobile ? 0.02 : 0.03;
-      modelRef.current.position.y = baseY + Math.sin(t * (isMobile ? 0.6 : 0.8)) * bobAmplitude;
-
-      // Add slight Z movement for more dynamism; smaller on mobile
-      modelRef.current.position.z = (isMobile ? 0.01 : 0.02) * Math.cos(t * (isMobile ? 0.4 : 0.5));
-    });
-  });
-
   return (
     <>
-      <group ref={modelRef} dispose={null}>
+      <group
+        ref={modelRef}
+        dispose={null}
+        // Mouse events
+        onPointerDown={handlePointerDown}
+        // Touch events
+        onTouchStart={handleTouchStart}
+        style={{
+          cursor: isDragging ? 'grabbing' : 'grab',
+          touchAction: 'none'
+        }}
+      >
         <primitive
           object={scene}
-          scale={isMobile ? 0.85 : 1.2}
-          position={[0, isMobile ? -0.7 : -0.5, isMobile ? 0.4 : 0]}
+          scale={isMobile ? 1.4 : 1.2} // Increased from 0.85 to 1.4 for mobile
+          position={[0, isMobile ? -0.5 : -0.5, isMobile ? 0.2 : 0]} // Adjusted position for larger size
         />
       </group>
 
@@ -1162,11 +1265,11 @@ const Hero3DModel = ({ modelPath, shouldReduceMotion, isMobile }) => {
         enablePan={false}
         enableRotate={!shouldReduceMotion && !isMobile}
         enableZoom={!shouldReduceMotion && !isMobile}
-        minDistance={isMobile ? 4 : 3}
-        maxDistance={isMobile ? 12 : 8}
+        minDistance={isMobile ? 3 : 3} // Reduced min distance for closer view
+        maxDistance={isMobile ? 10 : 8} // Adjusted max distance
         enableDamping={!shouldReduceMotion}
-        dampingFactor={isMobile ? 0.12 : 0.03} // more damping on mobile for stability
-        rotateSpeed={isMobile ? 0.5 : 0.8} // slightly slower rotate on mobile
+        dampingFactor={isMobile ? 0.12 : 0.03}
+        rotateSpeed={isMobile ? 0.5 : 0.8}
         makeDefault
       />
     </>
