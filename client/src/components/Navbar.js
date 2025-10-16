@@ -23,9 +23,9 @@ const Navbar = () => {
 
   const handleNavigation = (href, e) => {
     e.preventDefault();
-    
+
     // Handle navigation based on href
-    switch(href) {
+    switch (href) {
       case '/':
       case '/home':
         navigate('/');
@@ -33,9 +33,9 @@ const Navbar = () => {
       case '/products':
         navigate('/products');
         break;
-      case '/news':
-        navigate('/news');
-        break;
+      // case '/news':
+      //   navigate('/news');
+      //   break;
       case '/about':
         navigate('/about');
         break;
@@ -48,7 +48,7 @@ const Navbar = () => {
           navigate('/products' + href);
         }
     }
-    
+
     // Scroll to top after navigation
     window.scrollTo(0, 0);
   };
@@ -56,7 +56,7 @@ const Navbar = () => {
   const navLinks = [
     { href: '/', label: 'HOME' },
     { href: '/products', label: 'PRODUCTS' },
-    { href: '/news', label: 'NEWS' },
+    // { href: '/news', label: 'NEWS' },
     { href: '/about', label: 'ABOUT' },
     { href: '/contact', label: 'CONTACT' }
   ];
@@ -71,15 +71,14 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className={`sticky top-0 w-full z-50 transition-all duration-500 ${
-        scrolled 
-          ? 'bg-white shadow-lg border-b border-gray-200 py-3' 
+      <nav className={`sticky top-0 w-full z-50 transition-all duration-500 ${scrolled
+          ? 'bg-white shadow-lg border-b border-gray-200 py-3'
           : 'bg-transparent py-4'
-      }`}>
+        }`}>
         <div className="container mx-auto px-6">
           <div className="flex justify-between items-center">
             {/* Logo Section - Also clickable to go home */}
-            <div 
+            <div
               className="flex items-center space-x-4 cursor-pointer group"
               onClick={() => {
                 navigate('/');
@@ -102,8 +101,8 @@ const Navbar = () => {
             <div className="hidden lg:flex items-center">
               <div className="flex items-center space-x-1">
                 {navLinks.map((link) => (
-                  <div 
-                    key={link.href} 
+                  <div
+                    key={link.href}
                     className="relative"
                     onMouseEnter={() => setActiveDropdown(link.label)}
                     onMouseLeave={() => setActiveDropdown(null)}
@@ -111,13 +110,12 @@ const Navbar = () => {
                     <a
                       href={link.href}
                       onClick={(e) => handleNavigation(link.href, e)}
-                      className={`px-5 py-3 text-[13px] font-semibold tracking-wide transition-all duration-300 flex items-center space-x-2 relative group ${
-                        isActiveLink(link.href) 
-                          ? 'text-red-600' 
-                          : scrolled 
-                            ? 'text-gray-900 hover:text-red-600' 
+                      className={`px-5 py-3 text-[13px] font-semibold tracking-wide transition-all duration-300 flex items-center space-x-2 relative group ${isActiveLink(link.href)
+                          ? 'text-red-600'
+                          : scrolled
+                            ? 'text-gray-900 hover:text-red-600'
                             : 'text-black hover:text-red-600'
-                      }`}
+                        }`}
                     >
                       <span>{link.label}</span>
                       {link.dropdown && (
@@ -126,13 +124,12 @@ const Navbar = () => {
                         </svg>
                       )}
                       {/* Hover Line - Red accent */}
-                      <span className={`absolute bottom-0 left-0 w-full h-[3px] bg-red-600 transform transition-transform duration-300 ${
-                        isActiveLink(link.href) 
-                          ? 'scale-x-100' 
+                      <span className={`absolute bottom-0 left-0 w-full h-[3px] bg-red-600 transform transition-transform duration-300 ${isActiveLink(link.href)
+                          ? 'scale-x-100'
                           : 'scale-x-0 group-hover:scale-x-100'
-                      }`}></span>
+                        }`}></span>
                     </a>
-                    
+
                     {/* Professional Dropdown */}
                     {link.dropdown && activeDropdown === link.label && (
                       <div className="absolute left-0 mt-0 w-80 bg-white border-2 border-gray-200 shadow-2xl transform transition-all duration-300 rounded-lg overflow-hidden">
@@ -171,7 +168,7 @@ const Navbar = () => {
 
               {/* CTA Section */}
               <div className="ml-8 flex items-center space-x-4 border-l-2 border-gray-200 pl-8">
-                <button 
+                <button
                   className={`transition-colors duration-300 ${scrolled ? 'text-gray-900 hover:text-red-600' : 'text-white hover:text-red-600'}`}
                   aria-label="Search"
                 >
@@ -179,7 +176,7 @@ const Navbar = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                 </button>
-                
+
                 <button
                   onClick={() => navigate('/contact')}
                   className="px-5 py-2 bg-red-600 text-white text-sm font-bold rounded-lg hover:bg-red-700 transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
@@ -190,35 +187,33 @@ const Navbar = () => {
             </div>
 
             {/* Mobile Menu Button */}
-            <div className="lg:hidden">
+            <div className="lg:hidden ">
               <button
                 onClick={() => setIsOpen(!isOpen)}
                 className={`p-2 focus:outline-none hover:bg-gray-100/20 rounded-lg transition-colors ${scrolled ? 'text-gray-900' : 'text-white'}`}
                 aria-label="Toggle menu"
               >
                 <div className="w-6 h-5 flex flex-col justify-between">
-                  <span className={`block w-full h-0.5 ${scrolled ? 'bg-gray-900' : 'bg-white'} transition-all duration-300 origin-left ${isOpen ? 'rotate-45 translate-y-0.5' : ''}`}></span>
+                  <span className={`block w-full h-0.5 bg-gray-900 transition-all duration-300 origin-left ${isOpen ? 'rotate-45 translate-y-0.5' : ''}`}></span>
                   <span className={`block w-full h-0.5 bg-red-600 transition-all duration-300 ${isOpen ? 'opacity-0' : ''}`}></span>
-                  <span className={`block w-full h-0.5 ${scrolled ? 'bg-gray-900' : 'bg-white'} transition-all duration-300 origin-left ${isOpen ? '-rotate-45 -translate-y-0.5' : ''}`}></span>
+                  <span className={`block w-full h-0.5 bg-gray-900 transition-all duration-300 origin-left ${isOpen ? '-rotate-45 -translate-y-0.5' : ''}`}></span>
                 </div>
               </button>
             </div>
           </div>
 
           {/* Mobile Menu */}
-          <div className={`lg:hidden transition-all duration-500 ${
-            isOpen ? 'max-h-screen opacity-100 mt-4' : 'max-h-0 opacity-0 overflow-hidden'
-          }`}>
+          <div className={`lg:hidden transition-all duration-500 ${isOpen ? 'max-h-screen opacity-100 mt-4' : 'max-h-0 opacity-0 overflow-hidden'
+            }`}>
             <div className="bg-white border-2 border-gray-200 rounded-xl shadow-xl">
               {navLinks.map((link, index) => (
                 <div key={link.href}>
                   <a
                     href={link.href}
-                    className={`block px-6 py-4 text-sm font-semibold tracking-wide transition-colors duration-200 ${
-                      isActiveLink(link.href)
+                    className={`block px-6 py-4 text-sm font-semibold tracking-wide transition-colors duration-200 ${isActiveLink(link.href)
                         ? 'text-red-600 bg-red-50 border-l-4 border-red-600'
                         : 'text-gray-900 hover:text-red-600 hover:bg-red-50'
-                    }`}
+                      }`}
                     onClick={(e) => {
                       if (!link.dropdown) {
                         handleNavigation(link.href, e);
@@ -259,7 +254,7 @@ const Navbar = () => {
                   {index < navLinks.length - 1 && <div className="border-b border-gray-200"></div>}
                 </div>
               ))}
-              
+
               {/* Mobile CTA */}
               <div className="p-4 bg-gray-50 border-t-2 border-gray-200">
                 <button
