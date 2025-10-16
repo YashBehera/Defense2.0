@@ -60,3 +60,50 @@ body {
       padding-bottom: max(1rem, env(safe-area-inset-bottom));
     }
   }
+
+  /* 3D Model Enhancements */
+.hero-3d-canvas {
+  transition: all 0.3s ease;
+}
+
+.hero-3d-canvas:hover {
+  transform: scale(1.02);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* Responsive adjustments for 3D model */
+@media (max-width: 1024px) {
+  .hero-3d-container {
+    margin-top: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-3d-container canvas {
+    height: 400px !important;
+  }
+}
+
+/* Loading state for 3D model */
+.model-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  border-radius: 1rem;
+  min-height: 500px;
+}
+
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Reduce animations on mobile */
+@media (max-width: 768px) {
+  .reduce-motion-mobile {
+    animation: none !important;
+    transition: none !important;
+  }
+}

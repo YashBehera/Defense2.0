@@ -7,6 +7,9 @@ import HomePageVideo from '../video/DroneHomePage3.mp4';
 import './HomePage.css';
 import './smoothAnimations.css';
 import { useReducedMotion as useCustomReducedMotion } from './useReducedMotion';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { useGLTF, OrbitControls } from '@react-three/drei';
+import { Suspense } from 'react';
 import {
   easings,
   transitions,
@@ -19,7 +22,25 @@ import {
   viewportOptions,
 } from './motionVariants';
 
+const usePerformanceMonitor = () => {
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      const observer = new PerformanceObserver((list) => {
+        list.getEntries().forEach((entry) => {
+          if (entry.duration > 16) { // 60fps threshold
+            console.warn('Slow frame detected:', entry);
+          }
+        });
+      });
+
+      observer.observe({ entryTypes: ['measure', 'longtask'] });
+      return () => observer.disconnect();
+    }
+  }, []);
+};
+
 const HomePage = () => {
+  usePerformanceMonitor();
   const [scrollY, setScrollY] = useState(0);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isLoading, setIsLoading] = useState(true);
@@ -34,38 +55,94 @@ const HomePage = () => {
   const prefersReducedMotion = useReducedMotion();
   const customPrefersReducedMotion = useCustomReducedMotion();
   const shouldReduceMotion = prefersReducedMotion || customPrefersReducedMotion;
+  // Add this at the top of your component
+  const [isMobile, setIsMobile] = useState(false);
 
-  // Optimized scroll handler
   useEffect(() => {
-    const handleScroll = debounce(() => setScrollY(window.scrollY), 16); // 60fps
-    const handleMouseMove = debounce((e) => {
-      if (!shouldReduceMotion) {
-        setMousePosition({ x: e.clientX, y: e.clientY });
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Simplified motion config for mobile
+  const optimizedMotionConfig = useMemo(() => ({
+    initial: shouldReduceMotion || isMobile ? false : 'initial',
+    animate: 'animate',
+    exit: shouldReduceMotion || isMobile ? false : 'exit',
+    transition: shouldReduceMotion || isMobile ? { duration: 0 } : transitions.default,
+  }), [shouldReduceMotion, isMobile]);
+
+  // Replace your current scroll effect with this optimized version
+  useEffect(() => {
+    let animationFrameId;
+    let lastScrollY = window.scrollY;
+
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      // Only update if scroll position changed significantly
+      if (Math.abs(currentScrollY - lastScrollY) > 5) {
+        lastScrollY = currentScrollY;
+        setScrollY(currentScrollY);
       }
-    }, 16);
+    };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    if (!shouldReduceMotion) {
-      window.addEventListener('mousemove', handleMouseMove, { passive: true });
-    }
+    const throttledScroll = () => {
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+      animationFrameId = requestAnimationFrame(handleScroll);
+    };
 
-    setTimeout(() => setIsLoading(false), 1000);
+    window.addEventListener('scroll', throttledScroll, { passive: true });
 
     return () => {
-      window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('mousemove', handleMouseMove);
-      handleScroll.cancel();
-      handleMouseMove.cancel();
+      window.removeEventListener('scroll', throttledScroll);
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
     };
-  }, [shouldReduceMotion]);
+  }, []);
 
+  // Replace your mouse move effect with this
   useEffect(() => {
-    if (!shouldReduceMotion) {
-      const interval = setInterval(() => {
-        setActiveFeature((prev) => (prev + 1) % 4);
-      }, 4000);
-      return () => clearInterval(interval);
-    }
+    if (shouldReduceMotion) return;
+
+    let animationFrameId;
+    let lastX = 0;
+    let lastY = 0;
+
+    const handleMouseMove = (e) => {
+      // Throttle mouse updates
+      if (animationFrameId) return;
+
+      animationFrameId = requestAnimationFrame(() => {
+        const deltaX = Math.abs(e.clientX - lastX);
+        const deltaY = Math.abs(e.clientY - lastY);
+
+        // Only update if movement is significant
+        if (deltaX > 2 || deltaY > 2) {
+          setMousePosition({ x: e.clientX, y: e.clientY });
+          lastX = e.clientX;
+          lastY = e.clientY;
+        }
+
+        animationFrameId = null;
+      });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+    };
   }, [shouldReduceMotion]);
 
   // Memoized motion configs
@@ -143,9 +220,11 @@ const HomePage = () => {
       {/* Video Section - NO GAP */}
       <motion.div
         className="fixed top-0 left-0 w-full h-screen z-10"
+        style={{ pointerEvents: 'none' }}
+        aria-hidden={true}
         initial={{ opacity: 1 }}
         animate={{ opacity: scrollY > 200 ? 0 : 1 }}
-        transition={{ duration: 0.5, ease: easings.smoothOut }}
+        transition={{ duration: 0.5, ease: easings.smooth }}
       >
         <video
           ref={heroVideoRef}
@@ -161,128 +240,172 @@ const HomePage = () => {
       </motion.div>
 
       {/* Hero Section - RESPONSIVE */}
-      <section ref={heroVideoRef} className="relative min-h-screen bg-white flex items-center justify-center px-4 sm:px-6" style={{ marginTop: '10rem' }}>  
-      <div className="container mx-auto py-12 sm:py-16 md:py-20 lg:py-24">
-        <motion.div
-          className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center"
-          {...motionConfig}
-          variants={fadeInUpVariants}
-          custom={scrollY > 200}
-          animate={{ opacity: scrollY > 200 ? 1 : 0, y: scrollY > 200 ? 0 : 50 }}
-          transition={{ duration: 0.8, ease: easings.smooth }}
-        >
+      <section ref={heroVideoRef} className="relative min-h-screen bg-white flex items-center justify-center px-4 sm:px-6" style={{ marginTop: '10rem' }}>
+        <div className="container mx-auto py-12 sm:py-16 md:py-20 lg:py-24">
           <motion.div
+            className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center"
             {...motionConfig}
             variants={fadeInUpVariants}
-            animate={{ opacity: scrollY > 200 ? 1 : 0, y: scrollY > 200 ? 0 : 30 }}
+            custom={scrollY > 200}
+            animate={{ opacity: scrollY > 200 ? 1 : 0, y: scrollY > 200 ? 0 : 50 }}
             transition={{ duration: 0.8, ease: easings.smooth }}
           >
-            <motion.h1
+            {/* Left Column - Text Content */}
+            <motion.div
               {...motionConfig}
               variants={fadeInUpVariants}
-              animate={{ opacity: scrollY > 200 ? 1 : 0, y: scrollY > 200 ? 0 : 20 }}
-              transition={{ delay: 0.3, duration: 0.6, ease: easings.smooth }}
-              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 sm:mb-6 leading-tight text-gray-900"
+              animate={{ opacity: scrollY > 200 ? 1 : 0, y: scrollY > 200 ? 0 : 30 }}
+              transition={{ duration: 0.8, ease: easings.smooth }}
             >
-              Future-Ready
-              <motion.span
+              <motion.h1
                 {...motionConfig}
                 variants={fadeInUpVariants}
                 animate={{ opacity: scrollY > 200 ? 1 : 0, y: scrollY > 200 ? 0 : 20 }}
-                transition={{ delay: 0.5, duration: 0.6, ease: easings.smooth }}
-                className="block bg-gradient-to-r from-gray-900 via-red-600 to-red-700 bg-clip-text text-transparent"
+                transition={{ delay: 0.3, duration: 0.6, ease: easings.smooth }}
+                className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 sm:mb-6 leading-tight text-gray-900"
               >
-                Defense Solutions
-              </motion.span>
-            </motion.h1>
-
-            <motion.p
-              {...motionConfig}
-              variants={fadeInUpVariants}
-              animate={{ opacity: scrollY > 200 ? 1 : 0, y: scrollY > 200 ? 0 : 20 }}
-              transition={{ delay: 0.6, duration: 0.6, ease: easings.smooth }}
-              className="text-base sm:text-lg md:text-xl text-gray-600 mb-6 sm:mb-8 leading-relaxed"
-            >
-              Advanced autonomous aerial systems engineered for precision, reliability, and mission success in the most demanding operational environments.
-            </motion.p>
-
-            <motion.div
-              {...motionConfig}
-              variants={fadeInUpVariants}
-              animate={{ opacity: scrollY > 200 ? 1 : 0, y: scrollY > 200 ? 0 : 20 }}
-              transition={{ delay: 0.7, duration: 0.6, ease: easings.smooth }}
-              className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4"
-            >
-              <motion.a
-                href="#product"
-                whileHover={!shouldReduceMotion ? { scale: 1.05, y: -2 } : {}}
-                whileTap={!shouldReduceMotion ? { scale: 0.98 } : {}}
-                transition={transitions.spring}
-                className="group px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-gray-900 to-black text-white rounded-lg font-semibold shadow-lg relative overflow-hidden text-center gpu-accelerated"
-              >
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-red-600 to-red-700"
-                  initial={{ x: '-100%' }}
-                  whileHover={!shouldReduceMotion ? { x: 0 } : {}}
-                  transition={transitions.default}
-                />
-                <span className="flex items-center justify-center gap-2 relative z-10">
-                  Explore Platform
-                  {!shouldReduceMotion && (
-                    <motion.span
-                      animate={{ x: [0, 4, 0] }}
-                      transition={{ duration: 1.5, repeat: Infinity, ease: easings.smooth }}
-                    >
-                      →
-                    </motion.span>
-                  )}
-                  {shouldReduceMotion && <span>→</span>}
-                </span>
-              </motion.a>
-              <motion.a
-                href="#contact"
-                whileHover={!shouldReduceMotion ? { scale: 1.05, y: -2 } : {}}
-                whileTap={!shouldReduceMotion ? { scale: 0.98 } : {}}
-                transition={transitions.spring}
-                className="px-6 sm:px-8 py-3 sm:py-4 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold shadow-md text-center gpu-accelerated"
-              >
-                Request Demo
-              </motion.a>
-            </motion.div>
-
-            <motion.div
-              {...motionConfig}
-              variants={fadeInUpVariants}
-              animate={{ opacity: scrollY > 200 ? 1 : 0, y: scrollY > 200 ? 0 : 20 }}
-              transition={{ delay: 0.8, duration: 0.6, ease: easings.smooth }}
-              className="grid grid-cols-3 gap-4 sm:gap-6 md:gap-8 mt-12 sm:mt-16 pt-6 sm:pt-8 border-t border-gray-200"
-            >
-              {[
-                { value: 500, suffix: '+', label: 'Deployments' },
-                { value: 99.8, suffix: '%', label: 'Success Rate' },
-                { value: 24, suffix: '/7', label: 'Support' },
-              ].map((stat, index) => (
-                <motion.div
-                  key={index}
-                  whileHover={!shouldReduceMotion ? { scale: 1.05 } : {}}
-                  transition={transitions.spring}
+                Future-Ready
+                <motion.span
+                  {...motionConfig}
+                  variants={fadeInUpVariants}
+                  animate={{ opacity: scrollY > 200 ? 1 : 0, y: scrollY > 200 ? 0 : 20 }}
+                  transition={{ delay: 0.5, duration: 0.6, ease: easings.smooth }}
+                  className="block bg-gradient-to-r from-gray-900 via-red-600 to-red-700 bg-clip-text text-transparent"
                 >
-                  <AnimatedCounter
-                    value={stat.value}
-                    suffix={stat.suffix}
-                    className="text-xl sm:text-2xl md:text-3xl font-bold text-red-600"
-                    shouldReduceMotion={shouldReduceMotion}
-                  />
-                  <div className="text-xs sm:text-sm text-gray-500 mt-1 font-medium">{stat.label}</div>
-                </motion.div>
-              ))}
-            </motion.div>
-          </motion.div>
+                  Defense Solutions
+                </motion.span>
+              </motion.h1>
 
-          {/* Empty div to maintain grid layout on desktop */}
-          <div className="hidden lg:block"></div>
-        </motion.div>
-      </div>
+              <motion.p
+                {...motionConfig}
+                variants={fadeInUpVariants}
+                animate={{ opacity: scrollY > 200 ? 1 : 0, y: scrollY > 200 ? 0 : 20 }}
+                transition={{ delay: 0.6, duration: 0.6, ease: easings.smooth }}
+                className="text-base sm:text-lg md:text-xl text-gray-600 mb-6 sm:mb-8 leading-relaxed"
+              >
+                Advanced autonomous aerial systems engineered for precision, reliability, and mission success in the most demanding operational environments.
+              </motion.p>
+
+              <motion.div
+                {...motionConfig}
+                variants={fadeInUpVariants}
+                animate={{ opacity: scrollY > 200 ? 1 : 0, y: scrollY > 200 ? 0 : 20 }}
+                transition={{ delay: 0.7, duration: 0.6, ease: easings.smooth }}
+                className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4"
+              >
+                <motion.a
+                  href="#product"
+                  whileHover={!shouldReduceMotion ? { scale: 1.05, y: -2 } : {}}
+                  whileTap={!shouldReduceMotion ? { scale: 0.98 } : {}}
+                  transition={transitions.spring}
+                  className="group px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-gray-900 to-black text-white rounded-lg font-semibold shadow-lg relative overflow-hidden text-center gpu-accelerated"
+                >
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-r from-red-600 to-red-700"
+                    initial={{ x: '-100%' }}
+                    whileHover={!shouldReduceMotion ? { x: 0 } : {}}
+                    transition={transitions.default}
+                  />
+                  <span className="flex items-center justify-center gap-2 relative z-10">
+                    Explore Platform
+                    {!shouldReduceMotion && (
+                      <motion.span
+                        animate={{ x: [0, 4, 0] }}
+                        transition={{ duration: 1.5, repeat: Infinity, ease: easings.smooth }}
+                      >
+                        →
+                      </motion.span>
+                    )}
+                    {shouldReduceMotion && <span>→</span>}
+                  </span>
+                </motion.a>
+                <motion.a
+                  href="#contact"
+                  whileHover={!shouldReduceMotion ? { scale: 1.05, y: -2 } : {}}
+                  whileTap={!shouldReduceMotion ? { scale: 0.98 } : {}}
+                  transition={transitions.spring}
+                  className="px-6 sm:px-8 py-3 sm:py-4 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold shadow-md text-center gpu-accelerated"
+                >
+                  Request Demo
+                </motion.a>
+              </motion.div>
+
+              <motion.div
+                {...motionConfig}
+                variants={fadeInUpVariants}
+                animate={{ opacity: scrollY > 200 ? 1 : 0, y: scrollY > 200 ? 0 : 20 }}
+                transition={{ delay: 0.8, duration: 0.6, ease: easings.smooth }}
+                className="grid grid-cols-3 gap-4 sm:gap-6 md:gap-8 mt-12 sm:mt-16 pt-6 sm:pt-8 border-t border-gray-200"
+              >
+                {[
+                  { value: 500, suffix: '+', label: 'Deployments' },
+                  { value: 99.8, suffix: '%', label: 'Success Rate' },
+                  { value: 24, suffix: '/7', label: 'Support' },
+                ].map((stat, index) => (
+                  <motion.div
+                    key={index}
+                    whileHover={!shouldReduceMotion ? { scale: 1.05 } : {}}
+                    transition={transitions.spring}
+                  >
+                    <AnimatedCounter
+                      value={stat.value}
+                      suffix={stat.suffix}
+                      className="text-xl sm:text-2xl md:text-3xl font-bold text-red-600"
+                      shouldReduceMotion={shouldReduceMotion}
+                    />
+                    <div className="text-xs sm:text-sm text-gray-500 mt-1 font-medium">{stat.label}</div>
+                  </motion.div>
+                ))}
+              </motion.div>
+            </motion.div>
+
+            {/* Right Column - 3D Model Viewer */}
+            <motion.div
+              {...motionConfig}
+              variants={slideInVariants.right}
+              animate={{ opacity: scrollY > 200 ? 1 : 0, x: scrollY > 200 ? 0 : 50 }}
+              transition={{ duration: 0.8, ease: easings.smooth }}
+              className="relative"
+            >
+              <motion.div
+                className="relative w-full h-[500px] sm:h-[600px] md:h-[600px] rounded-2xl overflow-hidden  bg-white"
+                whileHover={!shouldReduceMotion ? { scale: 1.02 } : {}}
+                transition={transitions.spring}
+              >
+                {/* Fixed Canvas - No DOM elements inside */}
+                <Canvas
+                  shadows
+                  camera={{ position: isMobile ? [0, -0.2, 7] : [0, 0, 5], fov: isMobile ? 28 : 25, near: 0.1, far: 100 }}
+                  gl={{
+                    alpha: true,
+                    preserveDrawingBuffer: true,
+                    antialias: true,
+                    powerPreference: "high-performance"
+                  }}
+                  style={{ background: 'transparent', borderRadius: '1rem', pointerEvents: 'auto', touchAction: 'none' }}
+                  onCreated={({ gl }) => {
+                    // prevent default browser touch gestures inside the canvas
+                    gl.domElement.style.touchAction = 'none';
+                  }}
+                  // Stop propagation so parent scroll/handlers don't steal pointer/wheel events
+                  onPointerDownCapture={(e) => e.stopPropagation()}
+                  onPointerMoveCapture={(e) => e.stopPropagation()}
+                  onPointerUpCapture={(e) => e.stopPropagation()}
+                  onWheelCapture={(e) => e.stopPropagation()}
+                >
+                  <Suspense fallback={null}>
+                    <Hero3DModel
+                      modelPath="/models/drone.glb"
+                      shouldReduceMotion={shouldReduceMotion}
+                      isMobile={isMobile}
+                    />
+                  </Suspense>
+                </Canvas>
+              </motion.div>
+            </motion.div>
+
+          </motion.div>
+        </div>
       </section>
 
       {/* Featured Product Section */}
@@ -800,7 +923,7 @@ const HomePage = () => {
           </motion.div>
         </div>
       </section>
-      
+
       {/* Contact Section */}
       <section id="contact" className="py-12 sm:py-16 md:py-20 lg:py-24 bg-white-50 relative overflow-hidden">
         {!shouldReduceMotion && (
@@ -944,7 +1067,117 @@ const HomePage = () => {
   );
 };
 
-// Updated Components with shouldReduceMotion prop
+const ModelLoader = ({ shouldReduceMotion }) => (
+  <mesh>
+    <boxGeometry args={[1, 1, 1]} />
+    <meshStandardMaterial color="#dc2626" />
+  </mesh>
+);
+
+// Enhanced Sensitivity Hero3DModel Component
+const Hero3DModel = ({ modelPath, shouldReduceMotion, isMobile }) => {
+  const { scene } = useGLTF(modelPath);
+  const modelRef = useRef();
+  const controlsRef = useRef();
+  const frameRef = useRef();
+
+  // Enhanced sensitivity settings
+  const sensitivity = useRef({
+    rotation: isMobile ? 0.6 : 1.2,
+    vertical: isMobile ? 0.35 : 0.8,
+    interpolation: isMobile ? 0.08 : 0.15,
+  });
+
+  const mouseX = useRef(0);
+  const mouseY = useRef(0);
+
+  useEffect(() => {
+    // Don't attach mouse listeners on mobile or when reduced-motion is enabled
+    if (shouldReduceMotion || isMobile) return;
+
+    let added = false;
+    const handleMouseMove = (event) => {
+      // Enhanced mouse mapping with exponential curve for more dramatic movement
+      const normalizedX = (event.clientX / window.innerWidth) * 2 - 1;
+      const normalizedY = (event.clientY / window.innerHeight) * 2 - 1;
+
+      // Apply exponential curve for more sensitivity at small movements
+      mouseX.current = Math.sign(normalizedX) * Math.pow(Math.abs(normalizedX), 0.7);
+      mouseY.current = Math.sign(normalizedY) * Math.pow(Math.abs(normalizedY), 0.7);
+    };
+
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    added = true;
+
+    return () => {
+      if (added) window.removeEventListener('mousemove', handleMouseMove);
+      if (frameRef.current) {
+        cancelAnimationFrame(frameRef.current);
+      }
+    };
+  }, [shouldReduceMotion]);
+
+  useFrame((state, delta) => {
+    if (!modelRef.current || shouldReduceMotion) return;
+
+    frameRef.current = requestAnimationFrame(() => {
+      // Apply enhanced sensitivity multipliers
+      const targetY = mouseX.current * sensitivity.current.rotation;
+      const targetX = mouseY.current * sensitivity.current.vertical;
+
+      // Faster interpolation for more immediate response
+      modelRef.current.rotation.y += (targetY - modelRef.current.rotation.y) * sensitivity.current.interpolation;
+      modelRef.current.rotation.x += (targetX - modelRef.current.rotation.x) * sensitivity.current.interpolation;
+
+      // Enhanced bobbing effect that's more noticeable
+      const t = state.clock.getElapsedTime();
+      // Adjust bobbing / base position for mobile vs desktop
+      const baseY = isMobile ? -0.7 : -0.5;
+      const bobAmplitude = isMobile ? 0.02 : 0.03;
+      modelRef.current.position.y = baseY + Math.sin(t * (isMobile ? 0.6 : 0.8)) * bobAmplitude;
+
+      // Add slight Z movement for more dynamism; smaller on mobile
+      modelRef.current.position.z = (isMobile ? 0.01 : 0.02) * Math.cos(t * (isMobile ? 0.4 : 0.5));
+    });
+  });
+
+  return (
+    <>
+      <group ref={modelRef} dispose={null}>
+        <primitive
+          object={scene}
+          scale={isMobile ? 0.85 : 1.2}
+          position={[0, isMobile ? -0.7 : -0.5, isMobile ? 0.4 : 0]}
+        />
+      </group>
+
+      <ambientLight intensity={0.4} />
+      <directionalLight
+        position={[5, 5, 5]}
+        intensity={0.8}
+      />
+
+      <OrbitControls
+        ref={controlsRef}
+        enablePan={false}
+        enableRotate={!shouldReduceMotion && !isMobile}
+        enableZoom={!shouldReduceMotion && !isMobile}
+        minDistance={isMobile ? 4 : 3}
+        maxDistance={isMobile ? 12 : 8}
+        enableDamping={!shouldReduceMotion}
+        dampingFactor={isMobile ? 0.12 : 0.03} // more damping on mobile for stability
+        rotateSpeed={isMobile ? 0.5 : 0.8} // slightly slower rotate on mobile
+        makeDefault
+      />
+    </>
+  );
+};
+
+Hero3DModel.propTypes = {
+  modelPath: PropTypes.string.isRequired,
+  shouldReduceMotion: PropTypes.bool.isRequired,
+  isMobile: PropTypes.bool.isRequired,
+};
 
 // VideoShowcase Component
 const VideoShowcase = React.memo(({ video, videoRef, shouldReduceMotion }) => {
