@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, useScroll, useSpring, useInView, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { debounce } from 'lodash';
 import PropTypes from 'prop-types';
 import StrikerVideo from '../video/CruiseDrone.mp4';
 import HomePageVideo from '../video/DroneHomePage3.mp4';
 import './HomePage.css';
 import './smoothAnimations.css';
 import { useReducedMotion as useCustomReducedMotion } from './useReducedMotion';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Canvas } from '@react-three/fiber';
 import { useGLTF, OrbitControls } from '@react-three/drei';
 import { Suspense } from 'react';
 import {
@@ -24,17 +23,23 @@ import {
 
 const usePerformanceMonitor = () => {
   useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      const observer = new PerformanceObserver((list) => {
-        list.getEntries().forEach((entry) => {
-          if (entry.duration > 16) { // 60fps threshold
-            console.warn('Slow frame detected:', entry);
-          }
+    if (process.env.NODE_ENV === 'development' && typeof PerformanceObserver !== 'undefined') {
+      try {
+        const observer = new PerformanceObserver((list) => {
+          list.getEntries().forEach((entry) => {
+            if (entry.duration > 16) { // 60fps threshold
+              // keep minimal logging in dev
+              // eslint-disable-next-line no-console
+              console.warn('Slow frame detected:', entry);
+            }
+          });
         });
-      });
 
-      observer.observe({ entryTypes: ['measure', 'longtask'] });
-      return () => observer.disconnect();
+        observer.observe({ entryTypes: ['measure', 'longtask'] });
+        return () => observer.disconnect();
+      } catch (err) {
+        // gracefully ignore if PerformanceObserver isn't available or throws
+      }
     }
   }, []);
 };
@@ -42,12 +47,12 @@ const usePerformanceMonitor = () => {
 const HomePage = () => {
   usePerformanceMonitor();
   const [scrollY, setScrollY] = useState(0);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [isLoading, setIsLoading] = useState(true);
-  const [activeFeature, setActiveFeature] = useState(0);
+  // Removed unused state (mousePosition, isLoading, activeFeature) to keep component lean
   const containerRef = useRef(null);
   const videoRef = useRef(null);
   const heroVideoRef = useRef(null);
+  // Dedicated ref for the hero section DOM node (separate from the video element ref)
+  const heroSectionRef = useRef(null);
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
 
@@ -55,6 +60,11 @@ const HomePage = () => {
   const prefersReducedMotion = useReducedMotion();
   const customPrefersReducedMotion = useCustomReducedMotion();
   const shouldReduceMotion = prefersReducedMotion || customPrefersReducedMotion;
+  // Track initial fullscreen video playback/dismissal. This should reset on full page reload.
+  const hasInitialVideoPlayedRef = useRef(false);
+  const [showInitialVideo, setShowInitialVideo] = useState(true);
+  // Hero becomes visible either when user scrolls past threshold or when the initial video is dismissed/finished
+  const heroVisible = scrollY > 200 || !showInitialVideo;
   // Add this at the top of your component
   const [isMobile, setIsMobile] = useState(false);
 
@@ -67,6 +77,45 @@ const HomePage = () => {
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  // When user scrolls past threshold hide the initial video permanently (until a full reload)
+  useEffect(() => {
+    if (scrollY > 200 && showInitialVideo) {
+      setShowInitialVideo(false);
+      hasInitialVideoPlayedRef.current = true;
+    }
+  }, [scrollY, showInitialVideo]);
+
+  // When the initial video is dismissed (ended or scrolled away), ensure the page scrolls
+  // so the hero section starts from its top. Skip smooth scrolling when reduced motion is preferred.
+  useEffect(() => {
+    if (!showInitialVideo && heroSectionRef.current) {
+      try {
+        const heroTop = heroSectionRef.current.getBoundingClientRect().top + window.scrollY;
+        const currentY = window.scrollY;
+        // detect common fixed navbar/header selectors so we can offset the scroll target
+        const navEl = document.querySelector('header, .navbar, #navbar, .fixed-navbar');
+        const navHeight = navEl ? navEl.getBoundingClientRect().height : 0;
+        const offset = navHeight + 8; // small extra gap
+        const targetY = Math.max(0, heroTop - offset);
+
+        // only scroll if not already near the top of the hero section
+        if (Math.abs(currentY - targetY) > 30) {
+          if (shouldReduceMotion) {
+            window.scrollTo(0, targetY);
+          } else {
+            // small delay to allow any fade-out animation to start for a smoother transition
+            window.requestAnimationFrame(() => {
+              window.scrollTo({ top: targetY, behavior: 'smooth' });
+            });
+          }
+        }
+      } catch (err) {
+        // silent fallback
+        console.warn('Scroll to hero failed', err);
+      }
+    }
+  }, [showInitialVideo, shouldReduceMotion]);
 
   // Simplified motion config for mobile
   const optimizedMotionConfig = useMemo(() => ({
@@ -107,43 +156,6 @@ const HomePage = () => {
       }
     };
   }, []);
-
-  // Replace your mouse move effect with this
-  useEffect(() => {
-    if (shouldReduceMotion) return;
-
-    let animationFrameId;
-    let lastX = 0;
-    let lastY = 0;
-
-    const handleMouseMove = (e) => {
-      // Throttle mouse updates
-      if (animationFrameId) return;
-
-      animationFrameId = requestAnimationFrame(() => {
-        const deltaX = Math.abs(e.clientX - lastX);
-        const deltaY = Math.abs(e.clientY - lastY);
-
-        // Only update if movement is significant
-        if (deltaX > 2 || deltaY > 2) {
-          setMousePosition({ x: e.clientX, y: e.clientY });
-          lastX = e.clientX;
-          lastY = e.clientY;
-        }
-
-        animationFrameId = null;
-      });
-    };
-
-    window.addEventListener('mousemove', handleMouseMove, { passive: true });
-
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      if (animationFrameId) {
-        cancelAnimationFrame(animationFrameId);
-      }
-    };
-  }, [shouldReduceMotion]);
 
   // Memoized motion configs
   const motionConfig = useMemo(() => ({
@@ -218,49 +230,87 @@ const HomePage = () => {
       />
 
       {/* Video Section - NO GAP */}
-      <motion.div
-        className="fixed top-0 left-0 w-full h-screen z-10"
-        style={{ pointerEvents: 'none' }}
-        aria-hidden={true}
-        initial={{ opacity: 1 }}
-        animate={{ opacity: scrollY > 200 ? 0 : 1 }}
-        transition={{ duration: 0.5, ease: easings.smooth }}
-      >
-        <video
-          ref={heroVideoRef}
-          src={HomePageVideo}
-          autoPlay
-          muted
-          loop
-          playsInline
-          controls={false}
-          className="w-full h-full object-cover gpu-accelerated"
+      {showInitialVideo && (
+        <motion.div
+          className="fixed top-0 left-0 w-full h-screen z-10"
           style={{ pointerEvents: 'none' }}
-        />
-      </motion.div>
+          aria-hidden={true}
+          initial={{ opacity: 1 }}
+          animate={{ opacity: heroVisible ? 0 : 1 }}
+          transition={{ duration: 0.5, ease: easings.smooth }}
+        >
+          <video
+            ref={heroVideoRef}
+            src={HomePageVideo}
+            autoPlay
+            muted
+            playsInline
+            controls={false}
+            className="w-full h-full object-cover gpu-accelerated"
+            style={{ pointerEvents: 'none' }}
+            // play only once on initial load; when it ends hide it until reload
+            onEnded={() => {
+              setShowInitialVideo(false);
+              hasInitialVideoPlayedRef.current = true;
+            }}
+          // do not loop the initial fullscreen video
+          />
+
+          {/* Scroll-down indicator shown while initial video is visible */}
+          <motion.div
+            aria-hidden={true}
+            className="absolute bottom-12 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-2 text-white pointer-events-none"
+            initial={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
+            animate={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 1, y: [10, 0, 10] }}
+            transition={shouldReduceMotion ? { duration: 0 } : { duration: 1.6, repeat: Infinity, ease: easings.smooth }}
+            style={{ textShadow: '0 2px 8px rgba(0,0,0,0.6)' }}
+          >
+            <span className="bg-black/40 px-3 py-1 rounded-full text-xs sm:text-sm font-medium">Scroll down to continue</span>
+            {!shouldReduceMotion && (
+              <motion.svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                className="w-5 h-5 text-white"
+                initial={{ y: 0 }}
+                animate={{ y: [0, 6, 0] }}
+                transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
+              >
+                <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+              </motion.svg>
+            )}
+            {shouldReduceMotion && (
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="w-5 h-5 text-white">
+                <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            )}
+          </motion.div>
+        </motion.div>
+      )}
 
       {/* Hero Section - RESPONSIVE */}
-      <section ref={heroVideoRef} className="relative min-h-screen bg-white flex items-center justify-center px-4 sm:px-6" style={{ marginTop: '10rem' }}>
-        <div className="container mx-auto py-12 sm:py-16 md:py-20 lg:py-24">
+      <section ref={heroSectionRef} className="relative min-h-screen bg-white flex items-center justify-center px-4 sm:px-6">
+        <div className="container mx-auto">
           <motion.div
             className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center"
             {...motionConfig}
             variants={fadeInUpVariants}
-            custom={scrollY > 200}
-            animate={{ opacity: scrollY > 200 ? 1 : 0, y: scrollY > 200 ? 0 : 50 }}
+            custom={heroVisible}
+            animate={{ opacity: heroVisible ? 1 : 0, y: heroVisible ? 0 : 50 }}
             transition={{ duration: 0.8, ease: easings.smooth }}
           >
             {/* Left Column - Text Content */}
             <motion.div
               {...motionConfig}
               variants={fadeInUpVariants}
-              animate={{ opacity: scrollY > 200 ? 1 : 0, y: scrollY > 200 ? 0 : 30 }}
+              animate={{ opacity: heroVisible ? 1 : 0, y: heroVisible ? 0 : 30 }}
               transition={{ duration: 0.8, ease: easings.smooth }}
             >
               <motion.h1
                 {...motionConfig}
                 variants={fadeInUpVariants}
-                animate={{ opacity: scrollY > 200 ? 1 : 0, y: scrollY > 200 ? 0 : 20 }}
+                animate={{ opacity: heroVisible ? 1 : 0, y: heroVisible ? 0 : 20 }}
                 transition={{ delay: 0.3, duration: 0.6, ease: easings.smooth }}
                 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 sm:mb-6 leading-tight text-gray-900"
               >
@@ -268,7 +318,7 @@ const HomePage = () => {
                 <motion.span
                   {...motionConfig}
                   variants={fadeInUpVariants}
-                  animate={{ opacity: scrollY > 200 ? 1 : 0, y: scrollY > 200 ? 0 : 20 }}
+                  animate={{ opacity: heroVisible ? 1 : 0, y: heroVisible ? 0 : 20 }}
                   transition={{ delay: 0.5, duration: 0.6, ease: easings.smooth }}
                   className="block bg-gradient-to-r from-gray-900 via-red-600 to-red-700 bg-clip-text text-transparent"
                 >
@@ -279,7 +329,7 @@ const HomePage = () => {
               <motion.p
                 {...motionConfig}
                 variants={fadeInUpVariants}
-                animate={{ opacity: scrollY > 200 ? 1 : 0, y: scrollY > 200 ? 0 : 20 }}
+                animate={{ opacity: heroVisible ? 1 : 0, y: heroVisible ? 0 : 20 }}
                 transition={{ delay: 0.6, duration: 0.6, ease: easings.smooth }}
                 className="text-base sm:text-lg md:text-xl text-gray-600 mb-6 sm:mb-8 leading-relaxed"
               >
@@ -289,7 +339,7 @@ const HomePage = () => {
               <motion.div
                 {...motionConfig}
                 variants={fadeInUpVariants}
-                animate={{ opacity: scrollY > 200 ? 1 : 0, y: scrollY > 200 ? 0 : 20 }}
+                animate={{ opacity: heroVisible ? 1 : 0, y: heroVisible ? 0 : 20 }}
                 transition={{ delay: 0.7, duration: 0.6, ease: easings.smooth }}
                 className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4"
               >
@@ -333,7 +383,7 @@ const HomePage = () => {
               <motion.div
                 {...motionConfig}
                 variants={fadeInUpVariants}
-                animate={{ opacity: scrollY > 200 ? 1 : 0, y: scrollY > 200 ? 0 : 20 }}
+                animate={{ opacity: heroVisible ? 1 : 0, y: heroVisible ? 0 : 20 }}
                 transition={{ delay: 0.8, duration: 0.6, ease: easings.smooth }}
                 className="grid grid-cols-3 gap-4 sm:gap-6 md:gap-8 mt-12 sm:mt-16 pt-6 sm:pt-8 border-t border-gray-200"
               >
@@ -363,59 +413,59 @@ const HomePage = () => {
             <motion.div
               {...motionConfig}
               variants={slideInVariants.right}
-              animate={{ opacity: scrollY > 200 ? 1 : 0, x: scrollY > 200 ? 0 : 50 }}
+              animate={{ opacity: heroVisible ? 1 : 0, x: heroVisible ? 0 : 50 }}
               transition={{ duration: 0.8, ease: easings.smooth }}
               className="relative"
             >
-<motion.div
-  className="relative w-full h-[500px] sm:h-[600px] md:h-[600px] rounded-2xl overflow-hidden bg-white"
-  whileHover={!shouldReduceMotion ? { scale: 1.02 } : {}}
-  transition={transitions.spring}
->
-  {/* Fixed Canvas - No DOM elements inside */}
-  <Canvas
-    shadows
-    camera={{ 
-      position: isMobile ? [0, -0.1, 6] : [0, 0, 5], // Adjusted camera for larger model
-      fov: isMobile ? 32 : 25, // Increased FOV for mobile to see more of the larger model
-      near: 0.1, 
-      far: 100 
-    }}
-    gl={{
-      alpha: true,
-      preserveDrawingBuffer: true,
-      antialias: true,
-      powerPreference: "high-performance"
-    }}
-    style={{ 
-      background: 'transparent', 
-      borderRadius: '1rem', 
-      pointerEvents: 'auto', 
-      touchAction: 'none',
-      cursor: isMobile ? 'default' : 'grab'
-    }}
-    onCreated={({ gl }) => {
-      gl.domElement.style.touchAction = 'none';
-      gl.domElement.style.cursor = isMobile ? 'default' : 'grab';
-    }}
-    // Prevent default touch behaviors
-    onTouchStart={(e) => {
-      e.stopPropagation();
-    }}
-    onTouchEnd={(e) => {
-      e.stopPropagation();
-    }}
-    onWheelCapture={(e) => e.stopPropagation()}
-  >
-    <Suspense fallback={null}>
-      <Hero3DModel
-        modelPath="/models/drone.glb"
-        shouldReduceMotion={shouldReduceMotion}
-        isMobile={isMobile}
-      />
-    </Suspense>
-  </Canvas>
-</motion.div>
+              <motion.div
+                className="relative w-full h-[500px] sm:h-[600px] md:h-[600px] rounded-2xl overflow-hidden bg-white"
+                whileHover={!shouldReduceMotion ? { scale: 1.02 } : {}}
+                transition={transitions.spring}
+              >
+                {/* Fixed Canvas - No DOM elements inside */}
+                <Canvas
+                  shadows
+                  camera={{
+                    position: isMobile ? [0, -0.1, 6] : [0, 0, 5], // Adjusted camera for larger model
+                    fov: isMobile ? 32 : 25, // Increased FOV for mobile to see more of the larger model
+                    near: 0.1,
+                    far: 100
+                  }}
+                  gl={{
+                    alpha: true,
+                    preserveDrawingBuffer: true,
+                    antialias: true,
+                    powerPreference: "high-performance"
+                  }}
+                  style={{
+                    background: 'transparent',
+                    borderRadius: '1rem',
+                    pointerEvents: 'auto',
+                    touchAction: 'none',
+                    cursor: isMobile ? 'default' : 'grab'
+                  }}
+                  onCreated={({ gl }) => {
+                    gl.domElement.style.touchAction = 'none';
+                    gl.domElement.style.cursor = isMobile ? 'default' : 'grab';
+                  }}
+                  // Prevent default touch behaviors
+                  onTouchStart={(e) => {
+                    e.stopPropagation();
+                  }}
+                  onTouchEnd={(e) => {
+                    e.stopPropagation();
+                  }}
+                  onWheelCapture={(e) => e.stopPropagation()}
+                >
+                  <Suspense fallback={null}>
+                    <Hero3DModel
+                      modelPath="/models/drone.glb"
+                      shouldReduceMotion={shouldReduceMotion}
+                      isMobile={isMobile}
+                    />
+                  </Suspense>
+                </Canvas>
+              </motion.div>
             </motion.div>
 
           </motion.div>
