@@ -293,7 +293,7 @@ const HomePage = () => {
       <section ref={heroSectionRef} className="relative min-h-screen bg-white flex items-center justify-center px-4 sm:px-6">
         <div className="container mx-auto">
           <motion.div
-            className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center"
+            className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center py-20 sm:py-24 "
             {...motionConfig}
             variants={fadeInUpVariants}
             custom={heroVisible}

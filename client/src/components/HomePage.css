@@ -107,3 +107,21 @@ body {
     transition: none !important;
   }
 }
+
+/* Ensure canvas doesn't interfere with scrolling */
+canvas {
+  display: block;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  outline: none;
+}
+
+/* Prevent text selection on the entire 3D container */
+.gpu-accelerated {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
