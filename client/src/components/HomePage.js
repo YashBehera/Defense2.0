@@ -7,7 +7,7 @@ import './HomePage.css';
 import './smoothAnimations.css';
 import { useReducedMotion as useCustomReducedMotion } from './useReducedMotion';
 import { Canvas } from '@react-three/fiber';
-import { useGLTF, OrbitControls } from '@react-three/drei';
+import { useGLTF, OrbitControls, Html, Preload } from '@react-three/drei';
 import { Suspense } from 'react';
 import {
   easings,
@@ -20,6 +20,31 @@ import {
   tapVariants,
   viewportOptions,
 } from './motionVariants';
+
+// 3D model path (served from public/)
+const MODEL_PATH = '/models/scene.gltf';
+// Preload model for faster first render when in view
+try { useGLTF.preload(MODEL_PATH); } catch (_) { /* no-op */ }
+
+// Simple error boundary to harden Canvas in production
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() { return { hasError: true }; }
+  componentDidCatch() { /* swallow in production UI */ }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="model-loading">
+          <div className="w-10 h-10 border-4 border-gray-300 border-t-red-600 rounded-full animate-spin" aria-label="3D failed to load" />
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 const usePerformanceMonitor = () => {
   useEffect(() => {
@@ -67,6 +92,8 @@ const HomePage = () => {
   const heroVisible = scrollY > 200 || !showInitialVideo;
   // Add this at the top of your component
   const [isMobile, setIsMobile] = useState(false);
+  const modelContainerRef = useRef(null);
+  const modelInView = useInView(modelContainerRef, { once: true, amount: 0.2, margin: '0px 0px -80px 0px' });
 
   useEffect(() => {
     const checkMobile = () => {
@@ -415,56 +442,72 @@ const HomePage = () => {
               variants={slideInVariants.right}
               animate={{ opacity: heroVisible ? 1 : 0, x: heroVisible ? 0 : 50 }}
               transition={{ duration: 0.8, ease: easings.smooth }}
-              className="relative"
+              className="relative hero-3d-container"
             >
               <motion.div
-                className="relative w-full h-[500px] sm:h-[600px] md:h-[600px] rounded-2xl overflow-hidden bg-white"
+                ref={modelContainerRef}
+                className="relative w-full h-[420px] sm:h-[560px] md:h-[600px] rounded-2xl overflow-hidden bg-white"
                 whileHover={!shouldReduceMotion ? { scale: 1.02 } : {}}
                 transition={transitions.spring}
               >
-                {/* Fixed Canvas - No DOM elements inside */}
-                <Canvas
-                  shadows
-                  camera={{
-                    position: isMobile ? [0, -0.1, 6] : [0, 0, 5], // Adjusted camera for larger model
-                    fov: isMobile ? 32 : 25, // Increased FOV for mobile to see more of the larger model
-                    near: 0.1,
-                    far: 100
-                  }}
-                  gl={{
-                    alpha: true,
-                    preserveDrawingBuffer: true,
-                    antialias: true,
-                    powerPreference: "high-performance"
-                  }}
-                  style={{
-                    background: 'transparent',
-                    borderRadius: '1rem',
-                    pointerEvents: 'auto',
-                    touchAction: 'none',
-                    cursor: isMobile ? 'default' : 'grab'
-                  }}
-                  onCreated={({ gl }) => {
-                    gl.domElement.style.touchAction = 'none';
-                    gl.domElement.style.cursor = isMobile ? 'default' : 'grab';
-                  }}
-                  // Prevent default touch behaviors
-                  onTouchStart={(e) => {
-                    e.stopPropagation();
-                  }}
-                  onTouchEnd={(e) => {
-                    e.stopPropagation();
-                  }}
-                  onWheelCapture={(e) => e.stopPropagation()}
-                >
-                  <Suspense fallback={null}>
-                    <Hero3DModel
-                      modelPath="/models/drone.glb"
-                      shouldReduceMotion={shouldReduceMotion}
-                      isMobile={isMobile}
-                    />
-                  </Suspense>
-                </Canvas>
+                {/* Lazy-mount Canvas only when in view for better TTI */}
+                {modelInView ? (
+                  <ErrorBoundary>
+                    <Canvas
+                      className="hero-3d-canvas"
+                      dpr={[1, isMobile ? 1.5 : 2]}
+                      shadows={false}
+                      linear
+                      frameloop="demand"
+                      camera={{
+                        position: isMobile ? [0, -0.1, 6] : [0, 0, 5],
+                        fov: isMobile ? 32 : 25,
+                        near: 0.1,
+                        far: 100,
+                      }}
+                      gl={{
+                        alpha: true,
+                        antialias: true,
+                        powerPreference: 'high-performance',
+                        preserveDrawingBuffer: false,
+                      }}
+                      style={{
+                        background: 'transparent',
+                        borderRadius: '1rem',
+                        pointerEvents: 'auto',
+                        touchAction: 'none',
+                        cursor: isMobile ? 'default' : 'grab',
+                      }}
+                      onCreated={({ gl }) => {
+                        gl.domElement.style.touchAction = 'none';
+                        gl.domElement.style.cursor = isMobile ? 'default' : 'grab';
+                      }}
+                      // Prevent default touch behaviors
+                      onTouchStart={(e) => { e.stopPropagation(); }}
+                      onTouchEnd={(e) => { e.stopPropagation(); }}
+                      onWheelCapture={(e) => e.stopPropagation()}
+                    >
+                      <Suspense
+                        fallback={
+                          <Html center>
+                            <div className="w-10 h-10 border-4 border-gray-300 border-t-red-600 rounded-full animate-spin" aria-label="Loading 3D model" />
+                          </Html>
+                        }
+                      >
+                        <Hero3DModel
+                          modelPath={MODEL_PATH}
+                          shouldReduceMotion={shouldReduceMotion}
+                          isMobile={isMobile}
+                        />
+                        <Preload all />
+                      </Suspense>
+                    </Canvas>
+                  </ErrorBoundary>
+                ) : (
+                  <div className="model-loading">
+                    <div className="w-10 h-10 border-4 border-gray-300 border-t-red-600 rounded-full animate-spin" aria-label="Preparing 3D viewer" />
+                  </div>
+                )}
               </motion.div>
             </motion.div>
 
