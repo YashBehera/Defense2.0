@@ -3,12 +3,10 @@ import { motion, useScroll, useSpring, useInView, AnimatePresence, useReducedMot
 import PropTypes from 'prop-types';
 import StrikerVideo from '../video/CruiseDrone.mp4';
 import HomePageVideo from '../video/DroneHomePage3.mp4';
+import HomePageVideo2 from '../video/DroneHomePage2.mp4';
 import './HomePage.css';
 import './smoothAnimations.css';
 import { useReducedMotion as useCustomReducedMotion } from './useReducedMotion';
-import { Canvas } from '@react-three/fiber';
-import { useGLTF, OrbitControls } from '@react-three/drei';
-import { Suspense } from 'react';
 import {
   easings,
   transitions,
@@ -47,25 +45,19 @@ const usePerformanceMonitor = () => {
 const HomePage = () => {
   usePerformanceMonitor();
   const [scrollY, setScrollY] = useState(0);
-  // Removed unused state (mousePosition, isLoading, activeFeature) to keep component lean
   const containerRef = useRef(null);
   const videoRef = useRef(null);
   const heroVideoRef = useRef(null);
-  // Dedicated ref for the hero section DOM node (separate from the video element ref)
   const heroSectionRef = useRef(null);
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
 
-  // Reduced motion support
   const prefersReducedMotion = useReducedMotion();
   const customPrefersReducedMotion = useCustomReducedMotion();
   const shouldReduceMotion = prefersReducedMotion || customPrefersReducedMotion;
-  // Track initial fullscreen video playback/dismissal. This should reset on full page reload.
   const hasInitialVideoPlayedRef = useRef(false);
   const [showInitialVideo, setShowInitialVideo] = useState(true);
-  // Hero becomes visible either when user scrolls past threshold or when the initial video is dismissed/finished
   const heroVisible = scrollY > 200 || !showInitialVideo;
-  // Add this at the top of your component
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -78,7 +70,6 @@ const HomePage = () => {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // When user scrolls past threshold hide the initial video permanently (until a full reload)
   useEffect(() => {
     if (scrollY > 200 && showInitialVideo) {
       setShowInitialVideo(false);
@@ -86,38 +77,31 @@ const HomePage = () => {
     }
   }, [scrollY, showInitialVideo]);
 
-  // When the initial video is dismissed (ended or scrolled away), ensure the page scrolls
-  // so the hero section starts from its top. Skip smooth scrolling when reduced motion is preferred.
   useEffect(() => {
     if (!showInitialVideo && heroSectionRef.current) {
       try {
         const heroTop = heroSectionRef.current.getBoundingClientRect().top + window.scrollY;
         const currentY = window.scrollY;
-        // detect common fixed navbar/header selectors so we can offset the scroll target
         const navEl = document.querySelector('header, .navbar, #navbar, .fixed-navbar');
         const navHeight = navEl ? navEl.getBoundingClientRect().height : 0;
-        const offset = navHeight + 8; // small extra gap
+        const offset = navHeight + 8;
         const targetY = Math.max(0, heroTop - offset);
 
-        // only scroll if not already near the top of the hero section
         if (Math.abs(currentY - targetY) > 30) {
           if (shouldReduceMotion) {
             window.scrollTo(0, targetY);
           } else {
-            // small delay to allow any fade-out animation to start for a smoother transition
             window.requestAnimationFrame(() => {
               window.scrollTo({ top: targetY, behavior: 'smooth' });
             });
           }
         }
       } catch (err) {
-        // silent fallback
         console.warn('Scroll to hero failed', err);
       }
     }
   }, [showInitialVideo, shouldReduceMotion]);
 
-  // Simplified motion config for mobile
   const optimizedMotionConfig = useMemo(() => ({
     initial: shouldReduceMotion || isMobile ? false : 'initial',
     animate: 'animate',
@@ -125,7 +109,6 @@ const HomePage = () => {
     transition: shouldReduceMotion || isMobile ? { duration: 0 } : transitions.default,
   }), [shouldReduceMotion, isMobile]);
 
-  // Replace your current scroll effect with this optimized version
   useEffect(() => {
     let animationFrameId;
     let lastScrollY = window.scrollY;
@@ -133,7 +116,6 @@ const HomePage = () => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
 
-      // Only update if scroll position changed significantly
       if (Math.abs(currentScrollY - lastScrollY) > 5) {
         lastScrollY = currentScrollY;
         setScrollY(currentScrollY);
@@ -157,7 +139,6 @@ const HomePage = () => {
     };
   }, []);
 
-  // Memoized motion configs
   const motionConfig = useMemo(() => ({
     initial: shouldReduceMotion ? false : 'initial',
     animate: 'animate',
@@ -223,13 +204,10 @@ const HomePage = () => {
 
   return (
     <div ref={containerRef} className="min-h-screen bg-white text-gray-900 overflow-hidden">
-      {/* Scroll Progress Bar */}
       <motion.div
         className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-black via-red-600 to-red-600 transform origin-left z-50"
         style={{ scaleX }}
       />
-
-      {/* Video Section - NO GAP */}
       {showInitialVideo && (
         <motion.div
           className="fixed top-0 left-0 w-full h-screen z-10"
@@ -246,17 +224,10 @@ const HomePage = () => {
             muted
             playsInline
             controls={false}
+            loop
             className="w-full h-full object-cover gpu-accelerated"
             style={{ pointerEvents: 'none' }}
-            // play only once on initial load; when it ends hide it until reload
-            onEnded={() => {
-              setShowInitialVideo(false);
-              hasInitialVideoPlayedRef.current = true;
-            }}
-          // do not loop the initial fullscreen video
           />
-
-          {/* Scroll-down indicator shown while initial video is visible */}
           <motion.div
             aria-hidden={true}
             className="absolute bottom-12 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-2 text-white pointer-events-none"
@@ -288,8 +259,6 @@ const HomePage = () => {
           </motion.div>
         </motion.div>
       )}
-
-      {/* Hero Section - RESPONSIVE */}
       <section ref={heroSectionRef} className="relative min-h-screen bg-white flex items-center justify-center px-4 sm:px-6">
         <div className="container mx-auto">
           <motion.div
@@ -300,7 +269,6 @@ const HomePage = () => {
             animate={{ opacity: heroVisible ? 1 : 0, y: heroVisible ? 0 : 50 }}
             transition={{ duration: 0.8, ease: easings.smooth }}
           >
-            {/* Left Column - Text Content */}
             <motion.div
               {...motionConfig}
               variants={fadeInUpVariants}
@@ -325,7 +293,6 @@ const HomePage = () => {
                   Defense Solutions
                 </motion.span>
               </motion.h1>
-
               <motion.p
                 {...motionConfig}
                 variants={fadeInUpVariants}
@@ -335,7 +302,6 @@ const HomePage = () => {
               >
                 Advanced autonomous aerial systems engineered for precision, reliability, and mission success in the most demanding operational environments.
               </motion.p>
-
               <motion.div
                 {...motionConfig}
                 variants={fadeInUpVariants}
@@ -379,7 +345,6 @@ const HomePage = () => {
                   Request Demo
                 </motion.a>
               </motion.div>
-
               <motion.div
                 {...motionConfig}
                 variants={fadeInUpVariants}
@@ -408,8 +373,6 @@ const HomePage = () => {
                 ))}
               </motion.div>
             </motion.div>
-
-            {/* Right Column - 3D Model Viewer */}
             <motion.div
               {...motionConfig}
               variants={slideInVariants.right}
@@ -418,61 +381,28 @@ const HomePage = () => {
               className="relative"
             >
               <motion.div
-                className="relative w-full h-[500px] sm:h-[600px] md:h-[600px] rounded-2xl overflow-hidden bg-white"
+                className="relative w-full h-[300px] sm:h-[400px] md:h-[400px] rounded-2xl overflow-hidden"
                 whileHover={!shouldReduceMotion ? { scale: 1.02 } : {}}
                 transition={transitions.spring}
               >
-                {/* Fixed Canvas - No DOM elements inside */}
-                <Canvas
-                  shadows
-                  camera={{
-                    position: isMobile ? [0, -0.1, 6] : [0, 0, 5], // Adjusted camera for larger model
-                    fov: isMobile ? 32 : 25, // Increased FOV for mobile to see more of the larger model
-                    near: 0.1,
-                    far: 100
-                  }}
-                  gl={{
-                    alpha: true,
-                    preserveDrawingBuffer: true,
-                    antialias: true,
-                    powerPreference: "high-performance"
-                  }}
-                  style={{
-                    background: 'transparent',
-                    borderRadius: '1rem',
-                    pointerEvents: 'auto',
-                    touchAction: 'none',
-                    cursor: isMobile ? 'default' : 'grab'
-                  }}
-                  onCreated={({ gl }) => {
-                    gl.domElement.style.touchAction = 'none';
-                    gl.domElement.style.cursor = isMobile ? 'default' : 'grab';
-                  }}
-                  // Prevent default touch behaviors
-                  onTouchStart={(e) => {
-                    e.stopPropagation();
-                  }}
-                  onTouchEnd={(e) => {
-                    e.stopPropagation();
-                  }}
-                  onWheelCapture={(e) => e.stopPropagation()}
-                >
-                  <Suspense fallback={null}>
-                    <Hero3DModel
-                      modelPath="/models/drone.glb"
-                      shouldReduceMotion={shouldReduceMotion}
-                      isMobile={isMobile}
-                    />
-                  </Suspense>
-                </Canvas>
+                <motion.video
+                  src={HomePageVideo2}
+                  className="w-full h-full object-cover rounded-2xl gpu-accelerated"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: heroVisible ? 1 : 0 }}
+                  transition={{ duration: 0.5, ease: easings.smooth }}
+                  loop
+                  playsInline
+                  muted
+                  autoPlay
+                  preload="auto"
+                  controls={false}
+                />
               </motion.div>
             </motion.div>
-
           </motion.div>
         </div>
       </section>
-
-      {/* Featured Product Section */}
       <section id="product" className="py-12 sm:py-16 md:py-20 lg:py-24 bg-white relative overflow-hidden">
         <div className="absolute inset-0 opacity-5">
           <div
@@ -486,7 +416,6 @@ const HomePage = () => {
             }}
           />
         </div>
-
         <div className="container mx-auto px-4 sm:px-6 relative z-10">
           <motion.div
             {...motionConfig}
@@ -526,7 +455,6 @@ const HomePage = () => {
               {featuredProduct.tagline}
             </p>
           </motion.div>
-
           <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 md:gap-16 items-center mb-12 sm:mb-16 md:mb-20">
             <motion.div
               {...motionConfig}
@@ -536,7 +464,6 @@ const HomePage = () => {
             >
               <VideoShowcase video={featuredProduct.video} videoRef={videoRef} shouldReduceMotion={shouldReduceMotion} />
             </motion.div>
-
             <motion.div
               {...motionConfig}
               variants={slideInVariants.right}
@@ -559,7 +486,6 @@ const HomePage = () => {
               >
                 {featuredProduct.description}
               </motion.p>
-
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6 sm:mb-8">
                 {featuredProduct.specs.map((spec, index) => (
                   <motion.div
@@ -592,7 +518,6 @@ const HomePage = () => {
                   </motion.div>
                 ))}
               </div>
-
               <motion.a
                 href="#contact"
                 whileHover={!shouldReduceMotion ? { scale: 1.05, y: -2 } : {}}
@@ -621,8 +546,6 @@ const HomePage = () => {
               </motion.a>
             </motion.div>
           </div>
-
-          {/* Advanced Capabilities */}
           <motion.section
             {...motionConfig}
             variants={fadeInUpVariants}
@@ -631,7 +554,6 @@ const HomePage = () => {
             className="bg-white rounded-2xl p-6 sm:p-8 md:p-10 lg:p-12 border border-gray-200 relative overflow-hidden"
             aria-labelledby="advanced-capabilities-heading"
           >
-            {/* Decorative background kept minimal on smaller screens to preserve performance */}
             {!shouldReduceMotion && (
               <div
                 aria-hidden="true"
@@ -642,11 +564,9 @@ const HomePage = () => {
                 }}
               />
             )}
-
             <h3 id="advanced-capabilities-heading" className="text-2xl sm:text-3xl font-bold mb-6 text-center text-gray-900 relative z-10">
               Advanced Capabilities
             </h3>
-
             <div className="relative z-10">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
                 {featuredProduct.keyFeatures.map((feature, index) => (
@@ -674,17 +594,13 @@ const HomePage = () => {
           </motion.section>
         </div>
       </section>
-
-      {/* Technology Section */}
       <section id="technology" className="py-12 sm:py-16 md:py-20 lg:py-24 bg-gradient-to-b from-white to-gray-50 relative overflow-hidden">
-        {/* Decorative elements hidden on small screens to improve performance */}
         {!shouldReduceMotion && (
           <>
             <div className="hidden lg:block absolute top-20 right-10 w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-red-200 to-red-400 rounded-full blur-3xl opacity-10" aria-hidden="true" />
             <div className="hidden lg:block absolute bottom-20 left-10 w-32 h-32 sm:w-40 sm:h-40 bg-gradient-to-br from-gray-200 to-gray-400 rounded-full blur-3xl opacity-10" aria-hidden="true" />
           </>
         )}
-
         <div className="container mx-auto px-4 sm:px-6 relative z-10">
           <motion.div
             {...motionConfig}
@@ -724,7 +640,6 @@ const HomePage = () => {
               Leveraging cutting-edge innovations for unmatched performance
             </p>
           </motion.div>
-
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
             {[
               {
@@ -786,8 +701,6 @@ const HomePage = () => {
           </div>
         </div>
       </section>
-
-      {/* Capabilities Section */}
       <section id="capabilities" className="py-12 sm:py-16 md:py-20 lg:py-24 bg-white relative overflow-hidden">
         <div className="container mx-auto px-4 sm:px-6">
           <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 md:gap-16 items-center">
@@ -825,7 +738,6 @@ const HomePage = () => {
               <p className="text-gray-600 text-sm sm:text-base md:text-lg mb-6 sm:mb-8 leading-relaxed">
                 Our systems deliver consistent, reliable performance in extreme conditions where failure is not an option.
               </p>
-
               <div className="space-y-3 sm:space-y-4">
                 {[
                   {
@@ -881,7 +793,6 @@ const HomePage = () => {
                 ))}
               </div>
             </motion.div>
-
             <motion.div
               {...motionConfig}
               variants={slideInVariants.right}
@@ -894,8 +805,6 @@ const HomePage = () => {
           </div>
         </div>
       </section>
-
-      {/* CTA Section */}
       <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           {!shouldReduceMotion && (
@@ -912,7 +821,6 @@ const HomePage = () => {
             />
           )}
         </div>
-
         {!shouldReduceMotion && (
           <>
             <motion.div
@@ -937,7 +845,6 @@ const HomePage = () => {
             />
           </>
         )}
-
         <div className="container mx-auto px-4 sm:px-6 relative z-10">
           <motion.div
             {...motionConfig}
@@ -987,8 +894,6 @@ const HomePage = () => {
           </motion.div>
         </div>
       </section>
-
-      {/* Contact Section */}
       <section id="contact" className="py-12 sm:py-16 md:py-20 lg:py-24 bg-white-50 relative overflow-hidden">
         {!shouldReduceMotion && (
           <motion.div
@@ -1000,7 +905,6 @@ const HomePage = () => {
             className="absolute bottom-0 right-0 w-64 h-64 sm:w-96 sm:h-96 bg-gradient-to-br from-red-200 to-transparent rounded-full blur-3xl opacity-10"
           />
         )}
-
         <div className="container mx-auto px-4 sm:px-6 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 md:gap-16">
             <motion.div
@@ -1037,7 +941,6 @@ const HomePage = () => {
               <p className="text-gray-600 text-sm sm:text-base md:text-lg mb-6 sm:mb-8">
                 Our team is ready to provide detailed information about our systems.
               </p>
-
               <div className="space-y-4 sm:space-y-6">
                 {[
                   {
@@ -1120,7 +1023,6 @@ const HomePage = () => {
                 ))}
               </div>
             </motion.div>
-
             <motion.div {...motionConfig} variants={slideInVariants.right} whileInView="animate" viewport={viewportOptions} className="mt-6 lg:mt-0">
               <ProfessionalContactForm shouldReduceMotion={shouldReduceMotion} />
             </motion.div>
@@ -1131,208 +1033,6 @@ const HomePage = () => {
   );
 };
 
-const ModelLoader = ({ shouldReduceMotion }) => (
-  <mesh>
-    <boxGeometry args={[1, 1, 1]} />
-    <meshStandardMaterial color="#dc2626" />
-  </mesh>
-);
-
-// Hero3DModel Component with Larger Size for Small Devices
-const Hero3DModel = ({ modelPath, shouldReduceMotion, isMobile }) => {
-  const { scene } = useGLTF(modelPath);
-  const modelRef = useRef();
-  const controlsRef = useRef();
-
-  // State for drag interaction
-  const [isDragging, setIsDragging] = useState(false);
-  const dragState = useRef({
-    isDragging: false,
-    previousX: 0,
-    previousY: 0,
-    rotationX: 0,
-    rotationY: 0
-  });
-
-  // Drag sensitivity settings - adjusted for touch vs mouse
-  const sensitivity = useRef({
-    dragSensitivity: isMobile ? 0.008 : 0.015 // Slightly lower sensitivity for touch
-  });
-
-  // Common drag start handler for both mouse and touch
-  const handleDragStart = (clientX, clientY) => {
-    if (shouldReduceMotion) return;
-
-    dragState.current.isDragging = true;
-    dragState.current.previousX = clientX;
-    dragState.current.previousY = clientY;
-    setIsDragging(true);
-
-    // Disable orbit controls while dragging
-    if (controlsRef.current) {
-      controlsRef.current.enabled = false;
-    }
-  };
-
-  // Common drag move handler for both mouse and touch
-  const handleDragMove = (clientX, clientY) => {
-    if (!dragState.current.isDragging || shouldReduceMotion) return;
-
-    const deltaX = clientX - dragState.current.previousX;
-    const deltaY = clientY - dragState.current.previousY;
-
-    // Apply drag movement to rotation
-    dragState.current.rotationY += deltaX * sensitivity.current.dragSensitivity;
-    dragState.current.rotationX += deltaY * sensitivity.current.dragSensitivity;
-
-    // Clamp vertical rotation to prevent over-rotation
-    dragState.current.rotationX = Math.max(
-      -Math.PI / 2.5,
-      Math.min(Math.PI / 2.5, dragState.current.rotationX)
-    );
-
-    // Apply rotation directly to model
-    if (modelRef.current) {
-      modelRef.current.rotation.y = dragState.current.rotationY;
-      modelRef.current.rotation.x = dragState.current.rotationX;
-    }
-
-    dragState.current.previousX = clientX;
-    dragState.current.previousY = clientY;
-  };
-
-  // Common drag end handler for both mouse and touch
-  const handleDragEnd = () => {
-    if (!dragState.current.isDragging) return;
-
-    dragState.current.isDragging = false;
-    setIsDragging(false);
-
-    // Re-enable orbit controls
-    if (controlsRef.current) {
-      controlsRef.current.enabled = true;
-    }
-  };
-
-  // Mouse event handlers
-  const handlePointerDown = (event) => {
-    event.stopPropagation();
-    handleDragStart(event.clientX, event.clientY);
-  };
-
-  const handlePointerMove = (event) => {
-    handleDragMove(event.clientX, event.clientY);
-  };
-
-  // Touch event handlers
-  const handleTouchStart = (event) => {
-    event.stopPropagation();
-    if (event.touches.length === 1) { // Only handle single touch for rotation
-      handleDragStart(event.touches[0].clientX, event.touches[0].clientY);
-    }
-  };
-
-  const handleTouchMove = (event) => {
-    if (event.touches.length === 1) { // Only handle single touch for rotation
-      handleDragMove(event.touches[0].clientX, event.touches[0].clientY);
-    }
-  };
-
-  const handleTouchEnd = (event) => {
-    handleDragEnd();
-  };
-
-  // Add global event listeners for drag
-  useEffect(() => {
-    const handleGlobalPointerMove = (event) => {
-      handlePointerMove(event);
-    };
-
-    const handleGlobalPointerUp = () => {
-      handleDragEnd();
-    };
-
-    const handleGlobalTouchMove = (event) => {
-      handleTouchMove(event);
-    };
-
-    const handleGlobalTouchEnd = (event) => {
-      handleTouchEnd(event);
-    };
-
-    if (!shouldReduceMotion) {
-      // Mouse events
-      document.addEventListener('pointermove', handleGlobalPointerMove);
-      document.addEventListener('pointerup', handleGlobalPointerUp);
-
-      // Touch events
-      document.addEventListener('touchmove', handleGlobalTouchMove, { passive: false });
-      document.addEventListener('touchend', handleGlobalTouchEnd);
-      document.addEventListener('touchcancel', handleGlobalTouchEnd);
-    }
-
-    return () => {
-      // Clean up mouse events
-      document.removeEventListener('pointermove', handleGlobalPointerMove);
-      document.removeEventListener('pointerup', handleGlobalPointerUp);
-
-      // Clean up touch events
-      document.removeEventListener('touchmove', handleGlobalTouchMove);
-      document.removeEventListener('touchend', handleGlobalTouchEnd);
-      document.removeEventListener('touchcancel', handleGlobalTouchEnd);
-    };
-  }, [shouldReduceMotion]);
-
-  return (
-    <>
-      <group
-        ref={modelRef}
-        dispose={null}
-        // Mouse events
-        onPointerDown={handlePointerDown}
-        // Touch events
-        onTouchStart={handleTouchStart}
-        style={{
-          cursor: isDragging ? 'grabbing' : 'grab',
-          touchAction: 'none'
-        }}
-      >
-        <primitive
-          object={scene}
-          scale={isMobile ? 1.4 : 1.2} // Increased from 0.85 to 1.4 for mobile
-          position={[0, isMobile ? -0.5 : -0.5, isMobile ? 0.2 : 0]} // Adjusted position for larger size
-        />
-      </group>
-
-      <ambientLight intensity={0.4} />
-      <directionalLight
-        position={[5, 5, 5]}
-        intensity={0.8}
-      />
-
-      <OrbitControls
-        ref={controlsRef}
-        enablePan={false}
-        enableRotate={!shouldReduceMotion && !isMobile}
-        enableZoom={!shouldReduceMotion && !isMobile}
-        minDistance={isMobile ? 3 : 3} // Reduced min distance for closer view
-        maxDistance={isMobile ? 10 : 8} // Adjusted max distance
-        enableDamping={!shouldReduceMotion}
-        dampingFactor={isMobile ? 0.12 : 0.03}
-        rotateSpeed={isMobile ? 0.5 : 0.8}
-        makeDefault
-      />
-    </>
-  );
-};
-
-Hero3DModel.propTypes = {
-  modelPath: PropTypes.string.isRequired,
-  shouldReduceMotion: PropTypes.bool.isRequired,
-  isMobile: PropTypes.bool.isRequired,
-};
-
-// VideoShowcase Component
 const VideoShowcase = React.memo(({ video, videoRef, shouldReduceMotion }) => {
   const [isVideoReady, setIsVideoReady] = useState(false);
 
@@ -1391,6 +1091,7 @@ const VideoShowcase = React.memo(({ video, videoRef, shouldReduceMotion }) => {
           muted
           autoPlay
           preload="auto"
+          controls={false}
         />
       </div>
       {!shouldReduceMotion && (
@@ -1423,7 +1124,6 @@ VideoShowcase.propTypes = {
   shouldReduceMotion: PropTypes.bool.isRequired,
 };
 
-// ProfessionalRadar Component
 const ProfessionalRadar = React.memo(({ shouldReduceMotion }) => {
   return (
     <motion.div

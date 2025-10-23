@@ -708,7 +708,7 @@ const HeroSection = () => {
 const CategoryFilter = ({ categories, selectedCategory, onCategoryChange, productCounts }) => {
     return (
         <motion.section
-            className="bg-white border-y border-gray-200 sticky top-0 z-40 backdrop-blur-xl"
+            className="bg-white border-y border-gray-200 top-0 z-40 backdrop-blur-xl"
             initial={{ y: -100 }}
             animate={{ y: 0 }}
             transition={{ type: "spring", stiffness: 100 }}
