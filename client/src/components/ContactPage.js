@@ -25,7 +25,7 @@ const ContactPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     // Simulate form submission
     setTimeout(() => {
       setIsSubmitting(false);
@@ -39,7 +39,7 @@ const ContactPage = () => {
         message: '',
         category: 'general'
       });
-      
+
       setTimeout(() => setSubmitStatus(null), 5000);
     }, 2000);
   };
@@ -49,8 +49,7 @@ const ContactPage = () => {
       icon: '📍',
       title: 'Headquarters',
       details: [
-        'Bharath Defence Systems Pvt. Ltd.',
-        'Defense Tech Park, Sector 5',
+        'Hive+ Industries',
         'Bangalore - 560001, Karnataka, India'
       ]
     },
@@ -58,18 +57,18 @@ const ContactPage = () => {
       icon: '📞',
       title: 'Contact Numbers',
       details: [
-        'General: +91-80-2345-6789',
-        'Sales: +91-80-2345-6790',
-        'Support: +91-80-2345-6791'
+        'General: +91 9920887455',
+        'Sales: +91 9920887455',
+        'Support: +91 9920887455'
       ]
     },
     {
       icon: '📧',
       title: 'Email Addresses',
       details: [
-        'info@bharathdefence.com',
-        'sales@bharathdefence.com',
-        'support@bharathdefence.com'
+        'info@hiveindustries.com',
+        'sales@hiveindustries.com',
+        'support@hiveindustries.com'
       ]
     }
   ];
@@ -97,7 +96,7 @@ const ContactPage = () => {
       {/* Hero Section - light theme */}
       <section className="relative h-[50vh] flex items-center justify-center overflow-hidden bg-gradient-to-b from-white to-gray-50">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white"></div>
-        
+
         {/* Subtle Background Pattern */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0" style={{
@@ -138,7 +137,7 @@ const ContactPage = () => {
                 className="bg-white border border-gray-200 rounded-lg p-8"
               >
                 <h2 className="text-3xl font-bold mb-8 text-gray-900">Send us a Message</h2>
-                
+
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="grid md:grid-cols-2 gap-6">
                     <div>
@@ -155,7 +154,7 @@ const ContactPage = () => {
                         placeholder="John Doe"
                       />
                     </div>
-                    
+
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Organization
@@ -186,7 +185,7 @@ const ContactPage = () => {
                         placeholder="john@example.com"
                       />
                     </div>
-                    
+
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Phone Number
@@ -255,11 +254,10 @@ const ContactPage = () => {
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className={`px-8 py-3 font-semibold rounded transition-all ${
-                        isSubmitting 
-                          ? 'bg-gray-200 text-gray-500 cursor-not-allowed' 
-                          : 'bg-gradient-to-r from-orange-500 to-orange-400 text-white hover:from-orange-600 hover:to-orange-500'
-                      }`}
+                      className={`px-8 py-3 font-semibold rounded transition-all ${isSubmitting
+                          ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                          : 'bg-gradient-to-r from-red-600 to-red-500 text-white hover:from-red-600 hover:to-red-500'
+                        }`}
                     >
                       {isSubmitting ? 'Sending...' : 'Send Message'}
                     </button>
@@ -312,16 +310,17 @@ const ContactPage = () => {
                   <div className="space-y-2 text-gray-600 text-sm">
                     <div className="flex justify-between">
                       <span>Monday - Friday</span>
-                      <span>9:00 AM - 6:00 PM</span>
+                      <span>9:00 AM - 6:00 PM IST</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Saturday</span>
-                      <span>10:00 AM - 4:00 PM</span>
+                      <span>10:00 AM - 4:00 PM IST</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Sunday</span>
                       <span className="text-gray-500">Closed</span>
                     </div>
+                    <p className="mt-2 text-xs">Today is Friday, October 24, 2025, 10:08 AM IST</p>
                   </div>
                   <p className="text-xs text-gray-500 mt-4">
                     24/7 Support available for critical defense operations
@@ -339,7 +338,7 @@ const ContactPage = () => {
           <h2 className="text-3xl font-bold text-center mb-12 text-gray-900">
             OUR <span className="text-gray-500">FACILITIES</span>
           </h2>
-          
+
           <div className="grid md:grid-cols-3 gap-8">
             {offices.map((office, index) => (
               <motion.div
@@ -359,41 +358,6 @@ const ContactPage = () => {
                 </span>
               </motion.div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Map Section */}
-      <section className="h-96 relative">
-        <div className="absolute inset-0 bg-gray-100"></div>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-center">
-            <svg className="w-16 h-16 mx-auto mb-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round"               strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-            <p className="text-gray-600">Interactive Map</p>
-            <p className="text-gray-500 text-sm mt-2">Map integration available for authorized personnel only</p>
-          </div>
-        </div>
-      </section>
-
-      {/* Emergency Contact */}
-      <section className="py-12 bg-gradient-to-r from-red-50 to-orange-50 border-y border-red-100">
-        <div className="container mx-auto px-6">
-          <div className="flex flex-wrap items-center justify-between">
-            <div>
-              <h3 className="text-xl font-semibold text-red-600 mb-1">24/7 Emergency Support</h3>
-              <p className="text-gray-600">For critical defense operations and urgent technical assistance</p>
-            </div>
-            <div className="mt-4 lg:mt-0">
-              <a href="tel:+911800123456" className="inline-flex items-center space-x-2 px-6 py-3 bg-red-600 text-white rounded hover:bg-red-700 transition-all">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                </svg>
-                <span className="font-semibold text-white">1800-123-456</span>
-              </a>
-            </div>
           </div>
         </div>
       </section>

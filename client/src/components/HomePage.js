@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, useScroll, useSpring, useInView, AnimatePresence, useReducedMotion } from 'framer-motion';
 import PropTypes from 'prop-types';
-import StrikerVideo from '../video/CruiseDrone.mp4';
 import HomePageVideo from '../video/DroneHomePage3.mp4';
-import HomePageVideo2 from '../video/DroneHomePage2.mp4';
+import { useNavigate } from 'react-router-dom';
 import './HomePage.css';
 import './smoothAnimations.css';
 import { useReducedMotion as useCustomReducedMotion } from './useReducedMotion';
+import HomePageVideo2 from '../video/DroneHomePage4.mp4';
 import {
   easings,
   transitions,
@@ -14,8 +14,6 @@ import {
   fadeInVariants,
   scaleVariants,
   slideInVariants,
-  hoverVariants,
-  tapVariants,
   viewportOptions,
 } from './motionVariants';
 
@@ -45,31 +43,29 @@ const usePerformanceMonitor = () => {
 const HomePage = () => {
   usePerformanceMonitor();
   const [scrollY, setScrollY] = useState(0);
+  // Removed unused state (mousePosition, isLoading, activeFeature) to keep component lean
   const containerRef = useRef(null);
-  const videoRef = useRef(null);
   const heroVideoRef = useRef(null);
+  // Dedicated ref for the hero section DOM node (separate from the video element ref)
   const heroSectionRef = useRef(null);
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
-
+  const navigate = useNavigate();
+  // Reduced motion support
   const prefersReducedMotion = useReducedMotion();
   const customPrefersReducedMotion = useCustomReducedMotion();
   const shouldReduceMotion = prefersReducedMotion || customPrefersReducedMotion;
+  // Track initial fullscreen video playback/dismissal. This should reset on full page reload.
   const hasInitialVideoPlayedRef = useRef(false);
   const [showInitialVideo, setShowInitialVideo] = useState(true);
+  // Hero becomes visible either when user scrolls past threshold or when the initial video is dismissed/finished
   const heroVisible = scrollY > 200 || !showInitialVideo;
-  const [isMobile, setIsMobile] = useState(false);
 
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
+  const handleProduct = () => {
+    navigate('/products');
+  };
 
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
+  // When user scrolls past threshold hide the initial video permanently (until a full reload)
   useEffect(() => {
     if (scrollY > 200 && showInitialVideo) {
       setShowInitialVideo(false);
@@ -77,38 +73,43 @@ const HomePage = () => {
     }
   }, [scrollY, showInitialVideo]);
 
+  // When the initial video is dismissed (ended or scrolled away), ensure the page scrolls
+  // so the hero section starts from its top. Skip smooth scrolling when reduced motion is preferred.
   useEffect(() => {
     if (!showInitialVideo && heroSectionRef.current) {
       try {
-        const heroTop = heroSectionRef.current.getBoundingClientRect().top + window.scrollY;
-        const currentY = window.scrollY;
-        const navEl = document.querySelector('header, .navbar, #navbar, .fixed-navbar');
-        const navHeight = navEl ? navEl.getBoundingClientRect().height : 0;
-        const offset = navHeight + 8;
-        const targetY = Math.max(0, heroTop - offset);
+        const heroTop =
+          heroSectionRef.current.getBoundingClientRect().top + window.scrollY;
 
+        const currentY = window.scrollY;
+
+        // detect nav height intelligently
+        const navEl = document.querySelector(
+          'header, .navbar, #navbar, .fixed-navbar'
+        );
+        const navHeight = navEl
+          ? navEl.getBoundingClientRect().height + 8
+          : 12;
+
+        const isMobile = window.innerWidth < 768;
+        // add extra offset for mobile Safari’s toolbar
+        const mobileOffset = isMobile ? 60 : 0;
+
+        const targetY = Math.max(0, heroTop - (navHeight + mobileOffset));
+
+        // only scroll if not already close
         if (Math.abs(currentY - targetY) > 30) {
-          if (shouldReduceMotion) {
-            window.scrollTo(0, targetY);
-          } else {
-            window.requestAnimationFrame(() => {
-              window.scrollTo({ top: targetY, behavior: 'smooth' });
-            });
-          }
+          const scrollOptions = { top: targetY };
+          if (!shouldReduceMotion) scrollOptions.behavior = 'smooth';
+          requestAnimationFrame(() => window.scrollTo(scrollOptions));
         }
       } catch (err) {
-        console.warn('Scroll to hero failed', err);
+        console.warn('Scroll to hero failed:', err);
       }
     }
   }, [showInitialVideo, shouldReduceMotion]);
 
-  const optimizedMotionConfig = useMemo(() => ({
-    initial: shouldReduceMotion || isMobile ? false : 'initial',
-    animate: 'animate',
-    exit: shouldReduceMotion || isMobile ? false : 'exit',
-    transition: shouldReduceMotion || isMobile ? { duration: 0 } : transitions.default,
-  }), [shouldReduceMotion, isMobile]);
-
+  // Replace your current scroll effect with this optimized version
   useEffect(() => {
     let animationFrameId;
     let lastScrollY = window.scrollY;
@@ -116,6 +117,7 @@ const HomePage = () => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
 
+      // Only update if scroll position changed significantly
       if (Math.abs(currentScrollY - lastScrollY) > 5) {
         lastScrollY = currentScrollY;
         setScrollY(currentScrollY);
@@ -139,6 +141,7 @@ const HomePage = () => {
     };
   }, []);
 
+  // Memoized motion configs
   const motionConfig = useMemo(() => ({
     initial: shouldReduceMotion ? false : 'initial',
     animate: 'animate',
@@ -146,68 +149,15 @@ const HomePage = () => {
     transition: shouldReduceMotion ? { duration: 0 } : transitions.default,
   }), [shouldReduceMotion]);
 
-  const featuredProduct = useMemo(
-    () => ({
-      id: 1,
-      name: 'CRUISE KAMIKAZE DRONE',
-      tagline: 'Miniature Cruise Missile Platform',
-      description:
-        'A miniature cruise missile platform designed for long-range, high-speed autonomous strikes. With auto-stabilization and a unique wing-folding dive mechanism, it can fly like a plane and suddenly dive vertically onto a target, delivering devastating precision with minimal detection.',
-      video: StrikerVideo,
-      specs: [
-        { label: 'Max Range', value: '10-15 km', icon: '📡', color: 'from-blue-500 to-cyan-500' },
-        { label: 'Flight Type', value: 'Fixed-Wing', icon: '✈️', color: 'from-sky-500 to-blue-500' },
-        { label: 'Navigation', value: 'GPS Waypoint', icon: '🎯', color: 'from-purple-500 to-pink-500' },
-        { label: 'Launch Method', value: 'Multi-Mode', icon: '🚀', color: 'from-orange-500 to-red-500' },
-      ],
-      keyFeatures: [
-        {
-          title: 'Fixed-Wing Design',
-          description: 'Long-range autonomous flight capability with efficient aerodynamic design',
-          icon: '🛩️',
-        },
-        {
-          title: 'Wing-Folding Dive Mechanism',
-          description: 'Unique system enables vertical kamikaze dive for devastating precision strikes',
-          icon: '⬇️',
-        },
-        {
-          title: 'Auto-Stabilized Flight',
-          description: 'GPS waypoint navigation with autonomous flight control systems',
-          icon: '🧭',
-        },
-        {
-          title: 'Versatile Launch System',
-          description: 'Launchable via catapult, hand, or rail system for maximum deployment flexibility',
-          icon: '🚀',
-        },
-        {
-          title: 'Expendable Mission Design',
-          description: 'Lightweight and built for single-use or expendable tactical missions',
-          icon: '⚡',
-        },
-        {
-          title: 'Static Target Specialist',
-          description: 'Ideal for static target strikes, supply depot neutralization, or armor disruption',
-          icon: '🎯',
-        },
-      ],
-      additionalInfo: {
-        inspiration: 'Inspired by modern mini cruise drones used in Ukraine conflict',
-        useCase: 'Static target strikes, supply depot neutralization, armor disruption',
-        deployment: 'Single-use or expendable missions',
-        rangeNote: 'Range varies 10-15 km depending on payload',
-      },
-    }),
-    []
-  );
-
   return (
     <div ref={containerRef} className="min-h-screen bg-white text-gray-900 overflow-hidden">
+      {/* Scroll Progress Bar */}
       <motion.div
         className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-black via-red-600 to-red-600 transform origin-left z-50"
         style={{ scaleX }}
       />
+
+      {/* Video Section - NO GAP */}
       {showInitialVideo && (
         <motion.div
           className="fixed top-0 left-0 w-full h-screen z-10"
@@ -224,51 +174,30 @@ const HomePage = () => {
             muted
             playsInline
             controls={false}
-            loop
             className="w-full h-full object-cover gpu-accelerated"
             style={{ pointerEvents: 'none' }}
+            // play only once on initial load; when it ends hide it until reload
+            onEnded={() => {
+              setShowInitialVideo(false);
+              hasInitialVideoPlayedRef.current = true;
+            }}
+          // do not loop the initial fullscreen video
           />
-          <motion.div
-            aria-hidden={true}
-            className="absolute bottom-12 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-2 text-white pointer-events-none"
-            initial={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
-            animate={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 1, y: [10, 0, 10] }}
-            transition={shouldReduceMotion ? { duration: 0 } : { duration: 1.6, repeat: Infinity, ease: easings.smooth }}
-            style={{ textShadow: '0 2px 8px rgba(0,0,0,0.6)' }}
-          >
-            <span className="bg-black/40 px-3 py-1 rounded-full text-xs sm:text-sm font-medium">Scroll down to continue</span>
-            {!shouldReduceMotion && (
-              <motion.svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                className="w-5 h-5 text-white"
-                initial={{ y: 0 }}
-                animate={{ y: [0, 6, 0] }}
-                transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
-              >
-                <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-              </motion.svg>
-            )}
-            {shouldReduceMotion && (
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="w-5 h-5 text-white">
-                <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-              </svg>
-            )}
-          </motion.div>
         </motion.div>
       )}
+
+      {/* Hero Section - RESPONSIVE */}
       <section ref={heroSectionRef} className="relative min-h-screen bg-white flex items-center justify-center px-4 sm:px-6">
         <div className="container mx-auto">
           <motion.div
-            className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center py-20 sm:py-24 "
+            className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 items-center py-16 sm:py-20 md:py-24 "
             {...motionConfig}
             variants={fadeInUpVariants}
             custom={heroVisible}
             animate={{ opacity: heroVisible ? 1 : 0, y: heroVisible ? 0 : 50 }}
             transition={{ duration: 0.8, ease: easings.smooth }}
           >
+            {/* Left Column - Text Content */}
             <motion.div
               {...motionConfig}
               variants={fadeInUpVariants}
@@ -280,7 +209,7 @@ const HomePage = () => {
                 variants={fadeInUpVariants}
                 animate={{ opacity: heroVisible ? 1 : 0, y: heroVisible ? 0 : 20 }}
                 transition={{ delay: 0.3, duration: 0.6, ease: easings.smooth }}
-                className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 sm:mb-6 leading-tight text-gray-900"
+                className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 sm:mb-6 leading-tight text-gray-900 text-center sm:text-left"
               >
                 Future-Ready
                 <motion.span
@@ -293,6 +222,7 @@ const HomePage = () => {
                   Defense Solutions
                 </motion.span>
               </motion.h1>
+
               <motion.p
                 {...motionConfig}
                 variants={fadeInUpVariants}
@@ -302,6 +232,7 @@ const HomePage = () => {
               >
                 Advanced autonomous aerial systems engineered for precision, reliability, and mission success in the most demanding operational environments.
               </motion.p>
+
               <motion.div
                 {...motionConfig}
                 variants={fadeInUpVariants}
@@ -310,7 +241,6 @@ const HomePage = () => {
                 className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4"
               >
                 <motion.a
-                  href="#product"
                   whileHover={!shouldReduceMotion ? { scale: 1.05, y: -2 } : {}}
                   whileTap={!shouldReduceMotion ? { scale: 0.98 } : {}}
                   transition={transitions.spring}
@@ -322,8 +252,8 @@ const HomePage = () => {
                     whileHover={!shouldReduceMotion ? { x: 0 } : {}}
                     transition={transitions.default}
                   />
-                  <span className="flex items-center justify-center gap-2 relative z-10">
-                    Explore Platform
+                  <span className="flex items-center justify-center gap-2 relative z-10" onClick={handleProduct}>
+                    Explore Products
                     {!shouldReduceMotion && (
                       <motion.span
                         animate={{ x: [0, 4, 0] }}
@@ -345,6 +275,7 @@ const HomePage = () => {
                   Request Demo
                 </motion.a>
               </motion.div>
+
               <motion.div
                 {...motionConfig}
                 variants={fadeInUpVariants}
@@ -373,6 +304,8 @@ const HomePage = () => {
                 ))}
               </motion.div>
             </motion.div>
+
+            {/* Right Column */}
             <motion.div
               {...motionConfig}
               variants={slideInVariants.right}
@@ -381,7 +314,7 @@ const HomePage = () => {
               className="relative"
             >
               <motion.div
-                className="relative w-full h-[300px] sm:h-[400px] md:h-[400px] rounded-2xl overflow-hidden"
+                className="w-full aspect-video object-cover rounded-2xl gpu-accelerated"
                 whileHover={!shouldReduceMotion ? { scale: 1.02 } : {}}
                 transition={transitions.spring}
               >
@@ -396,14 +329,16 @@ const HomePage = () => {
                   muted
                   autoPlay
                   preload="auto"
-                  controls={false}
                 />
               </motion.div>
             </motion.div>
+
           </motion.div>
         </div>
       </section>
-      <section id="product" className="py-12 sm:py-16 md:py-20 lg:py-24 bg-white relative overflow-hidden">
+
+      {/* Technology Section */}
+      <section id="technology" className="py-12 sm:py-16 md:py-20 lg:py-24 bg-gradient-to-b from-white to-gray-50 relative overflow-hidden">
         <div className="absolute inset-0 opacity-5">
           <div
             className="absolute inset-0"
@@ -416,191 +351,14 @@ const HomePage = () => {
             }}
           />
         </div>
-        <div className="container mx-auto px-4 sm:px-6 relative z-10">
-          <motion.div
-            {...motionConfig}
-            variants={fadeInUpVariants}
-            whileInView="animate"
-            viewport={viewportOptions}
-            className="text-center mb-12 sm:mb-16 md:mb-20"
-          >
-            <motion.div
-              {...motionConfig}
-              variants={scaleVariants}
-              whileInView="animate"
-              viewport={viewportOptions}
-              whileHover={!shouldReduceMotion ? { scale: 1.05 } : {}}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-full mb-4 cursor-pointer"
-            >
-              {!shouldReduceMotion && (
-                <motion.div
-                  animate={{ scale: [1, 1.3, 1] }}
-                  transition={{ duration: 3, repeat: Infinity, ease: easings.smooth }}
-                  className="w-2 h-2 bg-red-600 rounded-full"
-                />
-              )}
-              {shouldReduceMotion && <div className="w-2 h-2 bg-red-600 rounded-full" />}
-              <span className="text-gray-700 text-xs sm:text-sm font-semibold">
-                FEATURED PLATFORM
-              </span>
-            </motion.div>
-            <motion.h2
-              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 text-gray-900 px-4"
-              whileHover={!shouldReduceMotion ? { scale: 1.02 } : {}}
-              transition={transitions.default}
-            >
-              {featuredProduct.name}
-            </motion.h2>
-            <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-3xl mx-auto px-4">
-              {featuredProduct.tagline}
-            </p>
-          </motion.div>
-          <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 md:gap-16 items-center mb-12 sm:mb-16 md:mb-20">
-            <motion.div
-              {...motionConfig}
-              variants={slideInVariants.left}
-              whileInView="animate"
-              viewport={viewportOptions}
-            >
-              <VideoShowcase video={featuredProduct.video} videoRef={videoRef} shouldReduceMotion={shouldReduceMotion} />
-            </motion.div>
-            <motion.div
-              {...motionConfig}
-              variants={slideInVariants.right}
-              whileInView="animate"
-              viewport={viewportOptions}
-            >
-              <motion.h3
-                className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4 text-gray-900"
-                whileHover={!shouldReduceMotion ? { x: 10 } : {}}
-                transition={transitions.spring}
-              >
-                Precision Meets Performance
-              </motion.h3>
-              <motion.p
-                className="text-gray-600 text-sm sm:text-base md:text-lg mb-6 sm:mb-8 leading-relaxed"
-                {...motionConfig}
-                variants={fadeInVariants}
-                whileInView="animate"
-                viewport={viewportOptions}
-              >
-                {featuredProduct.description}
-              </motion.p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6 sm:mb-8">
-                {featuredProduct.specs.map((spec, index) => (
-                  <motion.div
-                    key={index}
-                    {...motionConfig}
-                    variants={fadeInUpVariants}
-                    whileInView="animate"
-                    viewport={viewportOptions}
-                    transition={{ ...transitions.default, delay: shouldReduceMotion ? 0 : index * 0.1 }}
-                    whileHover={!shouldReduceMotion ? { y: -8, scale: 1.05 } : {}}
-                    className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-4 sm:p-6 border border-gray-200 cursor-pointer relative overflow-hidden group gpu-accelerated"
-                  >
-                    <motion.div
-                      className={`absolute inset-0 bg-gradient-to-br ${spec.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}
-                    />
-                    <motion.div
-                      className="text-2xl sm:text-3xl mb-2 sm:mb-3"
-                      whileHover={!shouldReduceMotion ? { scale: 1.2 } : {}}
-                      transition={transitions.spring}
-                    >
-                      {spec.icon}
-                    </motion.div>
-                    <div className="text-xs sm:text-sm text-gray-500 mb-1 font-medium">{spec.label}</div>
-                    <motion.div
-                      className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900"
-                      whileHover={!shouldReduceMotion ? { scale: 1.1 } : {}}
-                    >
-                      {spec.value}
-                    </motion.div>
-                  </motion.div>
-                ))}
-              </div>
-              <motion.a
-                href="#contact"
-                whileHover={!shouldReduceMotion ? { scale: 1.05, y: -2 } : {}}
-                whileTap={!shouldReduceMotion ? tapVariants : {}}
-                transition={transitions.default}
-                className="inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-gray-900 to-black text-white rounded-lg font-semibold shadow-lg relative overflow-hidden group w-full sm:w-auto gpu-accelerated"
-              >
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-red-600 to-red-700"
-                  initial={{ x: '-100%' }}
-                  whileHover={!shouldReduceMotion ? { x: 0 } : {}}
-                  transition={transitions.default}
-                />
-                <span className="relative z-10 flex items-center gap-2">
-                  Get Technical Specs
-                  {!shouldReduceMotion && (
-                    <motion.span
-                      animate={{ x: [0, 4, 0] }}
-                      transition={{ duration: 1.5, repeat: Infinity, ease: easings.smooth }}
-                    >
-                      →
-                    </motion.span>
-                  )}
-                  {shouldReduceMotion && <span>→</span>}
-                </span>
-              </motion.a>
-            </motion.div>
-          </div>
-          <motion.section
-            {...motionConfig}
-            variants={fadeInUpVariants}
-            whileInView="animate"
-            viewport={viewportOptions}
-            className="bg-white rounded-2xl p-6 sm:p-8 md:p-10 lg:p-12 border border-gray-200 relative overflow-hidden"
-            aria-labelledby="advanced-capabilities-heading"
-          >
-            {!shouldReduceMotion && (
-              <div
-                aria-hidden="true"
-                className="hidden md:block absolute inset-0 opacity-5"
-                style={{
-                  backgroundImage: `radial-gradient(circle at 2px 2px, rgba(220,38,38,0.9) 1px, transparent 0)`,
-                  backgroundSize: '40px 40px',
-                }}
-              />
-            )}
-            <h3 id="advanced-capabilities-heading" className="text-2xl sm:text-3xl font-bold mb-6 text-center text-gray-900 relative z-10">
-              Advanced Capabilities
-            </h3>
-            <div className="relative z-10">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
-                {featuredProduct.keyFeatures.map((feature, index) => (
-                  <motion.div
-                    key={index}
-                    initial={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
-                    whileInView={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.45, delay: shouldReduceMotion ? 0 : index * 0.06 }}
-                    whileHover={!shouldReduceMotion ? { y: -6, scale: 1.03 } : {}}
-                    className="bg-white rounded-xl p-5 sm:p-6 shadow-sm border border-gray-100 cursor-default relative overflow-hidden"
-                    aria-hidden={false}
-                  >
-                    <div className="flex items-start gap-4">
-                      <div className="text-3xl sm:text-4xl flex-shrink-0">{feature.icon}</div>
-                      <div>
-                        <div className="text-sm sm:text-base font-bold text-gray-900">{feature.title}</div>
-                        <p className="text-xs sm:text-sm text-gray-600 mt-1 leading-relaxed">{feature.description}</p>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-          </motion.section>
-        </div>
-      </section>
-      <section id="technology" className="py-12 sm:py-16 md:py-20 lg:py-24 bg-gradient-to-b from-white to-gray-50 relative overflow-hidden">
+        {/* Decorative elements hidden on small screens to improve performance */}
         {!shouldReduceMotion && (
           <>
             <div className="hidden lg:block absolute top-20 right-10 w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-red-200 to-red-400 rounded-full blur-3xl opacity-10" aria-hidden="true" />
             <div className="hidden lg:block absolute bottom-20 left-10 w-32 h-32 sm:w-40 sm:h-40 bg-gradient-to-br from-gray-200 to-gray-400 rounded-full blur-3xl opacity-10" aria-hidden="true" />
           </>
         )}
+
         <div className="container mx-auto px-4 sm:px-6 relative z-10">
           <motion.div
             {...motionConfig}
@@ -640,6 +398,7 @@ const HomePage = () => {
               Leveraging cutting-edge innovations for unmatched performance
             </p>
           </motion.div>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
             {[
               {
@@ -701,110 +460,192 @@ const HomePage = () => {
           </div>
         </div>
       </section>
+
+      {/* Capabilities Section */}
       <section id="capabilities" className="py-12 sm:py-16 md:py-20 lg:py-24 bg-white relative overflow-hidden">
-        <div className="container mx-auto px-4 sm:px-6">
-          <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 md:gap-16 items-center">
+        {/* Gradient Background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-red-50/30" />
+
+        {/* Dotted Overlay */}
+        <div className="absolute inset-0 opacity-10">
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundImage: 'radial-gradient(circle, #000 0.5px, transparent 0.5px)',
+              backgroundSize: '20px 20px',
+            }}
+          />
+        </div>
+
+        {/* Animated gradient blobs */}
+        {!shouldReduceMotion && (
+          <>
+            <motion.div
+              animate={{
+                x: [0, 50, 0],
+                y: [0, -30, 0],
+              }}
+              transition={{ duration: 15, repeat: Infinity, ease: easings.smooth }}
+              className="absolute top-20 right-20 w-96 h-96 bg-gradient-to-br from-red-100/40 to-transparent rounded-full blur-3xl"
+            />
+            <motion.div
+              animate={{
+                x: [0, -50, 0],
+                y: [0, 30, 0],
+              }}
+              transition={{ duration: 20, repeat: Infinity, ease: easings.smooth }}
+              className="absolute bottom-20 left-20 w-96 h-96 bg-gradient-to-br from-gray-100/40 to-transparent rounded-full blur-3xl"
+            />
+          </>
+        )}
+        <div className="container mx-auto px-4 sm:px-6 relative z-10">
+          {/* Section Header */}
+          <motion.div
+            {...motionConfig}
+            variants={fadeInUpVariants}
+            whileInView="animate"
+            viewport={viewportOptions}
+            className="text-center mb-12 sm:mb-16 lg:mb-20 max-w-3xl mx-auto"
+          >
             <motion.div
               {...motionConfig}
-              variants={slideInVariants.left}
+              variants={scaleVariants}
+              whileInView="animate"
+              viewport={viewportOptions}
+              whileHover={!shouldReduceMotion ? { scale: 1.05 } : {}}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-full mb-4 sm:mb-6 cursor-pointer"
+            >
+              {!shouldReduceMotion && (
+                <motion.div
+                  animate={{ scale: [1, 1.3, 1] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: easings.smooth }}
+                  className="w-2 h-2 bg-red-600 rounded-full"
+                />
+              )}
+              {shouldReduceMotion && <div className="w-2 h-2 bg-red-600 rounded-full" />}
+              <span className="text-gray-700 text-xs sm:text-sm font-semibold">MISSION READY</span>
+            </motion.div>
+
+            <motion.h2
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 text-gray-900"
+              {...motionConfig}
+              variants={scaleVariants}
               whileInView="animate"
               viewport={viewportOptions}
             >
+              Built for Demanding Operations
+            </motion.h2>
+
+            <p className="text-base sm:text-lg md:text-xl text-gray-600 leading-relaxed">
+              Our systems deliver consistent, reliable performance in extreme conditions where failure is not an option.
+            </p>
+          </motion.div>
+
+          {/* Capabilities Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 max-w-6xl mx-auto">
+            {[
+              {
+                title: 'All-Weather Operations',
+                description: 'Operational from -40°C to +60°C with IP67 weather resistance',
+                icon: '🌡️',
+                gradient: 'from-blue-500 to-cyan-500',
+              },
+              {
+                title: 'Electronic Warfare Resistant',
+                description: 'Advanced frequency hopping and anti-jamming countermeasures',
+                icon: '📡',
+                gradient: 'from-purple-500 to-pink-500',
+              },
+              {
+                title: 'Real-Time Intelligence',
+                description: 'Live 4K video feed with AI-powered threat detection',
+                icon: '📹',
+                gradient: 'from-green-500 to-emerald-500',
+              },
+              {
+                title: 'Rapid Deployment',
+                description: 'Operational readiness in under 5 minutes',
+                icon: '⚡',
+                gradient: 'from-yellow-500 to-orange-500',
+              },
+            ].map((capability, index) => (
               <motion.div
+                key={index}
                 {...motionConfig}
-                variants={scaleVariants}
+                variants={fadeInUpVariants}
                 whileInView="animate"
                 viewport={viewportOptions}
-                whileHover={!shouldReduceMotion ? { scale: 1.05 } : {}}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-full mb-4 sm:mb-6 cursor-pointer"
+                transition={{ ...transitions.default, delay: shouldReduceMotion ? 0 : index * 0.1 }}
+                whileHover={!shouldReduceMotion ? { y: -8, scale: 1.02 } : {}}
+                className="flex items-start gap-4 sm:gap-5 p-5 sm:p-6 lg:p-8 bg-white rounded-xl border-2 border-gray-200 hover:border-gray-300 hover:shadow-xl relative overflow-hidden group gpu-accelerated transition-all duration-300"
               >
-                {!shouldReduceMotion && (
-                  <motion.div
-                    animate={{ scale: [1, 1.3, 1] }}
-                    transition={{ duration: 3, repeat: Infinity, ease: easings.smooth }}
-                    className="w-2 h-2 bg-red-600 rounded-full"
-                  />
-                )}
-                {shouldReduceMotion && <div className="w-2 h-2 bg-red-600 rounded-full" />}
-                <span className="text-gray-700 text-xs sm:text-sm font-semibold">MISSION READY</span>
+                {/* Subtle gradient overlay on hover */}
+                <motion.div
+                  className={`absolute inset-0 bg-gradient-to-br ${capability.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-300`}
+                />
+
+                {/* Icon */}
+                <motion.div
+                  className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-gradient-to-br from-gray-900 to-red-600 rounded-xl flex items-center justify-center text-2xl sm:text-3xl flex-shrink-0 relative z-10 shadow-md group-hover:shadow-xl transition-shadow duration-300"
+                  whileHover={!shouldReduceMotion ? { scale: 1.1, rotate: 5 } : {}}
+                  transition={transitions.spring}
+                >
+                  {capability.icon}
+                </motion.div>
+
+                {/* Content */}
+                <div className="relative z-10 flex-1 min-w-0">
+                  <h3 className="font-bold text-lg sm:text-xl lg:text-2xl mb-2 sm:mb-3 text-gray-900">
+                    {capability.title}
+                  </h3>
+                  <p className="text-gray-600 text-sm sm:text-base leading-relaxed">
+                    {capability.description}
+                  </p>
+                </div>
               </motion.div>
-              <motion.h2
-                className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6 text-gray-900"
-                whileHover={!shouldReduceMotion ? { x: 10 } : {}}
-                transition={transitions.spring}
-              >
-                Built for Demanding Operations
-              </motion.h2>
-              <p className="text-gray-600 text-sm sm:text-base md:text-lg mb-6 sm:mb-8 leading-relaxed">
-                Our systems deliver consistent, reliable performance in extreme conditions where failure is not an option.
-              </p>
-              <div className="space-y-3 sm:space-y-4">
-                {[
-                  {
-                    title: 'All-Weather Operations',
-                    description: 'Operational from -40°C to +60°C with IP67 weather resistance',
-                    icon: '🌡️',
-                    gradient: 'from-blue-500 to-cyan-500',
-                  },
-                  {
-                    title: 'Electronic Warfare Resistant',
-                    description: 'Advanced frequency hopping and anti-jamming countermeasures',
-                    icon: '📡',
-                    gradient: 'from-purple-500 to-pink-500',
-                  },
-                  {
-                    title: 'Real-Time Intelligence',
-                    description: 'Live 4K video feed with AI-powered threat detection',
-                    icon: '📹',
-                    gradient: 'from-green-500 to-emerald-500',
-                  },
-                  {
-                    title: 'Rapid Deployment',
-                    description: 'Operational readiness in under 5 minutes',
-                    icon: '⚡',
-                    gradient: 'from-yellow-500 to-orange-500',
-                  },
-                ].map((capability, index) => (
-                  <motion.div
-                    key={index}
-                    {...motionConfig}
-                    variants={slideInVariants.left}
-                    whileInView="animate"
-                    viewport={viewportOptions}
-                    transition={{ ...transitions.default, delay: shouldReduceMotion ? 0 : index * 0.1 }}
-                    whileHover={!shouldReduceMotion ? { x: 12, scale: 1.02 } : {}}
-                    className="flex items-start gap-3 sm:gap-4 p-4 sm:p-6 bg-gray-50 rounded-xl border border-gray-200 hover:shadow-lg relative overflow-hidden group gpu-accelerated"
-                  >
-                    <motion.div
-                      className={`absolute inset-0 bg-gradient-to-br ${capability.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-300`}
-                    />
-                    <motion.div
-                      className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-gray-900 to-red-600 rounded-lg flex items-center justify-center text-xl sm:text-2xl flex-shrink-0 relative z-10"
-                      whileHover={!shouldReduceMotion ? { scale: 1.1 } : {}}
-                      transition={transitions.spring}
-                    >
-                      {capability.icon}
-                    </motion.div>
-                    <div className="relative z-10">
-                      <h4 className="font-bold text-base sm:text-lg mb-1 text-gray-900">{capability.title}</h4>
-                      <p className="text-gray-600 text-xs sm:text-sm">{capability.description}</p>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-            <motion.div
-              {...motionConfig}
-              variants={slideInVariants.right}
-              whileInView="animate"
-              viewport={viewportOptions}
-              className="relative mt-8 lg:mt-0"
-            >
-              <ProfessionalRadar shouldReduceMotion={shouldReduceMotion} />
-            </motion.div>
+            ))}
           </div>
+
+          {/* Performance Stats */}
+          <motion.div
+            {...motionConfig}
+            variants={fadeInUpVariants}
+            whileInView="animate"
+            viewport={viewportOptions}
+            className="mt-12 sm:mt-16 lg:mt-20 pt-8 sm:pt-12 border-t border-gray-200 max-w-5xl mx-auto"
+          >
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
+              {[
+                { value: '50km', label: 'Max Range', icon: '📍' },
+                { value: '120min', label: 'Flight Time', icon: '⏱️' },
+                { value: '5kg', label: 'Payload Capacity', icon: '📦' },
+                { value: '24/7', label: 'Support', icon: '🛟' },
+              ].map((stat, index) => (
+                <motion.div
+                  key={index}
+                  {...motionConfig}
+                  variants={scaleVariants}
+                  whileInView="animate"
+                  viewport={viewportOptions}
+                  transition={{ ...transitions.default, delay: shouldReduceMotion ? 0 : index * 0.1 }}
+                  whileHover={!shouldReduceMotion ? { scale: 1.05, y: -5 } : {}}
+                  className="text-center p-4 sm:p-6 bg-gradient-to-br from-gray-50 to-white rounded-xl border border-gray-200 hover:shadow-lg transition-all duration-300"
+                >
+                  <div className="text-3xl sm:text-4xl mb-2 sm:mb-3">{stat.icon}</div>
+                  <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-1 sm:mb-2">
+                    {stat.value}
+                  </div>
+                  <div className="text-xs sm:text-sm text-gray-600 font-medium">
+                    {stat.label}
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
         </div>
       </section>
+
+      {/* CTA Section */}
       <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           {!shouldReduceMotion && (
@@ -821,6 +662,7 @@ const HomePage = () => {
             />
           )}
         </div>
+
         {!shouldReduceMotion && (
           <>
             <motion.div
@@ -845,6 +687,7 @@ const HomePage = () => {
             />
           </>
         )}
+
         <div className="container mx-auto px-4 sm:px-6 relative z-10">
           <motion.div
             {...motionConfig}
@@ -894,6 +737,8 @@ const HomePage = () => {
           </motion.div>
         </div>
       </section>
+
+      {/* Contact Section */}
       <section id="contact" className="py-12 sm:py-16 md:py-20 lg:py-24 bg-white-50 relative overflow-hidden">
         {!shouldReduceMotion && (
           <motion.div
@@ -905,6 +750,7 @@ const HomePage = () => {
             className="absolute bottom-0 right-0 w-64 h-64 sm:w-96 sm:h-96 bg-gradient-to-br from-red-200 to-transparent rounded-full blur-3xl opacity-10"
           />
         )}
+
         <div className="container mx-auto px-4 sm:px-6 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 md:gap-16">
             <motion.div
@@ -941,6 +787,7 @@ const HomePage = () => {
               <p className="text-gray-600 text-sm sm:text-base md:text-lg mb-6 sm:mb-8">
                 Our team is ready to provide detailed information about our systems.
               </p>
+
               <div className="space-y-4 sm:space-y-6">
                 {[
                   {
@@ -1023,6 +870,7 @@ const HomePage = () => {
                 ))}
               </div>
             </motion.div>
+
             <motion.div {...motionConfig} variants={slideInVariants.right} whileInView="animate" viewport={viewportOptions} className="mt-6 lg:mt-0">
               <ProfessionalContactForm shouldReduceMotion={shouldReduceMotion} />
             </motion.div>
@@ -1033,6 +881,7 @@ const HomePage = () => {
   );
 };
 
+// VideoShowcase Component
 const VideoShowcase = React.memo(({ video, videoRef, shouldReduceMotion }) => {
   const [isVideoReady, setIsVideoReady] = useState(false);
 
@@ -1091,7 +940,6 @@ const VideoShowcase = React.memo(({ video, videoRef, shouldReduceMotion }) => {
           muted
           autoPlay
           preload="auto"
-          controls={false}
         />
       </div>
       {!shouldReduceMotion && (
@@ -1121,165 +969,6 @@ const VideoShowcase = React.memo(({ video, videoRef, shouldReduceMotion }) => {
 VideoShowcase.propTypes = {
   video: PropTypes.string.isRequired,
   videoRef: PropTypes.object.isRequired,
-  shouldReduceMotion: PropTypes.bool.isRequired,
-};
-
-const ProfessionalRadar = React.memo(({ shouldReduceMotion }) => {
-  return (
-    <motion.div
-      className="aspect-square bg-gradient-to-br from-gray-50 to-white rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 shadow-xl border border-gray-200 relative overflow-hidden"
-      whileHover={!shouldReduceMotion ? { scale: 1.02 } : {}}
-      transition={{ duration: 0.4, type: 'spring', stiffness: 300 }}
-    >
-      {!shouldReduceMotion && (
-        <motion.div
-          animate={{
-            opacity: [0.1, 0.2, 0.1],
-          }}
-          transition={{ duration: 3, repeat: Infinity, ease: easings.smooth }}
-          className="absolute inset-0"
-          style={{
-            backgroundImage: `
-              linear-gradient(to right, #dc2626 1px, transparent 1px),
-              linear-gradient(to bottom, #dc2626 1px, transparent 1px)
-            `,
-            backgroundSize: '20px 20px',
-          }}
-        />
-      )}
-      <div className="w-full h-full bg-white rounded-lg sm:rounded-xl flex items-center justify-center relative overflow-hidden">
-        <div className="relative w-full h-full max-w-[280px] max-h-[280px] sm:max-w-[320px] sm:max-h-[320px]">
-          {[...Array(4)].map((_, i) => (
-            <motion.div
-              key={i}
-              animate={!shouldReduceMotion ? {
-                scale: [1 - i * 0.25, 1 - i * 0.25 + 0.05, 1 - i * 0.25],
-                opacity: [0.3, 0.5, 0.3],
-              } : {}}
-              transition={!shouldReduceMotion ? { duration: 2, repeat: Infinity, delay: i * 0.2, ease: easings.smooth } : {}}
-              className="absolute inset-0 border-2 border-red-300 rounded-full"
-            />
-          ))}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <motion.div
-              animate={!shouldReduceMotion ? {
-                scale: [1, 1.3, 1],
-                opacity: [1, 0.6, 1],
-              } : {}}
-              transition={!shouldReduceMotion ? { duration: 2, repeat: Infinity, ease: easings.smooth } : {}}
-              className="w-4 h-4 sm:w-6 sm:h-6 bg-red-600 rounded-full shadow-lg"
-            />
-          </div>
-          {!shouldReduceMotion && (
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
-              className="absolute inset-0"
-            >
-              <div className="h-full w-0.5 sm:w-1 bg-gradient-to-b from-red-600 via-red-400 to-transparent mx-auto" />
-            </motion.div>
-          )}
-          {shouldReduceMotion && (
-            <div className="absolute inset-0">
-              <div className="h-full w-0.5 sm:w-1 bg-gradient-to-b from-red-600 via-red-400 to-transparent mx-auto" />
-            </div>
-          )}
-          {[...Array(6)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute w-2 h-2 sm:w-3 sm:h-3 bg-gray-900 rounded-full shadow-md"
-              style={{
-                top: `${30 + Math.random() * 40}%`,
-                left: `${30 + Math.random() * 40}%`,
-              }}
-              animate={!shouldReduceMotion ? {
-                scale: [0, 1.2, 0],
-                opacity: [0, 1, 0],
-              } : {}}
-              transition={!shouldReduceMotion ? {
-                duration: 2,
-                repeat: Infinity,
-                delay: i * 0.4,
-                ease: easings.smooth,
-              } : {}}
-            />
-          ))}
-        </div>
-      </div>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4, duration: 0.5, ease: easings.smooth }}
-        whileHover={!shouldReduceMotion ? { scale: 1.1 } : {}}
-        className="absolute -top-2 -left-2 sm:-top-4 sm:-left-4 bg-white rounded-lg sm:rounded-xl p-2 sm:p-4 shadow-xl border border-gray-100 cursor-pointer"
-      >
-        <div className="flex items-center gap-2 sm:gap-3">
-          <motion.div
-            className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center shadow-md"
-            whileHover={!shouldReduceMotion ? { scale: 1.1 } : {}}
-            transition={{ duration: 0.5 }}
-          >
-            {!shouldReduceMotion && (
-              <motion.div
-                animate={{ scale: [1, 1.3, 1] }}
-                transition={{ duration: 1, repeat: Infinity, ease: easings.smooth }}
-                className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-full"
-              />
-            )}
-            {shouldReduceMotion && <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-full" />}
-          </motion.div>
-          <div>
-            <div className="text-xs text-gray-500 font-medium">Active</div>
-            <div className="text-base sm:text-lg font-bold text-gray-900">6</div>
-          </div>
-        </div>
-      </motion.div>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.6, duration: 0.5, ease: easings.smooth }}
-        whileHover={!shouldReduceMotion ? { scale: 1.1 } : {}}
-        className="absolute -bottom-2 -right-2 sm:-bottom-4 sm:-right-4 bg-white rounded-lg sm:rounded-xl p-2 sm:p-4 shadow-xl border border-gray-100 cursor-pointer"
-      >
-        <div className="flex items-center gap-2 sm:gap-3">
-          <motion.div
-            className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-red-500 to-red-600 rounded-lg flex items-center justify-center shadow-md"
-            whileHover={!shouldReduceMotion ? { scale: 1.2 } : {}}
-            transition={transitions.spring}
-          >
-            <svg className="w-4 h-4 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
-          </motion.div>
-          <div>
-            <div className="text-xs text-gray-500 font-medium">Range</div>
-            <div className="text-base sm:text-lg font-bold text-gray-900">50km</div>
-          </div>
-        </div>
-      </motion.div>
-      <motion.div
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.8, duration: 0.5, ease: easings.smooth }}
-        whileHover={!shouldReduceMotion ? { scale: 1.15 } : {}}
-        className="absolute top-1/2 -right-2 sm:-right-4 transform -translate-y-1/2 bg-white rounded-lg sm:rounded-xl p-2 sm:p-3 shadow-xl border border-gray-100 cursor-pointer"
-      >
-        <div className="text-center">
-          <motion.div
-            className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center mx-auto mb-1 shadow-md"
-            animate={!shouldReduceMotion ? { rotate: [0, 360] } : {}}
-            transition={!shouldReduceMotion ? { duration: 3, repeat: Infinity, ease: 'linear' } : {}}
-          >
-            <span className="text-white text-xs font-bold">AI</span>
-          </motion.div>
-          <div className="text-xs text-gray-500 font-medium">Active</div>
-        </div>
-      </motion.div>
-    </motion.div>
-  );
-});
-
-ProfessionalRadar.propTypes = {
   shouldReduceMotion: PropTypes.bool.isRequired,
 };
 
