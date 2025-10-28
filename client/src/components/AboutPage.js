@@ -5,34 +5,23 @@ const AboutPage = () => {
 
     const leadership = [
         {
-            name: 'Dr. Rajesh Kumar',
-            position: 'Founder & CEO',
+            name: 'Tanishpreet Singh Jassal',
+            position: 'Co-founder & Director',
+            role: 'Lead UAV Design Engineer',
             image: '/api/placeholder/300/300',
-            bio: 'Former DRDO scientist with 20+ years in aerospace',
+            bio: '7 years of experience in design & flying | Ex–Kalam Labs UAV Engineer',
             linkedin: '#'
         },
         {
-            name: 'Col. Vikram Singh (Retd.)',
-            position: 'Chief Defense Advisor',
+            name: 'Krish Singh Chandhok',
+            position: 'Co-Founder & Director',
+            role: 'UAV & Robotics Engineer',
             image: '/api/placeholder/300/300',
-            bio: 'Ex-Indian Army with expertise in tactical operations',
-            linkedin: '#'
-        },
-        {
-            name: 'Dr. Priya Sharma',
-            position: 'CTO',
-            image: '/api/placeholder/300/300',
-            bio: 'AI/ML expert from IIT Delhi, specializing in autonomous systems',
-            linkedin: '#'
-        },
-        {
-            name: 'Wing Cdr. Arun Patel (Retd.)',
-            position: 'Head of Operations',
-            image: '/api/placeholder/300/300',
-            bio: 'Former IAF pilot with 15+ years of aerial operations experience',
+            bio: 'TEDx Speaker | Robotics & AI Expertise | 8+ years in UAV piloting, FPV flight systems, drone engineering, electronics, and intelligent autonomy',
             linkedin: '#'
         }
     ];
+
 
     const fadeInUp = {
         initial: { opacity: 0, y: 60 },
@@ -97,14 +86,14 @@ const AboutPage = () => {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.3, duration: 0.6 }}
-                            className="text-5xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight"
+                            className="text-5xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight "
                         >
-                            <span className="text-gray-900">NEXT-GEN</span>
+                            <span className=" bg-gradient-to-r from-gray-900 via-red-600 to-red-600 bg-clip-text text-transparent">NEXT-GEN</span>
                             <br />
                             <span className="block bg-gradient-to-r from-gray-900 via-red-600 to-red-600 bg-clip-text text-transparent">
                                 TACTICAL UAV
                             </span>
-                            <span className="text-gray-900">SOLUTIONS</span>
+                            <span className=" bg-gradient-to-r from-gray-900 via-red-600 to-red-600 bg-clip-text text-transparent">SOLUTIONS</span>
                         </motion.h1>
 
                         <motion.p
@@ -268,7 +257,7 @@ const AboutPage = () => {
                 </div>
             </section>
 
-            {/* Leadership Team */}
+            {/* Leadership Team – Only 2 Founders */}
             <section className="py-20 bg-white">
                 <div className="container mx-auto px-6">
                     <motion.div
@@ -288,22 +277,22 @@ const AboutPage = () => {
                         <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
                             LEADERSHIP <span className="text-gray-400">TEAM</span>
                         </h2>
-                        <p className="text-gray-600 text-lg">Meet the experts driving innovation</p>
+                        <p className="text-gray-600 text-lg">Meet the founders driving innovation</p>
                     </motion.div>
 
-                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div className="grid md:grid-cols-2 gap-12 max-w-4xl mx-auto">
                         {leadership.map((leader, index) => (
                             <motion.div
                                 key={index}
                                 initial={{ opacity: 0, y: 50 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
-                                transition={{ duration: 0.5, delay: index * 0.1 }}
+                                transition={{ duration: 0.5, delay: index * 0.2 }}
                                 whileHover={{ y: -10 }}
                                 className="group"
                             >
                                 <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300">
-                                    {/* Image Container */}
+                                    {/* Image */}
                                     <div className="relative overflow-hidden aspect-square bg-gradient-to-br from-gray-100 to-gray-200">
                                         <motion.img
                                             whileHover={{ scale: 1.1 }}
@@ -314,7 +303,6 @@ const AboutPage = () => {
                                         />
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-                                        {/* LinkedIn Icon - appears on hover */}
                                         <motion.a
                                             href={leader.linkedin}
                                             initial={{ opacity: 0, y: 20 }}
@@ -330,7 +318,8 @@ const AboutPage = () => {
                                     {/* Content */}
                                     <div className="p-6">
                                         <h3 className="text-xl font-bold text-gray-900 mb-1">{leader.name}</h3>
-                                        <p className="text-red-600 font-semibold text-sm mb-3">{leader.position}</p>
+                                        <p className="text-red-600 font-semibold text-sm mb-1">{leader.position}</p>
+                                        <p className="text-red-700 font-medium text-sm mb-3">{leader.role}</p>
                                         <p className="text-gray-600 text-sm leading-relaxed">{leader.bio}</p>
                                     </div>
                                 </div>
@@ -417,4 +406,4 @@ const AboutPage = () => {
     );
 };
 
-export default AboutPage;                                
+export default AboutPage;
