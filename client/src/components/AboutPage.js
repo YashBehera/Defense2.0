@@ -1,8 +1,11 @@
 import { motion, useScroll, useSpring } from 'framer-motion';
+import { useRef } from 'react';
+
 const AboutPage = () => {
     const { scrollYProgress } = useScroll();
     const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
 
+    // Leadership data
     const leadership = [
         {
             name: 'Tanishpreet Singh Jassal',
@@ -21,7 +24,6 @@ const AboutPage = () => {
             linkedin: '#'
         }
     ];
-
 
     const fadeInUp = {
         initial: { opacity: 0, y: 60 },
@@ -43,9 +45,9 @@ const AboutPage = () => {
                 className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-black via-red-600 to-red-600 transform origin-left z-50"
                 style={{ scaleX }}
             />
+            
             {/* Hero Section */}
-            <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-b from-gray-50 to-white">
-                {/* Animated Background */}
+            <section className="relative flex items-center justify-center overflow-hidden bg-gradient-to-b from-gray-50 to-white">
                 <div className="absolute inset-0 overflow-hidden">
                     <motion.div
                         animate={{
@@ -153,6 +155,7 @@ const AboutPage = () => {
                                 <motion.h3
                                     initial={{ scale: 0.5 }}
                                     whileInView={{ scale: 1 }}
+                                    viewport={{ once: true }}
                                     transition={{ delay: idx * 0.1, duration: 0.5, type: "spring" }}
                                     className="text-4xl md:text-5xl font-bold mb-2 bg-gradient-to-r from-red-500 to-red-600 bg-clip-text text-transparent"
                                 >
@@ -256,7 +259,7 @@ const AboutPage = () => {
                 </div>
             </section>
 
-            {/* Leadership Team – Only 2 Founders */}
+            {/* Leadership Team */}
             <section className="py-20 bg-white">
                 <div className="container mx-auto px-6">
                     <motion.div
@@ -291,7 +294,6 @@ const AboutPage = () => {
                                 className="group"
                             >
                                 <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300">
-                                    {/* Image */}
                                     <div className="relative overflow-hidden aspect-square bg-gradient-to-br from-gray-100 to-gray-200">
                                         <motion.img
                                             whileHover={{ scale: 1.1 }}
@@ -314,7 +316,6 @@ const AboutPage = () => {
                                         </motion.a>
                                     </div>
 
-                                    {/* Content */}
                                     <div className="p-6">
                                         <h3 className="text-xl font-bold text-gray-900 mb-1">{leader.name}</h3>
                                         <p className="text-red-600 font-semibold text-sm mb-1">{leader.position}</p>
@@ -328,20 +329,20 @@ const AboutPage = () => {
                 </div>
             </section>
 
-            {/* Why Choose Us Section */}
+            {/* Why Choose Us Section - FIXED */}
             <section className="py-32 bg-gradient-to-b from-gray-50 to-white">
                 <div className="container mx-auto px-6">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
+                        viewport={{ once: true, margin: "-100px" }}
                         transition={{ duration: 0.8 }}
                         className="text-center mb-20"
                     >
                         <motion.div
                             initial={{ width: 0 }}
                             whileInView={{ width: '64px' }}
-                            viewport={{ once: true }}
+                            viewport={{ once: true, margin: "-100px" }}
                             transition={{ duration: 0.6 }}
                             className="h-1 bg-gradient-to-r from-red-600 to-red-500 mb-6 mx-auto"
                         />
@@ -388,10 +389,17 @@ const AboutPage = () => {
                                 key={index}
                                 initial={{ opacity: 0, y: 30 }}
                                 whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ duration: 0.5, delay: index * 0.1 }}
-                                whileHover={{ y: -5 }}
-                                className="bg-white border border-gray-200 rounded-xl p-8 shadow-md hover:shadow-xl transition-all cursor-pointer"
+                                viewport={{ 
+                                    once: true,
+                                    margin: "-50px",
+                                    amount: 0.3
+                                }}
+                                transition={{ 
+                                    duration: 0.5, 
+                                    delay: index * 0.1,
+                                    ease: "easeOut"
+                                }}
+                                className="bg-white border border-gray-200 rounded-xl p-8 shadow-md hover:shadow-xl transition-shadow duration-300 cursor-pointer"
                             >
                                 <div className="text-4xl mb-4">{item.icon}</div>
                                 <h3 className="text-xl font-bold text-gray-900 mb-3">{item.title}</h3>
