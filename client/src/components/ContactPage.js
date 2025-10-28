@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 
 const ContactPage = () => {
@@ -11,37 +11,52 @@ const ContactPage = () => {
     message: '',
     category: 'general'
   });
-
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState(null);
+  const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const form = useRef();
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:4000';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSubmitting(true);
+    setLoading(true);
+    setError(null);
 
-    // Simulate form submission
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setSubmitStatus('success');
-      setFormData({
-        name: '',
-        organization: '',
-        email: '',
-        phone: '',
-        subject: '',
-        message: '',
-        category: 'general'
+    try {
+      const response = await fetch(`${API_URL}/api/send-email`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
       });
 
-      setTimeout(() => setSubmitStatus(null), 5000);
-    }, 2000);
+      if (response.ok) {
+        setSubmitted(true);
+        setFormData({
+          name: '',
+          organization: '',
+          email: '',
+          phone: '',
+          subject: '',
+          message: '',
+          category: 'general'
+        });
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to send emails');
+      }
+    } catch (err) {
+      setError('Failed to send message. Please try again.');
+      console.error('Error:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const contactInfo = [
@@ -66,9 +81,7 @@ const ContactPage = () => {
       icon: '📧',
       title: 'Email Addresses',
       details: [
-        'info@hiveindustries.com',
-        'sales@hiveindustries.com',
-        'support@hiveindustries.com'
+        'info@flyhivetechnologies.com',
       ]
     }
   ];
@@ -96,14 +109,11 @@ const ContactPage = () => {
       {/* Hero Section - light theme */}
       <section className="relative h-[50vh] flex items-center justify-center overflow-hidden bg-gradient-to-b from-white to-gray-50">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white"></div>
-
-        {/* Subtle Background Pattern */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0" style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
           }}></div>
         </div>
-
         <div className="relative z-10 text-center">
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
@@ -137,149 +147,145 @@ const ContactPage = () => {
                 className="bg-white border border-gray-200 rounded-lg p-8"
               >
                 <h2 className="text-3xl font-bold mb-8 text-gray-900">Send us a Message</h2>
-
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="grid md:grid-cols-2 gap-6">
+                {submitted ? (
+                  <div className="text-center text-green-600 font-medium">
+                    Thank you for your message! We have sent a confirmation to your email.
+                  </div>
+                ) : (
+                  <form ref={form} onSubmit={handleSubmit} className="space-y-6">
+                    {error && (
+                      <div className="text-center text-red-600 font-medium">
+                        {error}
+                      </div>
+                    )}
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Full Name *
+                        </label>
+                        <input
+                          type="text"
+                          name="name"
+                          required
+                          value={formData.name}
+                          onChange={handleChange}
+                          className="w-full px-4 py-3 bg-white border border-gray-200 rounded focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
+                          placeholder="John Doe"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Organization
+                        </label>
+                        <input
+                          type="text"
+                          name="organization"
+                          value={formData.organization}
+                          onChange={handleChange}
+                          className="w-full px-4 py-3 bg-white border border-gray-200 rounded focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
+                          placeholder="Company/Agency Name"
+                        />
+                      </div>
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Email Address *
+                        </label>
+                        <input
+                          type="email"
+                          name="email"
+                          required
+                          value={formData.email}
+                          onChange={handleChange}
+                          className="w-full px-4 py-3 bg-white border border-gray-200 rounded focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
+                          placeholder="john@example.com"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Phone Number
+                        </label>
+                        <input
+                          type="tel"
+                          name="phone"
+                          value={formData.phone}
+                          onChange={handleChange}
+                          className="w-full px-4 py-3 bg-white border border-gray-200 rounded focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
+                          placeholder="+91 98765 43210"
+                        />
+                      </div>
+                    </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Full Name *
+                        Inquiry Type *
+                      </label>
+                      <select
+                        name="category"
+                        required
+                        value={formData.category}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 bg-white border border-gray-200 rounded focus:ring-2 focus:ring-red-500 focus:outline-none transition-colors"
+                      >
+                        <option value="general">General Inquiry</option>
+                        <option value="sales">Sales & Procurement</option>
+                        <option value="technical">Technical Support</option>
+                        <option value="partnership">Partnership Opportunities</option>
+                        <option value="careers">Careers</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Subject *
                       </label>
                       <input
                         type="text"
-                        name="name"
+                        name="subject"
                         required
-                        value={formData.name}
+                        value={formData.subject}
                         onChange={handleChange}
                         className="w-full px-4 py-3 bg-white border border-gray-200 rounded focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
-                        placeholder="John Doe"
+                        placeholder="Brief description of your inquiry"
                       />
                     </div>
-
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Organization
+                        Message *
                       </label>
-                      <input
-                        type="text"
-                        name="organization"
-                        value={formData.organization}
-                        onChange={handleChange}
-                        className="w-full px-4 py-3 bg-white border border-gray-200 rounded focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
-                        placeholder="Company/Agency Name"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Email Address *
-                      </label>
-                      <input
-                        type="email"
-                        name="email"
+                      <textarea
+                        name="message"
                         required
-                        value={formData.email}
+                        rows={6}
+                        value={formData.message}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 bg-white border border-gray-200 rounded focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
-                        placeholder="john@example.com"
+                        className="w-full px-4 py-3 bg-white border border-gray-200 rounded focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors resize-none"
+                        placeholder="Provide detailed information about your requirements..."
                       />
                     </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Phone Number
-                      </label>
-                      <input
-                        type="tel"
-                        name="phone"
-                        value={formData.phone}
-                        onChange={handleChange}
-                        className="w-full px-4 py-3 bg-white border border-gray-200 rounded focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
-                        placeholder="+91 98765 43210"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Inquiry Type *
-                    </label>
-                    <select
-                      name="category"
-                      required
-                      value={formData.category}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 bg-white border border-gray-200 rounded focus:ring-2 focus:ring-red-500 focus:outline-none transition-colors"
-                    >
-                      <option value="general">General Inquiry</option>
-                      <option value="sales">Sales & Procurement</option>
-                      <option value="technical">Technical Support</option>
-                      <option value="partnership">Partnership Opportunities</option>
-                      <option value="careers">Careers</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Subject *
-                    </label>
-                    <input
-                      type="text"
-                      name="subject"
-                      required
-                      value={formData.subject}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 bg-white border border-gray-200 rounded focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
-                      placeholder="Brief description of your inquiry"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Message *
-                    </label>
-                    <textarea
-                      name="message"
-                      required
-                      rows={6}
-                      value={formData.message}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 bg-white border border-gray-200 rounded focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors resize-none"
-                      placeholder="Provide detailed information about your requirements..."
-                    />
-                  </div>
-
-                  <div className="flex items-center space-x-4">
                     <button
                       type="submit"
-                      disabled={isSubmitting}
-                      className={`px-8 py-3 font-semibold rounded transition-all ${isSubmitting
-                          ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                          : 'bg-gradient-to-r from-red-600 to-red-500 text-white hover:from-red-600 hover:to-red-500'
-                        }`}
+                      className={`w-full p-3 rounded-md transition-colors ${
+                        loading
+                          ? "bg-gray-400 cursor-not-allowed"
+                          : "bg-gradient-to-r from-red-600 to-red-500 text-white hover:from-red-600 hover:to-red-500"
+                      }`}
+                      disabled={loading}
                     >
-                      {isSubmitting ? 'Sending...' : 'Send Message'}
+                      {loading ? "Submitting..." : "Submit"}
                     </button>
-
-                    {submitStatus === 'success' && (
-                      <motion.span
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        className="text-green-600 text-sm"
-                      >
-                        ✓ Message sent successfully!
-                      </motion.span>
-                    )}
-                  </div>
-
-                  <p className="text-xs text-gray-500">
-                    * Required fields. We respect your privacy and will never share your information.
-                  </p>
-                </form>
+                    <p className="text-xs text-gray-500">
+                      * Required fields. We respect your privacy and will never share your information.
+                    </p>
+                  </form>
+                )}
+                <div className="mt-6 text-center text-gray-600">
+                  Or email us at{' '}
+                  <a href="mailto:info@flyhive.com" className="text-red-500 hover:text-red-600">
+                    info@flyhivetechnologies.com
+                  </a>
+                </div>
               </motion.div>
             </div>
-
             {/* Contact Information */}
             <div>
               <motion.div
@@ -303,8 +309,6 @@ const ContactPage = () => {
                     </div>
                   </div>
                 ))}
-
-                {/* Business Hours */}
                 <div className="bg-white border border-gray-200 rounded-lg p-6">
                   <h3 className="text-xl font-semibold mb-4 text-gray-900">Business Hours</h3>
                   <div className="space-y-2 text-gray-600 text-sm">
@@ -320,7 +324,7 @@ const ContactPage = () => {
                       <span>Sunday</span>
                       <span className="text-gray-500">Closed</span>
                     </div>
-                    <p className="mt-2 text-xs">Today is Friday, October 24, 2025, 10:08 AM IST</p>
+                    <p className="mt-2 text-xs">Today is Friday, October 24, 2025, 10:32 PM IST</p>
                   </div>
                   <p className="text-xs text-gray-500 mt-4">
                     24/7 Support available for critical defense operations
@@ -331,14 +335,12 @@ const ContactPage = () => {
           </div>
         </div>
       </section>
-
       {/* Other Locations */}
       <section className="py-20 border-t border-gray-100">
         <div className="container mx-auto px-6">
           <h2 className="text-3xl font-bold text-center mb-12 text-gray-900">
             OUR <span className="text-gray-500">FACILITIES</span>
           </h2>
-
           <div className="grid md:grid-cols-3 gap-8">
             {offices.map((office, index) => (
               <motion.div

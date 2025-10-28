@@ -86,8 +86,8 @@ function App() {
                     </svg>
                     <div>
                       <p className="text-xs text-gray-500 mb-1">Email</p>
-                      <a href="mailto:krishchandhok149@gmail.com" className="text-sm hover:text-red-500 transition-colors break-all">
-                        krishchandhok149@gmail.com
+                      <a href="mailto:info@flyhivetechnologies.com" className="text-sm hover:text-red-500 transition-colors break-all">
+                      info@flyhivetechnologies.com
                       </a>
                     </div>
                   </div>

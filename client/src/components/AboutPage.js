@@ -1,40 +1,6 @@
 import { motion } from 'framer-motion';
-import { useInView } from 'framer-motion';
-import { useRef } from 'react';
 
 const AboutPage = () => {
-    const technologies = [
-        {
-            category: 'Autonomous Systems',
-            features: ['AI-Powered Navigation', 'Real-time Decision Making', 'Adaptive Flight Control'],
-            color: 'from-blue-500 to-cyan-500'
-        },
-        {
-            category: 'Advanced Materials',
-            features: ['Lightweight Composites', 'Weather-Resistant Design', 'Impact Absorption'],
-            color: 'from-purple-500 to-pink-500'
-        },
-        {
-            category: 'Communication Systems',
-            features: ['Encrypted Data Links', 'Anti-Jamming Tech', 'Long-Range Transmission'],
-            color: 'from-green-500 to-emerald-500'
-        },
-        {
-            category: 'Propulsion',
-            features: ['Efficient Engines', 'Extended Range', 'Multi-Mode Launch'],
-            color: 'from-orange-500 to-red-500'
-        },
-        {
-            category: 'Surveillance',
-            features: ['4K Video Feed', 'Thermal Imaging', 'Target Recognition'],
-            color: 'from-red-500 to-pink-500'
-        },
-        {
-            category: 'Mission Planning',
-            features: ['GPS Waypoint Nav', 'Dynamic Routing', 'Collision Avoidance'],
-            color: 'from-indigo-500 to-purple-500'
-        }
-    ];
 
     const leadership = [
         {
@@ -168,21 +134,6 @@ const AboutPage = () => {
                         </motion.div>
                     </motion.div>
                 </div>
-
-                {/* Scroll Indicator */}
-                <motion.div
-                    animate={{ y: [0, 10, 0] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                    className="absolute bottom-10 left-1/2 transform -translate-x-1/2"
-                >
-                    <div className="w-6 h-10 border-2 border-gray-400 rounded-full flex items-start justify-center p-2">
-                        <motion.div
-                            animate={{ y: [0, 12, 0] }}
-                            transition={{ duration: 1.5, repeat: Infinity }}
-                            className="w-1.5 h-1.5 bg-red-600 rounded-full"
-                        />
-                    </div>
-                </motion.div>
             </section>
 
             {/* Stats Section */}
@@ -309,138 +260,6 @@ const AboutPage = () => {
                             </div>
                         </motion.div>
                     </div>
-                </div>
-            </section>
-
-            {/* Technology & Innovation Section (Replaces Timeline) */}
-            <section className="py-10 bg-gradient-to-b from-white via-gray-50 to-white relative overflow-hidden">
-                <div className="container mx-auto px-6">
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.8 }}
-                        className="text-center mb-20"
-                    >
-                        <motion.div
-                            initial={{ width: 0 }}
-                            whileInView={{ width: '64px' }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.6 }}
-                            className="h-1 bg-gradient-to-r from-red-600 to-red-500 mb-6 mx-auto"
-                        />
-                        <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-                            TECHNOLOGY & <span className="text-gray-400">INNOVATION</span>
-                        </h2>
-                        <p className="text-gray-600 text-lg max-w-3xl mx-auto">
-                            Leveraging cutting-edge technology to build the future of autonomous defense systems
-                        </p>
-                    </motion.div>
-
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-                        {technologies.map((tech, index) => (
-                            <motion.div
-                                key={index}
-                                initial={{ opacity: 0, y: 50 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ duration: 0.5, delay: index * 0.1 }}
-                                whileHover={{ y: -10, scale: 1.02 }}
-                                className="group relative"
-                            >
-                                <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 h-full relative overflow-hidden">
-                                    {/* Gradient overlay on hover */}
-                                    <div className={`absolute inset-0 bg-gradient-to-br ${tech.color} opacity-0 group-hover:opacity-5 transition-opacity duration-300`} />
-                                    
-                                    {/* Icon */}
-                                    <motion.div
-                                        whileHover={{ scale: 1.2, rotate: 360 }}
-                                        transition={{ duration: 0.5 }}
-                                        className="text-5xl mb-6 relative z-10"
-                                    >
-                                        {tech.icon}
-                                    </motion.div>
-
-                                    {/* Category */}
-                                    <h3 className="text-2xl font-bold text-gray-900 mb-4 relative z-10">
-                                        {tech.category}
-                                    </h3>
-
-                                    {/* Features */}
-                                    <ul className="space-y-3 relative z-10">
-                                        {tech.features.map((feature, idx) => (
-                                            <motion.li
-                                                key={idx}
-                                                initial={{ opacity: 0, x: -10 }}
-                                                whileInView={{ opacity: 1, x: 0 }}
-                                                viewport={{ once: true }}
-                                                transition={{ delay: index * 0.1 + idx * 0.05, duration: 0.3 }}
-                                                className="flex items-start gap-3"
-                                            >
-                                                <div className={`mt-1 w-1.5 h-1.5 rounded-full bg-gradient-to-r ${tech.color} flex-shrink-0`} />
-                                                <span className="text-gray-600 text-sm leading-relaxed">{feature}</span>
-                                            </motion.li>
-                                        ))}
-                                    </ul>
-
-                                    {/* Corner decoration */}
-                                    <div className="absolute bottom-0 right-0 w-20 h-20 opacity-10">
-                                        <div className={`w-full h-full bg-gradient-to-br ${tech.color} rounded-tl-full`} />
-                                    </div>
-                                </div>
-                            </motion.div>
-                        ))}
-                    </div>
-
-                    {/* Additional Tech Info */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.8, delay: 0.3 }}
-                        className="mt-20 max-w-4xl mx-auto"
-                    >
-                        <div className="bg-gradient-to-br from-gray-900 to-black text-white rounded-2xl p-12 relative overflow-hidden">
-                            {/* Background decoration */}
-                            <motion.div
-                                animate={{
-                                    scale: [1, 1.2, 1],
-                                    rotate: [0, 180, 360],
-                                }}
-                                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                                className="absolute -top-20 -right-20 w-60 h-60 bg-gradient-to-br from-red-500/20 to-transparent rounded-full blur-3xl"
-                            />
-
-                            <div className="relative z-10 text-center">
-                                <h3 className="text-3xl font-bold mb-4">
-                                    R&D <span className="text-red-500">Commitment</span>
-                                </h3>
-                                <p className="text-gray-300 text-lg mb-8 leading-relaxed">
-                                    We invest heavily in research and development to stay at the forefront of defense technology innovation
-                                </p>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                                    {[
-                                        { label: 'R&D Investment', value: '40%', desc: 'of Revenue' },
-                                        { label: 'Patents Filed', value: '12+', desc: 'in 2025' },
-                                        { label: 'Research Partners', value: '8+', desc: 'Institutions' }
-                                    ].map((stat, idx) => (
-                                        <motion.div
-                                            key={idx}
-                                            initial={{ opacity: 0, scale: 0.8 }}
-                                            whileInView={{ opacity: 1, scale: 1 }}
-                                            viewport={{ once: true }}
-                                            transition={{ delay: idx * 0.1, duration: 0.5 }}
-                                            className="text-center"
-                                        >
-                                            <div className="text-4xl font-bold text-red-500 mb-2">{stat.value}</div>
-                                            <div className="text-white font-semibold mb-1">{stat.label}</div>
-                                            <div className="text-gray-400 text-sm">{stat.desc}</div>
-                                        </motion.div>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    </motion.div>
                 </div>
             </section>
 

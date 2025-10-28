@@ -692,7 +692,7 @@ const HeroSection = () => {
                     </motion.button>
 
                     <motion.a
-                        href="tel:+919920887455"
+                        href="/contact"
                         className="px-6 sm:px-8 py-3 bg-white text-black font-bold rounded-lg border-2 border-black inline-flex items-center gap-3"
                         whileHover={!prefersReducedMotion && !isMobile ? { scale: 1.04, y: -2 } : {}}
                     >
