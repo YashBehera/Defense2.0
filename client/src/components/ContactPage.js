@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useScroll, useSpring } from 'framer-motion';
 
 const ContactPage = () => {
   const [formData, setFormData] = useState({
@@ -15,6 +15,8 @@ const ContactPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const form = useRef();
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -106,6 +108,11 @@ const ContactPage = () => {
 
   return (
     <div className="min-h-screen bg-white text-gray-900">
+
+      <motion.div
+        className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-black via-red-600 to-red-600 transform origin-left z-50"
+        style={{ scaleX }}
+      />
       {/* Hero Section - light theme */}
       <section className="relative h-[50vh] flex items-center justify-center overflow-hidden bg-gradient-to-b from-white to-gray-50">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white"></div>
@@ -264,11 +271,10 @@ const ContactPage = () => {
                     </div>
                     <button
                       type="submit"
-                      className={`w-full p-3 rounded-md transition-colors ${
-                        loading
+                      className={`w-full p-3 rounded-md transition-colors ${loading
                           ? "bg-gray-400 cursor-not-allowed"
                           : "bg-gradient-to-r from-red-600 to-red-500 text-white hover:from-red-600 hover:to-red-500"
-                      }`}
+                        }`}
                       disabled={loading}
                     >
                       {loading ? "Submitting..." : "Submit"}

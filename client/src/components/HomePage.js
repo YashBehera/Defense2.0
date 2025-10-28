@@ -16,6 +16,7 @@ import {
   slideInVariants,
   viewportOptions,
 } from './motionVariants';
+import { Link } from 'react-router-dom';
 
 const usePerformanceMonitor = () => {
   useEffect(() => {
@@ -190,7 +191,7 @@ const HomePage = () => {
       <section ref={heroSectionRef} className="relative min-h-screen bg-white flex items-center justify-center px-4 sm:px-6">
         <div className="container mx-auto">
           <motion.div
-            className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 items-center py-16 sm:py-20 md:py-24 "
+            className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 items-center py-8 sm:py-10 md:py-12 "
             {...motionConfig}
             variants={fadeInUpVariants}
             custom={heroVisible}
@@ -360,7 +361,7 @@ const HomePage = () => {
         )}
 
         <div className="container mx-auto px-4 sm:px-6 relative z-10">
-          <motion.div
+        <motion.div
             {...motionConfig}
             variants={fadeInUpVariants}
             whileInView="animate"
@@ -739,140 +740,205 @@ const HomePage = () => {
       </section>
 
       {/* Contact Section */}
-      <section id="contact" className="py-12 sm:py-16 md:py-20 lg:py-24 bg-white-50 relative overflow-hidden">
+      <section id="contact" className="py-16 sm:py-20 md:py-24 lg:py-32 bg-white relative overflow-hidden">
+        {/* Background Elements */}
+        <div className="absolute inset-0 bg-gradient-to-b from-gray-50 via-white to-gray-50" />
+
         {!shouldReduceMotion && (
-          <motion.div
-            animate={{
-              scale: [1, 1.2, 1],
-              rotate: [0, 180, 360],
-            }}
-            transition={{ duration: 20, repeat: Infinity, ease: easings.smooth }}
-            className="absolute bottom-0 right-0 w-64 h-64 sm:w-96 sm:h-96 bg-gradient-to-br from-red-200 to-transparent rounded-full blur-3xl opacity-10"
-          />
+          <>
+            <motion.div
+              animate={{
+                scale: [1, 1.1, 1],
+                opacity: [0.3, 0.5, 0.3],
+              }}
+              transition={{ duration: 15, repeat: Infinity, ease: easings.smooth }}
+              className="absolute top-1/4 left-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl"
+            />
+            <motion.div
+              animate={{
+                scale: [1, 1.15, 1],
+                opacity: [0.3, 0.5, 0.3],
+              }}
+              transition={{ duration: 18, repeat: Infinity, ease: easings.smooth }}
+              className="absolute bottom-1/4 right-0 w-96 h-96 bg-red-500/10 rounded-full blur-3xl"
+            />
+          </>
         )}
 
         <div className="container mx-auto px-4 sm:px-6 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 md:gap-16">
+          <div className="max-w-7xl mx-auto">
+            {/* Header */}
             <motion.div
               {...motionConfig}
-              variants={slideInVariants.left}
+              variants={fadeInVariants}
               whileInView="animate"
               viewport={viewportOptions}
+              className="text-center mb-16 sm:mb-20 md:mb-24"
             >
               <motion.div
                 {...motionConfig}
                 variants={scaleVariants}
                 whileInView="animate"
                 viewport={viewportOptions}
-                whileHover={!shouldReduceMotion ? { scale: 1.05 } : {}}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-full mb-4 sm:mb-6 cursor-pointer"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-gray-100 to-gray-50 rounded-full mb-6 sm:mb-8 border border-gray-200 shadow-sm"
               >
                 {!shouldReduceMotion && (
                   <motion.div
-                    animate={{ scale: [1, 1.3, 1] }}
-                    transition={{ duration: 3, repeat: Infinity, ease: easings.smooth }}
-                    className="w-2 h-2 bg-red-600 rounded-full"
+                    animate={{ scale: [1, 1.2, 1], opacity: [1, 0.8, 1] }}
+                    transition={{ duration: 2, repeat: Infinity, ease: easings.smooth }}
+                    className="w-2 h-2 bg-gradient-to-r from-red-600 to-red-500 rounded-full shadow-lg shadow-red-500/50"
                   />
                 )}
                 {shouldReduceMotion && <div className="w-2 h-2 bg-red-600 rounded-full" />}
-                <span className="text-gray-700 text-xs sm:text-sm font-semibold">GET IN TOUCH</span>
+                <span className="text-gray-700 text-sm sm:text-base font-semibold tracking-wide">GET IN TOUCH</span>
               </motion.div>
-              <motion.h2
-                className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6 text-gray-900"
-                whileHover={!shouldReduceMotion ? { x: 10 } : {}}
-                transition={transitions.spring}
-              >
-                Let's Discuss Your Requirements
-              </motion.h2>
-              <p className="text-gray-600 text-sm sm:text-base md:text-lg mb-6 sm:mb-8">
-                Our team is ready to provide detailed information about our systems.
-              </p>
 
-              <div className="space-y-4 sm:space-y-6">
-                {[
-                  {
-                    icon: (
-                      <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                        />
-                      </svg>
-                    ),
-                    title: 'Email',
-                    content: 'contact@hiveplus.in',
-                    gradient: 'from-blue-500 to-cyan-500',
-                  },
-                  {
-                    icon: (
-                      <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-                        />
-                      </svg>
-                    ),
-                    title: 'Phone',
-                    content: '+91 (0) 1234-567890',
-                    gradient: 'from-green-500 to-emerald-500',
-                  },
-                  {
-                    icon: (
-                      <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                        />
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                        />
-                      </svg>
-                    ),
-                    title: 'Location',
-                    content: 'Bangalore, Karnataka, India',
-                    gradient: 'from-red-500 to-orange-500',
-                  },
-                ].map((contact, index) => (
-                  <motion.div
-                    key={index}
-                    {...motionConfig}
-                    variants={slideInVariants.left}
-                    whileInView="animate"
-                    viewport={viewportOptions}
-                    transition={{ ...transitions.default, delay: shouldReduceMotion ? 0 : index * 0.1 }}
-                    whileHover={!shouldReduceMotion ? { x: 10, scale: 1.02 } : {}}
-                    className="flex items-start gap-3 sm:gap-4 cursor-pointer group"
-                  >
-                    <motion.div
-                      className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-gray-900 to-red-600 rounded-lg flex items-center justify-center text-white flex-shrink-0 shadow-md group-hover:shadow-lg gpu-accelerated"
-                      whileHover={!shouldReduceMotion ? { scale: 1.1 } : {}}
-                      transition={transitions.spring}
-                    >
-                      <motion.div
-                        className={`absolute inset-0 bg-gradient-to-br ${contact.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg`}
-                      />
-                      <span className="relative z-10">{contact.icon}</span>
-                    </motion.div>
-                    <div>
-                      <h4 className="font-semibold text-base sm:text-lg mb-1 text-gray-900">{contact.title}</h4>
-                      <p className="text-gray-600 text-sm sm:text-base break-all">{contact.content}</p>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
+              <motion.h2
+                className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 sm:mb-8 text-gray-900 leading-tight"
+                variants={fadeInVariants}
+              >
+                Ready to Deploy
+                <br />
+                <span className="bg-gradient-to-r from-gray-900 via-red-800 to-red-600 bg-clip-text text-transparent">
+                Next-Gen Defense Systems ?
+                </span>
+              </motion.h2>
+
+              <motion.p
+                className="text-gray-600 text-base sm:text-lg md:text-xl max-w-3xl mx-auto leading-relaxed font-light"
+                variants={fadeInVariants}
+              >
+                Let's discuss how our cutting-edge industrial automation solutions
+                <br className="hidden sm:block" />
+                can elevate your operations to the next level
+              </motion.p>
             </motion.div>
 
-            <motion.div {...motionConfig} variants={slideInVariants.right} whileInView="animate" viewport={viewportOptions} className="mt-6 lg:mt-0">
-              <ProfessionalContactForm shouldReduceMotion={shouldReduceMotion} />
+            {/* CTA Section */}
+            <motion.div
+              {...motionConfig}
+              variants={scaleVariants}
+              whileInView="animate"
+              viewport={viewportOptions}
+              className="relative"
+            >
+              <div className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-black rounded-3xl sm:rounded-[2rem] p-10 sm:p-14 md:p-16 lg:p-20 text-center overflow-hidden shadow-2xl border border-gray-700">
+                {/* Animated Grid Background */}
+                <div className="absolute inset-0 opacity-10">
+                  <div className="absolute inset-0" style={{
+                    backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
+                    backgroundSize: '50px 50px'
+                  }} />
+                </div>
+
+                {/* Animated Orbs */}
+                {!shouldReduceMotion && (
+                  <>
+                    <motion.div
+                      animate={{
+                        scale: [1, 1.3, 1],
+                        x: [0, 50, 0],
+                        y: [0, -30, 0],
+                      }}
+                      transition={{ duration: 12, repeat: Infinity, ease: easings.smooth }}
+                      className="absolute top-0 left-1/4 w-64 h-64 bg-gradient-to-br from-red-500/30 to-transparent rounded-full blur-3xl"
+                    />
+                    <motion.div
+                      animate={{
+                        scale: [1, 1.4, 1],
+                        x: [0, -50, 0],
+                        y: [0, 30, 0],
+                      }}
+                      transition={{ duration: 15, repeat: Infinity, ease: easings.smooth }}
+                      className="absolute bottom-0 right-1/4 w-64 h-64 bg-gradient-to-br from-blue-500/30 to-transparent rounded-full blur-3xl"
+                    />
+                  </>
+                )}
+
+                <div className="relative z-10">
+                  {/* Badge */}
+                  <motion.div
+                    variants={fadeInVariants}
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full mb-8 border border-white/20"
+                  >
+                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                    <span className="text-white/90 text-sm font-semibold tracking-wide">WE'RE ONLINE</span>
+                  </motion.div>
+
+                  <motion.h3
+                    className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 sm:mb-8 leading-tight tracking-tight"
+                    variants={fadeInVariants}
+                  >
+                    Let's Start a
+                    <br />
+                    <span className="bg-gradient-to-r from-white via-gray-200 to-red-400 bg-clip-text text-transparent">
+                      Conversation
+                    </span>
+                  </motion.h3>
+
+                  <motion.p
+                    className="text-gray-300 text-base sm:text-lg md:text-xl mb-10 sm:mb-12 max-w-3xl mx-auto leading-relaxed font-light"
+                    variants={fadeInVariants}
+                  >
+                    Share your requirements and our experts will provide tailored solutions
+                    <br className="hidden sm:block" />
+                    for your industrial automation needs
+                  </motion.p>
+
+                  <motion.div
+                    whileHover={!shouldReduceMotion ? { scale: 1.05 } : {}}
+                    whileTap={!shouldReduceMotion ? { scale: 0.98 } : {}}
+                  >
+                    <Link
+                      to="/contact"
+                      className="inline-flex items-center gap-4 px-10 sm:px-14 py-5 sm:py-6 bg-white text-gray-900 rounded-full font-bold text-base sm:text-lg md:text-xl shadow-2xl hover:shadow-white/20 transition-all duration-500 group relative overflow-hidden"
+                    >
+                      <span className="relative z-10">Send Us a Message</span>
+                      <motion.svg
+                        className="w-6 h-6 relative z-10 group-hover:translate-x-2 transition-transform duration-300"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                      </motion.svg>
+
+                      {/* Button Hover Effect */}
+                      <motion.div
+                        className="absolute inset-0 bg-gradient-to-r from-red-600 to-orange-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-full"
+                        initial={false}
+                      />
+                    </Link>
+                  </motion.div>
+
+                  {/* Trust Indicators */}
+                  <motion.div
+                    variants={fadeInVariants}
+                    className="mt-12 sm:mt-16 pt-8 sm:pt-10 border-t border-white/10"
+                  >
+                    <div className="flex flex-wrap justify-center items-center gap-8 sm:gap-12 md:gap-16">
+                      {[
+                        { label: '24/7 Support', icon: '🚀' },
+                        { label: 'Expert Team', icon: '⚡' },
+                        { label: 'Quick Response', icon: '✨' },
+                      ].map((item, idx) => (
+                        <motion.div
+                          key={idx}
+                          className="flex items-center gap-3 text-white/80 hover:text-white transition-colors duration-300 group"
+                          whileHover={!shouldReduceMotion ? { scale: 1.1 } : {}}
+                        >
+                          <span className="text-2xl group-hover:scale-110 transition-transform duration-300">
+                            {item.icon}
+                          </span>
+                          <span className="text-sm sm:text-base font-semibold tracking-wide">
+                            {item.label}
+                          </span>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </motion.div>
+                </div>
+              </div>
             </motion.div>
           </div>
         </div>

@@ -7,6 +7,9 @@ import AboutPage from './components/AboutPage';
 import ContactPage from './components/ContactPage';
 import ProductDetails from './components/ProductDetails';
 import ScrollToTop from './components/ScrollToTop';
+import Privacy from './components/Privacy';
+import Terms from './components/Terms';
+
 
 function App() {
   return (
@@ -21,6 +24,8 @@ function App() {
           <Route path="/product/:id" element={<ProductDetails />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
         </Routes>
 
         {/* Global Footer */}

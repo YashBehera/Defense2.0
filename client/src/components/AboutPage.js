@@ -1,6 +1,7 @@
-import { motion } from 'framer-motion';
-
+import { motion, useScroll, useSpring } from 'framer-motion';
 const AboutPage = () => {
+    const { scrollYProgress } = useScroll();
+    const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
 
     const leadership = [
         {
@@ -49,6 +50,10 @@ const AboutPage = () => {
 
     return (
         <div className="min-h-screen bg-white text-gray-900">
+            <motion.div
+                className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-black via-red-600 to-red-600 transform origin-left z-50"
+                style={{ scaleX }}
+            />
             {/* Hero Section */}
             <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-b from-gray-50 to-white">
                 {/* Animated Background */}
@@ -231,7 +236,7 @@ const AboutPage = () => {
                         >
                             <div className="bg-gradient-to-br from-gray-50 to-white border border-gray-200 rounded-2xl p-10 shadow-xl relative overflow-hidden">
                                 <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-red-100 to-transparent opacity-50 rounded-bl-full" />
-                                
+
                                 <h3 className="text-3xl font-bold mb-8 text-gray-900 relative z-10">Core Values</h3>
                                 <div className="space-y-6 relative z-10">
                                     {[
@@ -308,7 +313,7 @@ const AboutPage = () => {
                                             className="w-full h-full object-cover"
                                         />
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                                        
+
                                         {/* LinkedIn Icon - appears on hover */}
                                         <motion.a
                                             href={leader.linkedin}
