@@ -114,7 +114,7 @@ const ContactPage = () => {
         style={{ scaleX }}
       />
       {/* Hero Section - light theme */}
-      <section className="relative h-[30vh] sm:h-[35vh] md:h-[40vh] lg:h-[50vh] flex items-center justify-center overflow-hidden bg-gradient-to-b from-white to-gray-50"      >
+      <section className="relative h-[30vh] sm:h-[35vh] md:h-[40vh] lg:h-[50vh] flex items-center justify-center overflow-hidden bg-gradient-to-b from-white to-gray-50">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white"></div>
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0" style={{
@@ -142,11 +142,11 @@ const ContactPage = () => {
       </section>
 
       {/* Main Content */}
-      <section className='py-10'>
+      <section >
         <div className="container mx-auto px-6">
           <div className="grid lg:grid-cols-3 gap-12">
             {/* Contact Form */}
-            <div className="lg:col-span-2">
+            <div className="lg:col-span-2 pb-10 ">
               <motion.div
                 initial={{ opacity: 0, x: -50 }}
                 whileInView={{ opacity: 1, x: 0 }}
@@ -272,8 +272,8 @@ const ContactPage = () => {
                     <button
                       type="submit"
                       className={`w-full p-3 rounded-md transition-colors ${loading
-                          ? "bg-gray-400 cursor-not-allowed"
-                          : "bg-gradient-to-r from-red-600 to-red-500 text-white hover:from-red-600 hover:to-red-500"
+                        ? "bg-gray-400 cursor-not-allowed"
+                        : "bg-gradient-to-r from-red-600 to-red-500 text-white hover:from-red-600 hover:to-red-500"
                         }`}
                       disabled={loading}
                     >
