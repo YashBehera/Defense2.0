@@ -361,7 +361,7 @@ const HomePage = () => {
         )}
 
         <div className="container mx-auto px-4 sm:px-6 relative z-10">
-        <motion.div
+          <motion.div
             {...motionConfig}
             variants={fadeInUpVariants}
             whileInView="animate"
@@ -724,8 +724,12 @@ const HomePage = () => {
               >
                 <span className="relative z-10">Schedule Demonstration</span>
               </motion.a>
+              {/* CTA Section – inside the <section> with bg-gradient-to-br from-gray-900 … */}
               <motion.a
-                href="#download"
+                href="./HivePlus_Brochure.pdf"          
+                download="HivePlus_Defense_Brochure.pdf"  
+                target="_blank"                   
+                rel="noopener noreferrer"             
                 whileHover={!shouldReduceMotion ? { scale: 1.04, y: -2 } : {}}
                 whileTap={!shouldReduceMotion ? { scale: 0.98 } : {}}
                 transition={transitions.default}
@@ -800,7 +804,7 @@ const HomePage = () => {
                 Ready to Deploy
                 <br />
                 <span className="bg-gradient-to-r from-gray-900 via-red-800 to-red-600 bg-clip-text text-transparent">
-                Next-Gen Defense Systems ?
+                  Next-Gen Defense Systems ?
                 </span>
               </motion.h2>
 
