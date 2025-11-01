@@ -24,10 +24,7 @@ const ContactPage = () => {
   });
 
   // Auto-detect production or local backend
-  const API_URL =
-    process.env.NODE_ENV === "production"
-      ? "https://www.flyhivetechnologies.com" // 🔧 Replace with your actual backend domain
-      : "http://localhost:4000";
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:4000';
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
