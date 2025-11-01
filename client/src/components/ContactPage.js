@@ -26,7 +26,7 @@ const ContactPage = () => {
   // Auto-detect production or local backend
   const API_URL =
     process.env.NODE_ENV === "production"
-      ? "https://your-backend-domain.com" // 🔧 Replace with your actual backend domain
+      ? "https://www.flyhivetechnologies.com" // 🔧 Replace with your actual backend domain
       : "http://localhost:4000";
 
   const handleChange = (e) => {
