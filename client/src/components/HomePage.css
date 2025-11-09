@@ -1,0 +1,127 @@
+/* HomePage.css - Additional responsive utilities */
+
+/* Prevent horizontal scroll on mobile */
+body {
+    overflow-x: hidden;
+  }
+  
+  /* Touch-friendly tap targets */
+  @media (max-width: 768px) {
+    button,
+    a {
+      min-height: 44px;
+      min-width: 44px;
+    }
+  }
+  
+  /* Smooth scrolling */
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  /* Prevent text selection on interactive elements */
+  .no-select {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  
+  /* Video object-fit support */
+  video {
+    object-fit: cover;
+    object-position: center;
+  }
+  
+  /* Improved form inputs on iOS */
+  input,
+  textarea {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+  }
+  
+  /* Better focus states for accessibility */
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible {
+    outline: 2px solid #dc2626;
+    outline-offset: 2px;
+  }
+  
+  /* Safe area padding for notched devices */
+  @supports (padding: max(0px)) {
+    .safe-area-top {
+      padding-top: max(1rem, env(safe-area-inset-top));
+    }
+    
+    .safe-area-bottom {
+      padding-bottom: max(1rem, env(safe-area-inset-bottom));
+    }
+  }
+
+  /* 3D Model Enhancements */
+.hero-3d-canvas {
+  transition: all 0.3s ease;
+}
+
+.hero-3d-canvas:hover {
+  transform: scale(1.02);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* Responsive adjustments for 3D model */
+@media (max-width: 1024px) {
+  .hero-3d-container {
+    margin-top: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-3d-container canvas {
+    height: 400px !important;
+  }
+}
+
+/* Loading state for 3D model */
+.model-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  border-radius: 1rem;
+  min-height: 500px;
+}
+
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Reduce animations on mobile */
+@media (max-width: 768px) {
+  .reduce-motion-mobile {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Ensure canvas doesn't interfere with scrolling */
+canvas {
+  display: block;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  outline: none;
+}
+
+/* Prevent text selection on the entire 3D container */
+.gpu-accelerated {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
