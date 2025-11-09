@@ -90,49 +90,55 @@ const useImageLoader = (src) => {
 };
 
 // 3D Model Component
-const GLTFModel = ({ url }) => {
+const GLTFModel = ({ url, desiredSize = 5 }) => {
+    const groupRef = React.useRef();
     const { scene } = useGLTF(url);
 
     useEffect(() => {
-        if (scene) {
-            // Calculate the bounding box of the model
-            const box = new THREE.Box3().setFromObject(scene);
-            const center = box.getCenter(new THREE.Vector3());
-            const size = box.getSize(new THREE.Vector3());
+        if (!scene || !groupRef.current) return;
 
-            // Center the model at origin (0, 0, 0)
-            scene.position.x = -center.x;
-            scene.position.y = -center.y;
-            scene.position.z = -center.z;
+        // Reset scene transform so computations are consistent
+        scene.position.set(0, 0, 0);
+        scene.rotation.set(0, 0, 0);
+        scene.scale.set(1, 1, 1);
 
-            // Auto-scale the model to fit nicely in viewport
-            const maxDim = Math.max(size.x, size.y, size.z);
-            const desiredSize = 5; // Adjust this value to make model bigger/smaller
-            const scale = desiredSize / maxDim;
-            scene.scale.setScalar(scale);
+        // Compute bounding box of the raw scene
+        const box = new THREE.Box3().setFromObject(scene);
+        const center = box.getCenter(new THREE.Vector3());
+        const size = box.getSize(new THREE.Vector3());
 
-            // Optional: Traverse and update materials for better rendering
-            scene.traverse((child) => {
-                if (child.isMesh) {
-                    child.castShadow = true;
-                    child.receiveShadow = true;
-                    
-                    // Ensure materials are properly configured
-                    if (child.material) {
-                        child.material.needsUpdate = true;
-                    }
+        // Defensive defaults
+        const maxDim = Math.max(size.x, size.y, size.z) || 1;
+        const scale = desiredSize / maxDim;
+
+        // Apply scale to the wrapper group and translate it so model center is at origin
+        groupRef.current.scale.setScalar(scale);
+        groupRef.current.position.set(-center.x * scale, -center.y * scale, -center.z * scale);
+
+        // Ensure meshes cast/receive shadows and materials update
+        scene.traverse((child) => {
+            if (child.isMesh) {
+                child.castShadow = true;
+                child.receiveShadow = true;
+                if (child.material) {
+                    child.material.side = THREE.DoubleSide;
+                    child.material.needsUpdate = true;
                 }
-            });
-        }
-    }, [scene]);
+            }
+        });
+    }, [scene, desiredSize]);
 
-    return <primitive object={scene} />;
+    return (
+        <group ref={groupRef}>
+            {scene && <primitive object={scene} />}
+        </group>
+    );
 };
 
 GLTFModel.propTypes = {
     url: PropTypes.string.isRequired,
+    desiredSize: PropTypes.number
 };
-
 
 const useToast = () => {
     const [toast, setToast] = useState(null);
@@ -590,6 +596,7 @@ const PRODUCTS_DATA = [
         name: 'Kamikaze+ Tactical Drone',
         model: 'KAMIKAZE+ (5-INCH)',
         image: kamikazeTacticalImg,
+        model3D: '/models/fully_done_glb.glb',
         overview: 'Used in a similar style as seen in the Ukraine war, the Kamikaze+ is a compact, low-cost, high-impact drone designed for surveillance and precision strikes. Its ability to carry and drop payloads while streaming FPV makes it a reliable tool for modern tactical missions in sensitive or high-risk zones.',
         specifications: {
             'Type': '5-inch Quadcopter',
@@ -623,6 +630,7 @@ const PRODUCTS_DATA = [
         name: 'Kamikaze Training Drone',
         model: 'TRAINER KAMIKAZE',
         image: trainingDroneImg,
+        model3D: '/models/fully_done_glb.glb',
         overview: 'Designed to help personnel master FPV drone tactics, the Trainer Kamikaze is a safe, stable, and crash-tolerant platform that simulates real kamikaze drone missions. It allows soldiers to train in real-world conditions without risking actual strike units — making it an essential tool in any drone warfare training program.',
         specifications: {
             'Type': 'Crash-resistant quadcopter',
@@ -657,6 +665,7 @@ const PRODUCTS_DATA = [
         name: 'VTOL Heavy Payload UAV',
         model: 'HIVE+ VTOL',
         image: vtol,
+        model3D: '/models/drone.glb',
         overview: 'The Hive+ VTOL combines the vertical takeoff of a drone with the range and efficiency of a fixed-wing aircraft, enabling long-range missions without a runway. With over 1 hour of flight time and the ability to carry 4-5 kg payloads, it\'s perfect for surveillance, logistics, or tactical delivery — especially in difficult terrains like mountains or border zones.',
         specifications: {
             'Type': 'Hybrid VTOL',
@@ -693,6 +702,7 @@ const PRODUCTS_DATA = [
         name: 'Cruise Kamikaze Drone',
         model: 'CRUISE KAMIKAZE',
         image: cruiseKamikaze,
+        model3D: '/models/fully_done_glb.glb',
         overview: 'This drone is a miniature cruise missile platform designed for long-range, high-speed autonomous strikes. With auto-stabilization and a unique wing-folding dive mechanism, it can fly like a plane and suddenly dive vertically onto a target, delivering devastating precision with minimal detection.',
         specifications: {
             'Design': 'Fixed-wing for long-range',
@@ -727,6 +737,7 @@ const PRODUCTS_DATA = [
         name: 'Fixed-Wing Kamikaze',
         model: 'FIXED-WING KAMIKAZE',
         image: fixedWingKamikaze,
+        model3D: '/models/fully_done_glb.glb',
         overview: 'This disposable fixed-wing drone is engineered for direct target engagement. With a lightweight design, long straight-line range, and support for manual or semi-auto control, it\'s built to deliver precise strikes at minimal cost. Ideal for saturating enemy zones with multiple low-cost airborne threats, just like tactics seen in modern asymmetric warfare.',
         specifications: {
             'Design': 'Fixed-wing for long-range flight',
@@ -965,8 +976,7 @@ Phone: ${CONSTANTS.CONTACT_PHONE}
                                         </motion.div>
                                     )}
 
-                                    {product.id === 3 ? (
-                                        // Enhanced 3D Model Container - CENTERED
+                                    {product.model3D ? (
                                         <div className="w-full h-full relative">
                                             <Canvas
                                                 camera={{
@@ -997,7 +1007,7 @@ Phone: ${CONSTANTS.CONTACT_PHONE}
                                                 <Suspense fallback={null}>
                                                     {/* Center the model using a group */}
                                                     <group position={[0, 0, 0]}>
-                                                        <GLTFModel url="/models/fully_done_glb.glb" />
+                                                        <GLTFModel url={product.model3D} desiredSize={6} />
                                                     </group>
                                                 </Suspense>
 
@@ -1035,7 +1045,6 @@ Phone: ${CONSTANTS.CONTACT_PHONE}
                                             </div>
                                         </div>
                                     ) : (
-                                        // Enhanced Image Container
                                         <>
                                             <img
                                                 src={imageError ? '/api/placeholder/600/500' : product.image}
