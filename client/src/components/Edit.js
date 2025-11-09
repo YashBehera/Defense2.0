@@ -2,6 +2,9 @@ import React, { useState, useEffect, useRef, lazy, Suspense, useCallback, useMem
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence, useScroll, useSpring, useInView } from 'framer-motion';
 import PropTypes from 'prop-types';
+import { Canvas } from '@react-three/fiber';
+import { OrbitControls, useGLTF, Stage } from '@react-three/drei';
+import * as THREE from 'three';
 
 // Image imports
 import kamikazeTacticalImg from '../img/1.png';
@@ -86,6 +89,51 @@ const useImageLoader = (src) => {
     return state;
 };
 
+// 3D Model Component
+const GLTFModel = ({ url }) => {
+    const { scene } = useGLTF(url);
+
+    useEffect(() => {
+        if (scene) {
+            // Calculate the bounding box of the model
+            const box = new THREE.Box3().setFromObject(scene);
+            const center = box.getCenter(new THREE.Vector3());
+            const size = box.getSize(new THREE.Vector3());
+
+            // Center the model at origin (0, 0, 0)
+            scene.position.x = -center.x;
+            scene.position.y = -center.y;
+            scene.position.z = -center.z;
+
+            // Auto-scale the model to fit nicely in viewport
+            const maxDim = Math.max(size.x, size.y, size.z);
+            const desiredSize = 5; // Adjust this value to make model bigger/smaller
+            const scale = desiredSize / maxDim;
+            scene.scale.setScalar(scale);
+
+            // Optional: Traverse and update materials for better rendering
+            scene.traverse((child) => {
+                if (child.isMesh) {
+                    child.castShadow = true;
+                    child.receiveShadow = true;
+                    
+                    // Ensure materials are properly configured
+                    if (child.material) {
+                        child.material.needsUpdate = true;
+                    }
+                }
+            });
+        }
+    }, [scene]);
+
+    return <primitive object={scene} />;
+};
+
+GLTFModel.propTypes = {
+    url: PropTypes.string.isRequired,
+};
+
+
 const useToast = () => {
     const [toast, setToast] = useState(null);
 
@@ -152,8 +200,8 @@ const Toast = React.memo(({ message, type = 'success', onClose }) => (
     <motion.div
         {...animations.fadeInUp}
         className={`fixed bottom-4 right-4 px-5 py-4 rounded-lg shadow-2xl z-50 flex items-center gap-3 max-w-xs sm:max-w-sm border ${type === 'success'
-                ? 'bg-white border-green-200 text-gray-800'
-                : 'bg-white border-red-600 text-gray-800'
+            ? 'bg-white border-green-200 text-gray-800'
+            : 'bg-white border-red-600 text-gray-800'
             }`}
         role="alert"
         aria-live="polite"
@@ -887,48 +935,170 @@ Phone: ${CONSTANTS.CONTACT_PHONE}
                     </motion.div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-                        {/* Left Column - Image and Features */}
+                        {/* Left Column - Image / 3D Model and Features */}
                         <motion.div
-                            className="space-y-6"
+                            className="space-y-8"
                             {...animations.fadeInLeft}
                             transition={{ duration: 0.6 }}
                         >
+                            {/* Main Product Showcase */}
                             <div className="relative group">
-                                <div className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 shadow-xl border-2 border-gray-200 hover:border-red-600 transition-all duration-300">
+                                {/* 3D/Image Container with Enhanced Styling */}
+                                <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-gray-50 via-white to-gray-100 shadow-2xl border border-gray-200 hover:border-red-500 transition-all duration-500 h-[280px] sm:h-[380px] lg:h-[450px]">
+                                    {/* Decorative Background Elements */}
+                                    <div className="absolute inset-0 bg-gradient-to-tr from-red-500/5 via-transparent to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                                    <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-red-500/10 to-transparent rounded-bl-full blur-2xl" />
+                                    <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-blue-500/10 to-transparent rounded-tr-full blur-2xl" />
+
+                                    {/* Loading Spinner */}
                                     {imageLoading && (
-                                        <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+                                        <motion.div
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            exit={{ opacity: 0 }}
+                                            className="absolute inset-0 flex items-center justify-center bg-white/90 backdrop-blur-sm z-10"
+                                        >
                                             <div className="relative">
-                                                <div className="w-16 h-16 border-4 border-gray-300 border-t-red-600 rounded-full animate-spin" />
+                                                <div className="w-16 h-16 border-4 border-gray-200 border-t-red-600 rounded-full animate-spin" />
+                                                <div className="absolute inset-0 w-16 h-16 border-4 border-transparent border-b-red-400 rounded-full animate-spin-slow" />
                                             </div>
-                                        </div>
+                                        </motion.div>
                                     )}
 
-                                    <img
-                                        src={imageError ? '/api/placeholder/600/500' : product.image}
-                                        alt={`${product.name} - ${product.model}`}
-                                        className={`w-full h-[250px] sm:h-[350px] lg:h-[400px] object-fill transition-all duration-700 ${imageLoading ? 'opacity-0 scale-110' : 'opacity-100 scale-100'
-                                            }`}
-                                        loading="lazy"
-                                        onError={(e) => {
-                                            e.target.src = '/api/placeholder/600/500';
-                                        }}
-                                    />
+                                    {product.id === 3 ? (
+                                        // Enhanced 3D Model Container - CENTERED
+                                        <div className="w-full h-full relative">
+                                            <Canvas
+                                                camera={{
+                                                    position: [0, 0, 8],
+                                                    fov: 45,
+                                                    near: 0.1,
+                                                    far: 1000
+                                                }}
+                                                style={{ background: 'transparent' }}
+                                            >
+                                                {/* Lighting Setup */}
+                                                <ambientLight intensity={0.8} />
+                                                <directionalLight position={[5, 5, 5]} intensity={1} castShadow />
+                                                <directionalLight position={[-5, -5, -5]} intensity={0.5} />
+                                                <spotLight
+                                                    position={[0, 10, 0]}
+                                                    intensity={0.8}
+                                                    angle={0.6}
+                                                    penumbra={1}
+                                                    castShadow
+                                                />
+                                                <hemisphereLight
+                                                    skyColor="#ffffff"
+                                                    groundColor="#444444"
+                                                    intensity={0.5}
+                                                />
+
+                                                <Suspense fallback={null}>
+                                                    {/* Center the model using a group */}
+                                                    <group position={[0, 0, 0]}>
+                                                        <GLTFModel url="/models/fully_done_glb.glb" />
+                                                    </group>
+                                                </Suspense>
+
+                                                {/* Centered OrbitControls */}
+                                                <OrbitControls
+                                                    target={[0, 0, 0]}
+                                                    enableZoom={true}
+                                                    enablePan={false}
+                                                    enableDamping={true}
+                                                    dampingFactor={0.05}
+                                                    minDistance={4}
+                                                    maxDistance={12}
+                                                    minPolarAngle={Math.PI / 4}
+                                                    maxPolarAngle={Math.PI / 1.5}
+                                                    autoRotate={true}
+                                                    autoRotateSpeed={3}
+                                                    rotateSpeed={0.5}
+                                                />
+                                            </Canvas>
+
+                                            {/* 3D Model Badge */}
+                                            <div className="absolute top-4 right-4 bg-black/80 backdrop-blur-md text-white px-4 py-2 rounded-full text-xs font-semibold flex items-center gap-2 shadow-lg z-10">
+                                                <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                                                3D Interactive View
+                                            </div>
+
+                                            {/* Control Instructions */}
+                                            <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-md text-gray-800 px-4 py-2 rounded-lg text-xs font-medium shadow-lg z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                                <div className="flex items-center gap-2">
+                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+                                                    </svg>
+                                                    Drag to rotate • Scroll to zoom
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        // Enhanced Image Container
+                                        <>
+                                            <img
+                                                src={imageError ? '/api/placeholder/600/500' : product.image}
+                                                alt={`${product.name} - ${product.model}`}
+                                                className={`w-full h-full object-cover transition-all duration-700 group-hover:scale-105 ${imageLoading ? 'opacity-0 scale-110' : 'opacity-100 scale-100'
+                                                    }`}
+                                                loading="lazy"
+                                                onError={(e) => {
+                                                    e.target.src = '/api/placeholder/600/500';
+                                                }}
+                                            />
+
+                                            {/* Image Overlay on Hover */}
+                                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-6">
+                                                <p className="text-white text-sm font-medium">Click to view full details</p>
+                                            </div>
+                                        </>
+                                    )}
+
+                                    {/* Corner Accent */}
+                                    <div className="absolute top-0 left-0 w-20 h-20 border-t-4 border-l-4 border-red-600 rounded-tl-3xl opacity-100 transition-all duration-500" />
+                                    <div className="absolute bottom-0 right-0 w-20 h-20 border-b-4 border-r-4 border-red-600 rounded-br-3xl opacity-100 transition-all duration-500" />
                                 </div>
 
-                                {/* Product Badge */}
+                                {/* Enhanced Product Badge */}
                                 <motion.div
-                                    className="mt-5"
+                                    className="mt-6 -mb-2"
                                     initial={{ y: 20, opacity: 0 }}
                                     animate={{ y: 0, opacity: 1 }}
                                     transition={{ delay: 0.3, duration: 0.5 }}
                                 >
-                                    <div className="bg-white rounded-xl px-6 py-4 border-2 border-gray-200 shadow-lg hover:shadow-xl hover:border-red-600 transition-all duration-300">
-                                        <h2 className="text-black font-bold text-xl sm:text-2xl tracking-tight">
-                                            {product.model}
-                                        </h2>
-                                        <p className="text-gray-600 text-sm sm:text-base capitalize mt-1 font-medium">
-                                            {product.category}
-                                        </p>
+                                    <div className="relative bg-gradient-to-br from-white to-gray-50 rounded-2xl px-8 py-6 border border-gray-200 shadow-xl hover:shadow-2xl hover:border-red-500 transition-all duration-500 overflow-hidden group/badge">
+                                        {/* Animated Background */}
+                                        <div className="absolute inset-0 bg-gradient-to-r from-red-500/5 via-transparent to-blue-500/5 translate-x-[-100%] group-hover/badge:translate-x-[100%] transition-transform duration-1000" />
+
+                                        <div className="relative flex items-center justify-between">
+                                            <div>
+                                                <h2 className="text-gray-900 font-bold text-2xl sm:text-3xl tracking-tight mb-1 flex items-center gap-3">
+                                                    {product.model}
+                                                    <span className="inline-flex items-center gap-1 bg-red-600 text-white text-xs px-3 py-1 rounded-full font-semibold">
+                                                        <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
+                                                        NEW
+                                                    </span>
+                                                </h2>
+                                                <p className="text-gray-600 text-base sm:text-lg capitalize font-medium flex items-center gap-2">
+                                                    <span className="w-2 h-2 bg-red-600 rounded-full" />
+                                                    {product.category}
+                                                </p>
+                                            </div>
+
+                                            {/* Quick Action Button */}
+                                            <motion.button
+                                                whileHover={{ scale: 1.05, rotate: 5 }}
+                                                whileTap={{ scale: 0.95 }}
+                                                className="hidden sm:flex items-center gap-2 bg-gradient-to-r from-gray-900 to-black text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all"
+                                            >
+                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                </svg>
+                                                View
+                                            </motion.button>
+                                        </div>
                                     </div>
                                 </motion.div>
                             </div>
