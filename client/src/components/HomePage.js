@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, Suspense } from 'react';
 import { motion, useScroll, useSpring, useInView, AnimatePresence, useReducedMotion } from 'framer-motion';
 import PropTypes from 'prop-types';
 import HomePageVideo from '../video/DroneHomePage3.mp4';
@@ -17,6 +17,10 @@ import {
   viewportOptions,
 } from './motionVariants';
 import { Link } from 'react-router-dom';
+import { Canvas } from '@react-three/fiber';
+import { OrbitControls, useGLTF } from '@react-three/drei';
+import * as THREE from 'three';
+import DroneVideo from '../video/Drone.mp4';
 
 const usePerformanceMonitor = () => {
   useEffect(() => {
@@ -39,6 +43,127 @@ const usePerformanceMonitor = () => {
       }
     }
   }, []);
+};
+
+// Utility hook: simple media query
+const useMediaQuery = (query) => {
+  const [matches, setMatches] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia(query).matches;
+  });
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const mq = window.matchMedia(query);
+    const handle = (e) => setMatches(e.matches);
+    mq.addEventListener ? mq.addEventListener('change', handle) : mq.addListener(handle);
+    setMatches(mq.matches);
+    return () => {
+      mq.removeEventListener ? mq.removeEventListener('change', handle) : mq.removeListener(handle);
+    };
+  }, [query]);
+
+  return matches;
+};
+
+// Centering GLTF model component
+const CenteredGLTF = ({ url, desiredSize = 4 }) => {
+  const { scene } = useGLTF(url);
+  const groupRef = useRef();
+
+  useEffect(() => {
+    if (!scene || !groupRef.current) return;
+
+    scene.position.set(0, 0, 0);
+    scene.rotation.set(0, 0, 0);
+    scene.scale.set(1, 1, 1);
+
+    const box = new THREE.Box3().setFromObject(scene);
+    const center = box.getCenter(new THREE.Vector3());
+    const size = box.getSize(new THREE.Vector3());
+    const maxDim = Math.max(size.x, size.y, size.z) || 1;
+    const scale = desiredSize / maxDim;
+
+    groupRef.current.scale.setScalar(scale);
+    groupRef.current.position.set(-center.x * scale, -center.y * scale, -center.z * scale);
+
+    scene.traverse((child) => {
+      if (child.isMesh) {
+        child.castShadow = true;
+        child.receiveShadow = true;
+        if (child.material) {
+          child.material.side = THREE.DoubleSide;
+          child.material.needsUpdate = true;
+        }
+      }
+    });
+  }, [scene, desiredSize]);
+
+  return (
+    <group ref={groupRef}>
+      {scene && <primitive object={scene} />}
+    </group>
+  );
+};
+
+// HeroRight: shows 3D on large screens, video on small screens
+const HeroRight = ({ shouldReduceMotion, heroVisible, motionConfig }) => {
+  const isLarge = useMediaQuery('(min-width: 1024px)'); // lg and above
+
+  if (isLarge) {
+    return (
+      <motion.div
+        {...motionConfig}
+        variants={slideInVariants.right}
+        animate={{ opacity: heroVisible ? 1 : 0, x: heroVisible ? 0 : 50 }}
+        transition={{ duration: 0.8, ease: easings.smooth }}
+        className="relative w-full h-full"
+      >
+        <div className="w-full h-[320px] sm:h-[420px] lg:h-[520px] rounded-2xl overflow-hidden">
+          <Canvas camera={{ position: [0, 0, 8], fov: 45 }}> 
+            <ambientLight intensity={0.8} />
+            <directionalLight position={[5, 5, 5]} intensity={1} />
+            <Suspense fallback={null}>
+              <CenteredGLTF url={'/models/fully_done_glb.glb'} desiredSize={6} />
+            </Suspense>
+            <OrbitControls
+              target={[0, 0, 0]}
+              enableZoom={!shouldReduceMotion}
+              enablePan={false}
+              enableDamping
+              dampingFactor={0.05}
+              autoRotate={!shouldReduceMotion}
+              autoRotateSpeed={2}
+            />
+          </Canvas>
+        </div>
+      </motion.div>
+    );
+  }
+
+  // Small screens: show lightweight looping video
+  return (
+    <motion.div
+      {...motionConfig}
+      variants={slideInVariants.right}
+      animate={{ opacity: heroVisible ? 1 : 0, x: heroVisible ? 0 : 50 }}
+      transition={{ duration: 0.8, ease: easings.smooth }}
+      className="relative"
+    >
+      <motion.video
+        src={DroneVideo}
+        className="w-full aspect-video object-cover rounded-2xl gpu-accelerated"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: heroVisible ? 1 : 0 }}
+        transition={{ duration: 0.5, ease: easings.smooth }}
+        loop
+        playsInline
+        muted
+        autoPlay
+        preload="auto"
+      />
+    </motion.div>
+  );
 };
 
 const HomePage = () => {
@@ -307,32 +432,7 @@ const HomePage = () => {
             </motion.div>
 
             {/* Right Column */}
-            <motion.div
-              {...motionConfig}
-              variants={slideInVariants.right}
-              animate={{ opacity: heroVisible ? 1 : 0, x: heroVisible ? 0 : 50 }}
-              transition={{ duration: 0.8, ease: easings.smooth }}
-              className="relative"
-            >
-              <motion.div
-                className="w-full aspect-video object-cover rounded-2xl gpu-accelerated"
-                whileHover={!shouldReduceMotion ? { scale: 1.02 } : {}}
-                transition={transitions.spring}
-              >
-                <motion.video
-                  src={HomePageVideo2}
-                  className="w-full h-full object-cover rounded-2xl gpu-accelerated"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: heroVisible ? 1 : 0 }}
-                  transition={{ duration: 0.5, ease: easings.smooth }}
-                  loop
-                  playsInline
-                  muted
-                  autoPlay
-                  preload="auto"
-                />
-              </motion.div>
-            </motion.div>
+            <HeroRight shouldReduceMotion={shouldReduceMotion} heroVisible={heroVisible} motionConfig={motionConfig} />
 
           </motion.div>
         </div>
