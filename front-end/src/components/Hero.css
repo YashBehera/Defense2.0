@@ -1,0 +1,618 @@
+/* Hero.css - Single Static Hero Section */
+
+/* ============================================
+   CSS Custom Properties (Variables)
+   ============================================ */
+   :root {
+    --hero-primary: #e63946;
+    --hero-primary-dark: #d62839;
+    --hero-dark: #1a1a1a;
+    --hero-light: #ffffff;
+    --hero-gray: #6b7280;
+    --hero-transition-fast: 0.2s ease;
+    --hero-transition-normal: 0.3s ease;
+    --hero-transition-slow: 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ============================================
+   Base Hero Styles
+   ============================================ */
+.hero-archer {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    min-height: 600px;
+    max-height: 1200px;
+    overflow: hidden;
+    background: var(--hero-dark);
+}
+
+/* ============================================
+   Background Image
+   ============================================ */
+.hero-archer__media {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.hero-archer__background-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transform: scale(1.1);
+    transition: transform 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hero-archer--loaded .hero-archer__background-image {
+    transform: scale(1) translateY(calc(var(--scroll-progress, 0) * 50px));
+}
+
+/* ============================================
+   Overlays
+   ============================================ */
+.hero-archer__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.hero-archer__overlay--gradient {
+    background: linear-gradient(
+        135deg,
+        rgba(0, 0, 0, 0.7) 0%,
+        rgba(0, 0, 0, 0.4) 40%,
+        rgba(0, 0, 0, 0.2) 60%,
+        rgba(0, 0, 0, 0.5) 100%
+    );
+}
+
+.hero-archer__overlay--vignette {
+    background: radial-gradient(
+        ellipse at center,
+        transparent 0%,
+        rgba(0, 0, 0, 0.3) 100%
+    );
+}
+
+.hero-archer__overlay--noise {
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+}
+
+/* ============================================
+   Skip Link (Accessibility)
+   ============================================ */
+.hero-archer__skip-link {
+    position: absolute;
+    top: -100%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 1rem 2rem;
+    background: var(--hero-primary);
+    color: var(--hero-light);
+    text-decoration: none;
+    border-radius: 4px;
+    z-index: 1000;
+    transition: top var(--hero-transition-fast);
+}
+
+.hero-archer__skip-link:focus {
+    top: 1rem;
+}
+
+/* ============================================
+   Main Container
+   ============================================ */
+.hero-archer__container {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 6rem 2rem 8rem;
+}
+
+/* ============================================
+   Content Area
+   ============================================ */
+.hero-archer__content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    max-width: 800px;
+    margin-top: 15rem;
+}
+
+/* ============================================
+   Headline Group
+   ============================================ */
+.hero-archer__headline-group {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all var(--hero-transition-slow);
+}
+
+.hero-archer__headline-group--active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.hero-archer--loaded .hero-archer__headline-group--active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ============================================
+   Title Styles
+   ============================================ */
+.hero-archer__title {
+    margin: 0 0 1.5rem;
+    font-size: clamp(3rem, 10vw, 7rem);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.03em;
+}
+
+.hero-archer__title-line {
+    display: block;
+    overflow: hidden;
+}
+
+.hero-archer__title-text {
+    display: block;
+    color: var(--hero-light);
+    transform: translateY(100%);
+    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hero-archer--loaded .hero-archer__title-text {
+    transform: translateY(0);
+}
+
+.hero-archer__title-line:nth-child(2) .hero-archer__title-text {
+    transition-delay: 0.15s;
+}
+
+.hero-archer__title-text--outline {
+    color: transparent;
+    -webkit-text-stroke: 2px var(--hero-light);
+    text-stroke: 2px var(--hero-light);
+}
+
+/* ============================================
+   Description
+   ============================================ */
+.hero-archer__description {
+    max-width: 500px;
+    margin-bottom: 2rem;
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    font-weight: 400;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.8);
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.6s ease 0.4s;
+}
+
+.hero-archer--loaded .hero-archer__description {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ============================================
+   CTA Button
+   ============================================ */
+.hero-archer__cta-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 2rem;
+    background: var(--hero-primary);
+    color: var(--hero-light);
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.6s ease 0.5s;
+}
+
+.hero-archer--loaded .hero-archer__cta-button {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.hero-archer__cta-button:hover {
+    background: var(--hero-primary-dark);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(230, 57, 70, 0.4);
+}
+
+.hero-archer__cta-button svg {
+    width: 20px;
+    height: 20px;
+    transition: transform var(--hero-transition-normal);
+}
+
+.hero-archer__cta-button:hover svg {
+    transform: translateX(5px);
+}
+
+/* ============================================
+   Bottom Bar
+   ============================================ */
+.hero-archer__bottom-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1.5rem 2rem;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, transparent 100%);
+    z-index: 10;
+}
+
+.hero-archer__bottom-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+    .hero-archer__bottom-container {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+}
+
+/* ============================================
+   Stats
+   ============================================ */
+.hero-archer__stats {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.6s ease 0.6s;
+}
+
+.hero-archer--loaded .hero-archer__stats {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.hero-archer__stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.hero-archer__stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--hero-light);
+}
+
+.hero-archer__stat-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.hero-archer__stat-divider {
+    width: 1px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* ============================================
+   Announcement
+   ============================================ */
+.hero-archer__announcement {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.6s ease 0.7s;
+}
+
+.hero-archer--loaded .hero-archer__announcement {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.hero-archer__announcement-badge {
+    padding: 0.25rem 0.75rem;
+    background: var(--hero-primary);
+    color: var(--hero-light);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    border-radius: 50px;
+}
+
+.hero-archer__announcement-text {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.hero-archer__announcement-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--hero-light);
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color var(--hero-transition-normal);
+}
+
+.hero-archer__announcement-link:hover {
+    color: var(--hero-primary);
+}
+
+.hero-archer__announcement-link svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* ============================================
+   Corner Frames
+   ============================================ */
+.hero-archer__frame {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    z-index: 5;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.6s ease 0.8s;
+}
+
+.hero-archer--loaded .hero-archer__frame {
+    opacity: 1;
+}
+
+.hero-archer__frame--tl {
+    top: 2rem;
+    left: 2rem;
+    border-right: none;
+    border-bottom: none;
+}
+
+.hero-archer__frame--tr {
+    top: 2rem;
+    right: 2rem;
+    border-left: none;
+    border-bottom: none;
+}
+
+.hero-archer__frame--bl {
+    bottom: 6rem;
+    left: 2rem;
+    border-right: none;
+    border-top: none;
+}
+
+.hero-archer__frame--br {
+    bottom: 6rem;
+    right: 2rem;
+    border-left: none;
+    border-top: none;
+}
+
+/* ============================================
+   Scroll Indicator
+   ============================================ */
+.hero-archer__scroll-indicator {
+    position: absolute;
+    bottom: 8rem;
+    right: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    z-index: 10;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.6s ease 0.9s;
+}
+
+.hero-archer--loaded .hero-archer__scroll-indicator {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.hero-archer__scroll-text {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    writing-mode: vertical-rl;
+}
+
+.hero-archer__scroll-line {
+    width: 1px;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-archer__scroll-dot {
+    width: 3px;
+    height: 10px;
+    background: var(--hero-primary);
+    border-radius: 2px;
+    position: absolute;
+    left: -1px;
+    animation: scrollDot 2s ease-in-out infinite;
+}
+
+@keyframes scrollDot {
+    0% {
+        top: 0;
+        opacity: 0;
+    }
+    20% {
+        opacity: 1;
+    }
+    80% {
+        opacity: 1;
+    }
+    100% {
+        top: 100%;
+        opacity: 0;
+    }
+}
+
+/* ============================================
+   Reduced Motion
+   ============================================ */
+.hero-archer--reduced-motion .hero-archer__background-image,
+.hero-archer--reduced-motion .hero-archer__headline-group,
+.hero-archer--reduced-motion .hero-archer__title-text,
+.hero-archer--reduced-motion .hero-archer__description,
+.hero-archer--reduced-motion .hero-archer__cta-button,
+.hero-archer--reduced-motion .hero-archer__stats,
+.hero-archer--reduced-motion .hero-archer__announcement,
+.hero-archer--reduced-motion .hero-archer__frame,
+.hero-archer--reduced-motion .hero-archer__scroll-indicator {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+}
+
+.hero-archer--reduced-motion .hero-archer__scroll-dot {
+    animation: none;
+}
+
+/* ============================================
+   Mobile Styles
+   ============================================ */
+@media (max-width: 768px) {
+    .hero-archer {
+        min-height: 100vh;
+        min-height: 100dvh;
+    }
+
+    .hero-archer__container {
+        padding: 5rem 1.5rem 10rem;
+    }
+
+    .hero-archer__stats {
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .hero-archer__stat-divider {
+        display: none;
+    }
+
+    .hero-archer__announcement {
+        flex-wrap: wrap;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .hero-archer__frame {
+        width: 40px;
+        height: 40px;
+    }
+
+    .hero-archer__frame--tl,
+    .hero-archer__frame--tr {
+        top: 1rem;
+    }
+
+    .hero-archer__frame--tl,
+    .hero-archer__frame--bl {
+        left: 1rem;
+    }
+
+    .hero-archer__frame--tr,
+    .hero-archer__frame--br {
+        right: 1rem;
+    }
+
+    .hero-archer__scroll-indicator {
+        right: 1rem;
+        bottom: 10rem;
+    }
+
+    .hero-archer__cta-button {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* ============================================
+   Large Screens
+   ============================================ */
+@media (min-width: 1200px) {
+    .hero-archer__container {
+        padding: 8rem 4rem 10rem;
+    }
+
+    .hero-archer__frame {
+        width: 80px;
+        height: 80px;
+    }
+
+    .hero-archer__frame--tl,
+    .hero-archer__frame--tr {
+        top: 3rem;
+    }
+
+    .hero-archer__frame--bl,
+    .hero-archer__frame--br {
+        bottom: 8rem;
+    }
+
+    .hero-archer__frame--tl,
+    .hero-archer__frame--bl {
+        left: 3rem;
+    }
+
+    .hero-archer__frame--tr,
+    .hero-archer__frame--br {
+        right: 3rem;
+    }
+
+    .hero-archer__scroll-indicator {
+        right: 3rem;
+    }
+}
