@@ -929,79 +929,312 @@ const ProductSection = () => {
                 </div>
             </section>
 
-            {/* ==================== FEATURES SECTION ==================== */}
+            {/* ==================== FEATURES SECTION - HORIZONTAL SCROLL ==================== */}
             <section
                 ref={el => sectionRefs.current.features = el}
                 className={`features ${isVisible.features ? 'features--visible' : ''}`}
                 aria-labelledby="features-title"
             >
+                {/* Simple Background */}
                 <div className="features__bg">
                     <div className="features__bg-gradient" />
+                    <div className="features__bg-accent" />
                 </div>
 
-                <div className="features__container">
-                    {/* Section Header */}
-                    <header className="section-header">
-                        <span className="section-header__label">Design Excellence</span>
-                        <h2 id="features-title" className="section-header__title">
-                            Crafted for the Future
+                {/* Section Header */}
+                <div className="features__header">
+                    <div className="features__header-content">
+                        <div className="features__label">
+                            <span className="features__label-dot" />
+                            <span className="features__label-text">Design Excellence</span>
+                        </div>
+                        <h2 id="features-title" className="features__title">
+                            Crafted with <span className="features__title-accent">Precision</span>
                         </h2>
-                        <p className="section-header__description">
-                            Every component designed with precision, purpose, and passion
+                        <p className="features__subtitle">
+                            Every detail meticulously designed. Every component engineered for perfection.
                         </p>
-                    </header>
+                    </div>
 
-                    {/* Feature Cards */}
-                    <div
-                        className="features__grid"
-                        onMouseEnter={() => featurePaused.current = true}
-                        onMouseLeave={() => featurePaused.current = false}
-                    >
+                    {/* Navigation Controls */}
+                    <div className="features__controls">
+                        <div className="features__progress-info">
+                            <span className="features__progress-current">
+                                {String(activeFeature + 1).padStart(2, '0')}
+                            </span>
+                            <div className="features__progress-bar">
+                                <div
+                                    className="features__progress-fill"
+                                    style={{
+                                        width: `${((activeFeature + 1) / product.featureCards.length) * 100}%`
+                                    }}
+                                />
+                            </div>
+                            <span className="features__progress-total">
+                                {String(product.featureCards.length).padStart(2, '0')}
+                            </span>
+                        </div>
+                        <div className="features__nav-buttons">
+                            <button
+                                className="features__nav-btn"
+                                onClick={() => setActiveFeature(prev =>
+                                    prev === 0 ? product.featureCards.length - 1 : prev - 1
+                                )}
+                                aria-label="Previous feature"
+                            >
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <path d="M15 18l-6-6 6-6" />
+                                </svg>
+                            </button>
+                            <button
+                                className="features__nav-btn"
+                                onClick={() => setActiveFeature(prev =>
+                                    prev === product.featureCards.length - 1 ? 0 : prev + 1
+                                )}
+                                aria-label="Next feature"
+                            >
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <path d="M9 18l6-6-6-6" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Horizontal Scroll Cards */}
+                <div
+                    className="features__carousel"
+                    onMouseEnter={() => featurePaused.current = true}
+                    onMouseLeave={() => featurePaused.current = false}
+                >
+                    <div className="features__track">
                         {product.featureCards.map((feature, index) => (
                             <article
                                 key={feature.id}
-                                className={`feature-card ${activeFeature === index ? 'feature-card--active' : ''}`}
-                                style={{ '--delay': `${index * 0.15}s` }}
+                                className={`feature-card ${activeFeature === index ? 'feature-card--active' : ''
+                                    } ${index < activeFeature ? 'feature-card--past' : ''}`}
+                                style={{ '--index': index }}
+                                onClick={() => setActiveFeature(index)}
                                 onMouseEnter={() => setActiveFeature(index)}
-                                onFocus={() => setActiveFeature(index)}
                                 tabIndex={0}
+                                role="button"
+                                aria-pressed={activeFeature === index}
                             >
-                                <div className="feature-card__media">
-                                    <img
-                                        src={feature.image}
-                                        alt={feature.title}
-                                        className="feature-card__image"
-                                        loading="lazy"
-                                        decoding="async"
-                                    />
-                                    <div className="feature-card__overlay" />
-                                    <span className="feature-card__badge">{feature.badge}</span>
-                                    <span className="feature-card__number">
-                                        {String(index + 1).padStart(2, '0')}
-                                    </span>
-                                </div>
-                                <div className="feature-card__content">
-                                    <h3 className="feature-card__title">{feature.title}</h3>
-                                    <p className="feature-card__description">{feature.description}</p>
+                                {/* Card Glow Effect */}
+                                <div className="feature-card__glow" />
 
+                                {/* Card Inner */}
+                                <div className="feature-card__inner">
+                                    {/* Header */}
+                                    <div className="feature-card__header">
+                                        <div className="feature-card__index">
+                                            <svg viewBox="0 0 100 100" className="feature-card__index-ring">
+                                                <circle
+                                                    cx="50" cy="50" r="44"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    strokeWidth="2"
+                                                    strokeDasharray="276"
+                                                    strokeDashoffset={276 - (276 * ((index + 1) / product.featureCards.length))}
+                                                    strokeLinecap="round"
+                                                />
+                                            </svg>
+                                            <span className="feature-card__index-number">
+                                                {String(index + 1).padStart(2, '0')}
+                                            </span>
+                                        </div>
+                                        <div className="feature-card__meta">
+                                            <span className="feature-card__badge">{feature.badge}</span>
+                                            <span className="feature-card__status">
+                                                <span className="feature-card__status-dot" />
+                                                Featured
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    {/* Image */}
+                                    <div className="feature-card__image-container">
+                                        <div className="feature-card__image-wrapper">
+                                            <img
+                                                src={feature.image}
+                                                alt={feature.title}
+                                                className="feature-card__image"
+                                                loading={index === 0 ? 'eager' : 'lazy'}
+                                                decoding="async"
+                                            />
+                                            <div className="feature-card__image-overlay" />
+
+                                            {/* Quick Stats Overlay */}
+                                            <div className="feature-card__quick-stats">
+                                                <div className="feature-card__quick-stat">
+                                                    <span className="feature-card__quick-stat-value">A+</span>
+                                                    <span className="feature-card__quick-stat-label">Grade</span>
+                                                </div>
+                                                <div className="feature-card__quick-stat">
+                                                    <span className="feature-card__quick-stat-value">100%</span>
+                                                    <span className="feature-card__quick-stat-label">Quality</span>
+                                                </div>
+                                            </div>
+
+                                            {/* Floating Labels */}
+                                            <div className="feature-card__floating-labels">
+                                                <span className="feature-card__floating-label">Premium</span>
+                                                <span className="feature-card__floating-label">Certified</span>
+                                            </div>
+                                        </div>
+
+                                        {/* Reflection Effect */}
+                                        <div className="feature-card__reflection">
+                                            <img src={feature.image} alt="" aria-hidden="true" />
+                                        </div>
+                                    </div>
+
+                                    {/* Content */}
+                                    <div className="feature-card__content">
+                                        <h3 className="feature-card__title">{feature.title}</h3>
+                                        <p className="feature-card__description">{feature.description}</p>
+
+                                        {/* Feature Highlights */}
+                                        <div className="feature-card__highlights">
+                                            <div className="feature-card__highlight">
+                                                <div className="feature-card__highlight-icon">
+                                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                                                        <path d="M9 12l2 2 4-4" />
+                                                        <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" />
+                                                    </svg>
+                                                </div>
+                                                <span>Verified Quality</span>
+                                            </div>
+                                            <div className="feature-card__highlight">
+                                                <div className="feature-card__highlight-icon">
+                                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                                                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                                                    </svg>
+                                                </div>
+                                                <span>Safety Certified</span>
+                                            </div>
+                                            <div className="feature-card__highlight">
+                                                <div className="feature-card__highlight-icon">
+                                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                                                        <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                                                        <path d="M2 17l10 5 10-5" />
+                                                        <path d="M2 12l10 5 10-5" />
+                                                    </svg>
+                                                </div>
+                                                <span>Modular Design</span>
+                                            </div>
+                                        </div>
+
+                                        {/* Actions */}
+                                        <div className="feature-card__actions">
+                                            <button className="feature-card__cta">
+                                                <span className="feature-card__cta-text">Explore</span>
+                                                <span className="feature-card__cta-icon">
+                                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                        <path d="M5 12h14M12 5l7 7-7 7" />
+                                                    </svg>
+                                                </span>
+                                                <span className="feature-card__cta-bg" />
+                                            </button>
+                                            <button className="feature-card__secondary" aria-label="Watch video">
+                                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                                    <polygon points="5 3 19 12 5 21 5 3" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* Progress Indicator */}
+                                    <div className="feature-card__progress">
+                                        <div
+                                            className="feature-card__progress-bar"
+                                            style={{
+                                                animationPlayState: activeFeature === index && !featurePaused.current
+                                                    ? 'running'
+                                                    : 'paused'
+                                            }}
+                                        />
+                                    </div>
+
+                                    {/* Corner Decorations */}
+                                    <div className="feature-card__corner feature-card__corner--tl" />
+                                    <div className="feature-card__corner feature-card__corner--tr" />
+                                    <div className="feature-card__corner feature-card__corner--bl" />
+                                    <div className="feature-card__corner feature-card__corner--br" />
                                 </div>
-                                <div className="feature-card__border" />
+
+                                {/* Hover Shine Effect */}
+                                <div className="feature-card__shine" />
                             </article>
                         ))}
                     </div>
+                </div>
 
-                    {/* Feature Navigation */}
-                    <nav className="features__nav" aria-label="Feature navigation">
-                        {product.featureCards.map((_, index) => (
+                {/* Thumbnail Navigation */}
+                <div className="features__thumbnails">
+                    <div className="features__thumbnails-track">
+                        {product.featureCards.map((feature, index) => (
                             <button
                                 key={index}
-                                className={`features__nav-dot ${activeFeature === index ? 'features__nav-dot--active' : ''}`}
+                                className={`features__thumbnail ${activeFeature === index ? 'features__thumbnail--active' : ''
+                                    }`}
                                 onClick={() => setActiveFeature(index)}
-                                aria-label={`Go to feature ${index + 1}`}
-                                aria-current={activeFeature === index ? 'true' : 'false'}
-                            />
+                                aria-label={`Go to ${feature.title}`}
+                            >
+                                <div className="features__thumbnail-image">
+                                    <img src={feature.image} alt="" />
+                                </div>
+                                <div className="features__thumbnail-info">
+                                    <span className="features__thumbnail-badge">{feature.badge}</span>
+                                    <span className="features__thumbnail-title">{feature.title}</span>
+                                </div>
+                                <div className="features__thumbnail-indicator" />
+                            </button>
                         ))}
-                    </nav>
+                    </div>
+                </div>
+
+                {/* Bottom Info Bar */}
+                <div className="features__info-bar">
+                    <div className="features__info-item">
+                        <div className="features__info-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                                <path d="M9 12l2 2 4-4" />
+                            </svg>
+                        </div>
+                        <div className="features__info-text">
+                            <span className="features__info-value">Aerospace Grade</span>
+                            <span className="features__info-label">Materials</span>
+                        </div>
+                    </div>
+                    <div className="features__info-divider" />
+                    <div className="features__info-item">
+                        <div className="features__info-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                                <circle cx="12" cy="12" r="10" />
+                                <path d="M12 6v6l4 2" />
+                            </svg>
+                        </div>
+                        <div className="features__info-text">
+                            <span className="features__info-value">5 Year</span>
+                            <span className="features__info-label">Warranty</span>
+                        </div>
+                    </div>
+                    <div className="features__info-divider" />
+                    <div className="features__info-item">
+                        <div className="features__info-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                                <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                                <path d="M2 17l10 5 10-5" />
+                                <path d="M2 12l10 5 10-5" />
+                            </svg>
+                        </div>
+                        <div className="features__info-text">
+                            <span className="features__info-value">Modular</span>
+                            <span className="features__info-label">Design System</span>
+                        </div>
+                    </div>
                 </div>
             </section>
 
