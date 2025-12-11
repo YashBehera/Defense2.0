@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import './ProductSection.css';
 import Panaromic from './Panaromic.png';
-import CarbonFiber from './CarbonFibre.jpeg';
 import ProductHero from './VertiPort2.mp4';
 import VertiPort from './Vertiport.jpeg';
-
+import Speed from './Speed.jpeg';
+import Traffic from './Traffic.jpeg';
+import Application from './Application.jpeg';
+import Time from './Time.jpeg';
 // Custom hook for smooth counter animation
 const useCountUp = (end, duration = 2000, start = 0, isActive = false) => {
     const [count, setCount] = useState(start);
@@ -77,25 +79,48 @@ const ProductSection = () => {
         ],
         featureCards: [
             {
-                id: 'cockpit',
-                title: '360° Panoramic View',
-                description: 'Made from aerospace-grade polycarbonate with unobstructed visibility for pilots and passengers.',
-                image: Panaromic,
-                badge: 'Design',
+                id: 'time-revolution',
+                title: '2 Hours → 20 Minutes',
+                description: 'Transform your daily commute. What takes 2 hours on congested roads now takes just 20 minutes through the sky. Reclaim your time, every single day.',
+                image: Speed, // Your image import
+                badge: 'Speed',
+                stats: {
+                    value: '6x',
+                    label: 'Faster'
+                }
             },
             {
-                id: 'carbon',
-                title: 'Carbon Fiber Excellence',
-                description: 'Main structure and rotors crafted from carbon fiber for optimal strength and minimal weight.',
-                image: CarbonFiber,
-                badge: 'Material',
+                id: 'skip-traffic',
+                title: 'Rise Above The Chaos',
+                description: 'While millions sit stuck in gridlock, you soar above. No honking, no road rage, no wasted hours. The sky is your express lane.',
+                image: Traffic, // Your image import
+                badge: 'Freedom',
+                stats: {
+                    value: '0',
+                    label: 'Traffic Delays'
+                }
             },
             {
-                id: 'climate',
-                title: 'Climate Control System',
-                description: 'Advanced HVAC system ensures comfortable cabin temperature in all weather conditions.',
-                image: VertiPort,
-                badge: 'Comfort',
+                id: 'on-demand',
+                title: 'One Tap Away',
+                description: 'Book your Hive like you book an Ola. Your personal flying vehicle arrives at your location within minutes. Urban mobility, reimagined.',
+                image: Application, // Your image import
+                badge: 'Access',
+                stats: {
+                    value: '5 min',
+                    label: 'Avg. Pickup'
+                }
+            },
+            {
+                id: 'time-back',
+                title: 'Get Your Life Back',
+                description: 'India loses ₹1.5 lakh crore annually to traffic. With 90+ minute daily commutes in metros, Hive gives you back 500+ hours every year.',
+                image: Time, // Your image import
+                badge: 'Impact',
+                stats: {
+                    value: '500+',
+                    label: 'Hours Saved/Year'
+                }
             },
         ],
         specs: [
@@ -941,18 +966,19 @@ const ProductSection = () => {
                     <div className="features__bg-accent" />
                 </div>
 
-                {/* Section Header */}
+                {/* Section Header - UPDATED */}
                 <div className="features__header">
                     <div className="features__header-content">
                         <div className="features__label">
                             <span className="features__label-dot" />
-                            <span className="features__label-text">Design Excellence</span>
+                            <span className="features__label-text">The Problem We Solve</span>
                         </div>
                         <h2 id="features-title" className="features__title">
-                            Crafted with <span className="features__title-accent">Precision</span>
+                            Time Is The New <span className="features__title-accent">Currency</span>
                         </h2>
                         <p className="features__subtitle">
-                            Every detail meticulously designed. Every component engineered for perfection.
+                            India loses billions of productive hours daily to traffic.
+                            The sky remains unused. Until now.
                         </p>
                     </div>
 
@@ -1047,7 +1073,7 @@ const ProductSection = () => {
                                             <span className="feature-card__badge">{feature.badge}</span>
                                             <span className="feature-card__status">
                                                 <span className="feature-card__status-dot" />
-                                                Featured
+                                                Revolutionary
                                             </span>
                                         </div>
                                     </div>
@@ -1064,22 +1090,26 @@ const ProductSection = () => {
                                             />
                                             <div className="feature-card__image-overlay" />
 
-                                            {/* Quick Stats Overlay */}
+                                            {/* Quick Stats Overlay - UPDATED */}
                                             <div className="feature-card__quick-stats">
                                                 <div className="feature-card__quick-stat">
-                                                    <span className="feature-card__quick-stat-value">A+</span>
-                                                    <span className="feature-card__quick-stat-label">Grade</span>
+                                                    <span className="feature-card__quick-stat-value">
+                                                        {feature.stats?.value || '—'}
+                                                    </span>
+                                                    <span className="feature-card__quick-stat-label">
+                                                        {feature.stats?.label || 'Metric'}
+                                                    </span>
                                                 </div>
                                                 <div className="feature-card__quick-stat">
-                                                    <span className="feature-card__quick-stat-value">100%</span>
-                                                    <span className="feature-card__quick-stat-label">Quality</span>
+                                                    <span className="feature-card__quick-stat-value">∞</span>
+                                                    <span className="feature-card__quick-stat-label">Possibilities</span>
                                                 </div>
                                             </div>
 
-                                            {/* Floating Labels */}
+                                            {/* Floating Labels - UPDATED */}
                                             <div className="feature-card__floating-labels">
-                                                <span className="feature-card__floating-label">Premium</span>
-                                                <span className="feature-card__floating-label">Certified</span>
+                                                <span className="feature-card__floating-label">Sky-Native</span>
+                                                <span className="feature-card__floating-label">Future-Ready</span>
                                             </div>
                                         </div>
 
@@ -1094,41 +1124,40 @@ const ProductSection = () => {
                                         <h3 className="feature-card__title">{feature.title}</h3>
                                         <p className="feature-card__description">{feature.description}</p>
 
-                                        {/* Feature Highlights */}
+                                        {/* Feature Highlights - UPDATED */}
                                         <div className="feature-card__highlights">
                                             <div className="feature-card__highlight">
                                                 <div className="feature-card__highlight-icon">
                                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                                                        <path d="M9 12l2 2 4-4" />
-                                                        <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" />
+                                                        <circle cx="12" cy="12" r="10" />
+                                                        <path d="M12 6v6l4 2" />
                                                     </svg>
                                                 </div>
-                                                <span>Verified Quality</span>
+                                                <span>Time Saved</span>
                                             </div>
                                             <div className="feature-card__highlight">
                                                 <div className="feature-card__highlight-icon">
                                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                                                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                                                        <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
                                                     </svg>
                                                 </div>
-                                                <span>Safety Certified</span>
+                                                <span>Zero Emissions</span>
                                             </div>
                                             <div className="feature-card__highlight">
                                                 <div className="feature-card__highlight-icon">
                                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                                                        <path d="M12 2L2 7l10 5 10-5-10-5z" />
-                                                        <path d="M2 17l10 5 10-5" />
-                                                        <path d="M2 12l10 5 10-5" />
+                                                        <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
+                                                        <line x1="12" y1="18" x2="12" y2="18" />
                                                     </svg>
                                                 </div>
-                                                <span>Modular Design</span>
+                                                <span>App Controlled</span>
                                             </div>
                                         </div>
 
                                         {/* Actions */}
                                         <div className="feature-card__actions">
                                             <button className="feature-card__cta">
-                                                <span className="feature-card__cta-text">Explore</span>
+                                                <span className="feature-card__cta-text">Learn More</span>
                                                 <span className="feature-card__cta-icon">
                                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                                         <path d="M5 12h14M12 5l7 7-7 7" />
@@ -1136,7 +1165,7 @@ const ProductSection = () => {
                                                 </span>
                                                 <span className="feature-card__cta-bg" />
                                             </button>
-                                            <button className="feature-card__secondary" aria-label="Watch video">
+                                            <button className="feature-card__secondary" aria-label="Watch demo">
                                                 <svg viewBox="0 0 24 24" fill="currentColor">
                                                     <polygon points="5 3 19 12 5 21 5 3" />
                                                 </svg>
@@ -1194,21 +1223,8 @@ const ProductSection = () => {
                     </div>
                 </div>
 
-                {/* Bottom Info Bar */}
+                {/* Bottom Info Bar - UPDATED */}
                 <div className="features__info-bar">
-                    <div className="features__info-item">
-                        <div className="features__info-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                                <path d="M9 12l2 2 4-4" />
-                            </svg>
-                        </div>
-                        <div className="features__info-text">
-                            <span className="features__info-value">Aerospace Grade</span>
-                            <span className="features__info-label">Materials</span>
-                        </div>
-                    </div>
-                    <div className="features__info-divider" />
                     <div className="features__info-item">
                         <div className="features__info-icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -1217,22 +1233,34 @@ const ProductSection = () => {
                             </svg>
                         </div>
                         <div className="features__info-text">
-                            <span className="features__info-value">5 Year</span>
-                            <span className="features__info-label">Warranty</span>
+                            <span className="features__info-value">90+ Min</span>
+                            <span className="features__info-label">Saved Daily</span>
                         </div>
                     </div>
                     <div className="features__info-divider" />
                     <div className="features__info-item">
                         <div className="features__info-icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                                <path d="M12 2L2 7l10 5 10-5-10-5z" />
-                                <path d="M2 17l10 5 10-5" />
-                                <path d="M2 12l10 5 10-5" />
+                                <path d="M12 2v20M2 12h20" />
+                                <circle cx="12" cy="12" r="4" />
                             </svg>
                         </div>
                         <div className="features__info-text">
-                            <span className="features__info-value">Modular</span>
-                            <span className="features__info-label">Design System</span>
+                            <span className="features__info-value">₹1.5L Cr</span>
+                            <span className="features__info-label">Annual Loss Solved</span>
+                        </div>
+                    </div>
+                    <div className="features__info-divider" />
+                    <div className="features__info-item">
+                        <div className="features__info-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                                <rect x="5" y="2" width="14" height="20" rx="2" />
+                                <path d="M12 18h.01" />
+                            </svg>
+                        </div>
+                        <div className="features__info-text">
+                            <span className="features__info-value">Tap & Fly</span>
+                            <span className="features__info-label">App Booking</span>
                         </div>
                     </div>
                 </div>
