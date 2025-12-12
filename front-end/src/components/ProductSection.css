@@ -5143,6 +5143,7 @@ textarea {
   margin-bottom: var(--space-12);
   max-width: 600px;
   opacity: 0;
+  font-weight: 600;
   transform: translateY(20px);
   transition: all 0.8s var(--ease-out) 0.4s;
   /* Text shadow for readability */
