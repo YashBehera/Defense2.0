@@ -1,16 +1,15 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import './ProductSection.css';
-import Panaromic from './Panaromic.png';
-import ProductHero from './VertiPort2.mp4';
-import VertiPort from './Vertiport.jpeg';
-import Speed from './Speed.jpeg';
-import Traffic from './Traffic.jpeg';
-import Application from './Application.jpeg';
-import Time from './Time.jpeg';
-import TrafficChaos from './TrafficChaos.jpeg';
-import SkyFreedom from './SkyFreedom.jpeg'; 
-import AppExperience from './AppExperience.jpeg';
-import FutureVision from './FutureVision.jpeg';
+import ProductHero from '../assets/VertiPort2.mp4';
+import VertiPort from '../assets/Vertiport.jpeg';
+import Speed from '../assets/Speed.jpeg';
+import Traffic from '../assets/Traffic.jpeg';
+import Application from '../assets/Application.jpeg';
+import Time from '../assets/Time.jpeg';
+import TrafficChaos from '../assets/TrafficChaos.jpeg';
+import SkyFreedom from '../assets/SkyFreedom.jpeg'; 
+import AppExperience from '../assets/AppExperience.jpeg';
+import FutureVision from '../assets/FutureVision.jpeg';
 // Custom hook for smooth counter animation
 const useCountUp = (end, duration = 2000, start = 0, isActive = false) => {
     const [count, setCount] = useState(start);
@@ -169,7 +168,7 @@ const ProductSection = () => {
                 subtitle: 'The Experience',
                 title: 'Your Flying Car\nOne Tap Away',
                 description: 'Book like Ola. Fly like the future. Our app connects you to the nearest Hive in minutes. Step onto a vertiport, step off at your destination. That simple.',
-                alignment: 'center',
+                alignment: 'right',
                 stats: [
                     { value: '5', unit: 'min', label: 'Avg Pickup' },
                     { value: '50', unit: '+', label: 'Vertiports' },
@@ -184,7 +183,7 @@ const ProductSection = () => {
                 subtitle: 'The Vision',
                 title: 'Reclaim Your Life\nOwn Your Time',
                 description: 'This isn\'t just about getting from A to B. It\'s about getting your life back. More time with family. More productive hours. More living, less waiting.',
-                alignment: 'left',
+                alignment: 'right',
                 stats: [
                     { value: '2', unit: 'hrs', label: 'Given Back Daily' },
                     { value: '730', unit: 'hrs', label: 'Per Year' },

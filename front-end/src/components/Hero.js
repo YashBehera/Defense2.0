@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './Hero.css';
-import AirTaxi1 from './AirTaxi1.jpeg';
+import AirTaxi1 from '../assets/AirTaxi1.jpeg';
 
 const Hero = () => {
     const [isLoaded, setIsLoaded] = useState(false);
