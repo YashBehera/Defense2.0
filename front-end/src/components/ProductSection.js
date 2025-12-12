@@ -7,7 +7,7 @@ import Traffic from '../assets/Traffic.jpeg';
 import Application from '../assets/Application.jpeg';
 import Time from '../assets/Time.jpeg';
 import TrafficChaos from '../assets/TrafficChaos.jpeg';
-import SkyFreedom from '../assets/SkyFreedom.jpeg'; 
+import SkyFreedom from '../assets/SkyFreedom.jpeg';
 import AppExperience from '../assets/AppExperience.jpeg';
 import FutureVision from '../assets/FutureVision.jpeg';
 // Custom hook for smooth counter animation
@@ -151,7 +151,7 @@ const ProductSection = () => {
             {
                 id: 'solution',
                 subtitle: 'The Revolution',
-                title: 'The Sky Was Always\nThe Answer',
+                title: 'The Sky Was Always \nThe Answer',
                 description: 'While roads overflow and metros crowd, an entire dimension remains empty. Hive opens the sky — turning 2-hour commutes into 20-minute flights.',
                 alignment: 'right',
                 stats: [
@@ -1312,113 +1312,89 @@ const ProductSection = () => {
                     ref={el => sectionRefs.current[`showcase-${index}`] = el}
                     className={`
             showcase 
-            showcase--${section.alignment} 
             showcase--${section.theme}
-            showcase--accent-${section.accent}
+            showcase--layout-${section.layout || 'stacked'}
             ${isVisible[`showcase-${index}`] ? 'showcase--visible' : ''}
         `}
                     aria-labelledby={`showcase-title-${index}`}
-                    data-section={section.id}
                 >
-                    {/* Layered Background System */}
-                    <div className="showcase__bg">
-                        {/* Base Gradient */}
-                        <div className="showcase__bg-gradient" />
+                    {/* Minimal Background */}
+                    <div className="showcase__backdrop" />
 
-                        {/* Image Layer - NO OVERLAY */}
-                        <div className="showcase__bg-image-wrapper">
-                            {isVisible[`showcase-${index}`] && (
-                                <img
-                                    src={section.image}
-                                    alt=""
-                                    className="showcase__bg-image"
-                                    loading="lazy"
-                                    decoding="async"
-                                />
-                            )}
-                        </div>
+                    {/* Main Content Wrapper */}
+                    <div className="showcase__wrapper">
 
-                        {/* Animated Particles/Grid */}
-                        <div className="showcase__bg-grid">
-                            {[...Array(20)].map((_, i) => (
-                                <div
-                                    key={i}
-                                    className="showcase__bg-grid-line"
-                                    style={{ '--line-index': i }}
-                                />
-                            ))}
-                        </div>
+                        {/* Text Content */}
+                        <div className="showcase__text-block">
+                            {/* Category Label */}
+                            <span className="showcase__category">{section.subtitle}</span>
 
-                        {/* Floating Orbs */}
-                        <div className="showcase__bg-orbs">
-                            <div className="showcase__bg-orb showcase__bg-orb--1" />
-                            <div className="showcase__bg-orb showcase__bg-orb--2" />
-                            <div className="showcase__bg-orb showcase__bg-orb--3" />
-                        </div>
-
-                        {/* Noise Texture */}
-                        <div className="showcase__bg-noise" />
-                    </div>
-
-                    {/* Main Container */}
-                    <div className="showcase__container">
-                        {/* Left Vertical Indicator */}
-                        <div className="showcase__side-indicator">
-                            <div className="showcase__side-line" />
-                            <span className="showcase__side-label">{section.subtitle}</span>
-                            <div className="showcase__side-dot" />
-                        </div>
-
-                        {/* Content - Full Width Now */}
-                        <div className="showcase__content">
-                            {/* Animated Label */}
-                            <div className="showcase__label">
-                                <span className="showcase__label-line" />
-                                <span className="showcase__label-text">{section.subtitle}</span>
-                                <span className="showcase__label-badge">
-                                    {String(index + 1).padStart(2, '0')}
-                                </span>
-                            </div>
-
-                            {/* Title with Animated Lines */}
-                            <h2 id={`showcase-title-${index}`} className="showcase__title">
+                            {/* Main Title */}
+                            <h2 className="showcase__title" id={`showcase-title-${index}`}>
                                 {section.title.split('\n').map((line, i) => (
-                                    <span
-                                        key={i}
-                                        className="showcase__title-line"
-                                        style={{ '--line-delay': `${i * 0.1}s` }}
-                                    >
-                                        <span className="showcase__title-text">{line}</span>
-                                        <span className="showcase__title-highlight" />
+                                    <span key={i} className="showcase__title-row">
+                                        <span
+                                            className="showcase__title-content"
+                                            style={{ '--row': i }}
+                                        >
+                                            {line}
+                                        </span>
                                     </span>
                                 ))}
                             </h2>
 
-                            {/* Description */}
-                            <p className="showcase__description">
-                                {section.description}
-                            </p>
+                            {/* Subtitle / Description */}
+                            <p className="showcase__subtitle">{section.description}</p>
+
+                            {/* Action Links */}
+                            <div className="showcase__actions">
+                                <a href="#" className="showcase__action">
+                                    Learn more
+                                    <svg className="showcase__action-arrow" viewBox="0 0 20 20" fill="none">
+                                        <path d="M7.5 4.5L13 10L7.5 15.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                    </svg>
+                                </a>
+                                <a href="#" className="showcase__action showcase__action--play">
+                                    <svg className="showcase__action-play-icon" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M6.5 4.5v11l9-5.5-9-5.5z" />
+                                    </svg>
+                                    Watch the video
+                                </a>
+                            </div>
                         </div>
+
+                        {/* Product Image */}
+                        <figure className="showcase__figure">
+                            <div className="showcase__image-wrapper">
+                                {isVisible[`showcase-${index}`] && (
+                                    <img
+                                        src={section.image}
+                                        alt={section.title}
+                                        className="showcase__image"
+                                        loading="lazy"
+                                    />
+                                )}
+                            </div>
+
+                            {/* Optional Caption */}
+                            {section.caption && (
+                                <figcaption className="showcase__caption">
+                                    {section.caption}
+                                </figcaption>
+                            )}
+                        </figure>
+
                     </div>
 
-                    {/* Large Index Number */}
-                    <div className="showcase__index">
-                        <span className="showcase__index-number">
-                            {String(index + 1).padStart(2, '0')}
-                        </span>
-                        <span className="showcase__index-total">
-                            / {String(product.showcaseSections.length).padStart(2, '0')}
-                        </span>
-                    </div>
+                    {/* Bottom Fade (for stacked sections) */}
+                    <div className="showcase__fade" />
 
-                    {/* Scroll Indicator (First section only) */}
+                    {/* Scroll Prompt - Only on first */}
                     {index === 0 && (
-                        <div className="showcase__scroll-hint">
-                            <span className="showcase__scroll-text">Scroll to explore</span>
-                            <div className="showcase__scroll-icon">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                    <path d="M12 5v14M5 12l7 7 7-7" />
-                                </svg>
+                        <div className="showcase__scroll-prompt">
+                            <span className="showcase__scroll-text">Scroll</span>
+                            <div className="showcase__scroll-track">
+                                <div className="showcase__scroll-thumb" />
                             </div>
                         </div>
                     )}
