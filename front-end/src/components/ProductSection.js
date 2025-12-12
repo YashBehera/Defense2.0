@@ -7,6 +7,10 @@ import Speed from './Speed.jpeg';
 import Traffic from './Traffic.jpeg';
 import Application from './Application.jpeg';
 import Time from './Time.jpeg';
+import TrafficChaos from './TrafficChaos.jpeg';
+import SkyFreedom from './SkyFreedom.jpeg'; 
+import AppExperience from './AppExperience.jpeg';
+import FutureVision from './FutureVision.jpeg';
 // Custom hook for smooth counter animation
 const useCountUp = (end, duration = 2000, start = 0, isActive = false) => {
     const [count, setCount] = useState(start);
@@ -131,29 +135,65 @@ const ProductSection = () => {
         ],
         showcaseSections: [
             {
-                id: 'modular',
-                title: 'Store an "Aircraft" at Your Vertiport',
-                subtitle: 'India\'s First Modular eVTOL Design',
-                description: 'One-button operation enables seamless configuration changes between passenger and cargo modes within 10 minutes.',
-                image: VertiPort,
-                alignment: 'center',
+                id: 'problem',
+                subtitle: 'The Crisis',
+                title: 'India Is Choking\nOn Its Own Growth',
+                description: 'Every day, millions of Indians lose hours stuck in traffic. Mumbai and Bangalore commuters spend 90+ minutes one way. That\'s not transportation — it\'s time theft.',
+                alignment: 'left',
                 stats: [
-                    { value: '10', unit: 'min', label: 'Config Change' },
-                    { value: '2', unit: 'modes', label: 'Operations' },
+                    { value: '90', unit: '+min', label: 'Daily Commute' },
+                    { value: '₹1.5L', unit: 'Cr', label: 'Annual Loss' },
+                    { value: '0', unit: '%', label: 'Sky Utilized' }
                 ],
+                image: TrafficChaos, // Import your image
+                theme: 'dark',
+                accent: 'red'
             },
             {
-                id: 'urban',
-                title: 'Redefining City Transport',
-                subtitle: 'Skip the traffic, embrace the sky',
-                description: 'Designed specifically for India\'s urban environments with whisper-quiet operation and zero emissions.',
-                image: Panaromic,
+                id: 'solution',
+                subtitle: 'The Revolution',
+                title: 'The Sky Was Always\nThe Answer',
+                description: 'While roads overflow and metros crowd, an entire dimension remains empty. Hive opens the sky — turning 2-hour commutes into 20-minute flights.',
                 alignment: 'right',
                 stats: [
-                    { value: '65', unit: 'dB', label: 'Noise Level' },
-                    { value: '0', unit: 'g', label: 'Emissions' },
+                    { value: '6', unit: 'x', label: 'Faster' },
+                    { value: '20', unit: 'min', label: 'Avg Flight' },
+                    { value: '500', unit: '+hrs', label: 'Saved Yearly' }
                 ],
+                image: SkyFreedom, // Import your image
+                theme: 'light',
+                accent: 'blue'
             },
+            {
+                id: 'access',
+                subtitle: 'The Experience',
+                title: 'Your Flying Car\nOne Tap Away',
+                description: 'Book like Ola. Fly like the future. Our app connects you to the nearest Hive in minutes. Step onto a vertiport, step off at your destination. That simple.',
+                alignment: 'center',
+                stats: [
+                    { value: '5', unit: 'min', label: 'Avg Pickup' },
+                    { value: '50', unit: '+', label: 'Vertiports' },
+                    { value: '24', unit: '/7', label: 'Availability' }
+                ],
+                image: AppExperience, // Import your image
+                theme: 'gradient',
+                accent: 'cyan'
+            },
+            {
+                id: 'future',
+                subtitle: 'The Vision',
+                title: 'Reclaim Your Life\nOwn Your Time',
+                description: 'This isn\'t just about getting from A to B. It\'s about getting your life back. More time with family. More productive hours. More living, less waiting.',
+                alignment: 'left',
+                stats: [
+                    { value: '2', unit: 'hrs', label: 'Given Back Daily' },
+                    { value: '730', unit: 'hrs', label: 'Per Year' },
+                    { value: '∞', unit: '', label: 'Possibilities' }
+                ],
+                image: FutureVision, // Import your image
+                theme: 'dark',
+                accent: 'gold'
+            }
         ],
         techHighlights: [
             {
@@ -1271,54 +1311,118 @@ const ProductSection = () => {
                 <section
                     key={section.id}
                     ref={el => sectionRefs.current[`showcase-${index}`] = el}
-                    className={`showcase showcase--${section.alignment} ${isVisible[`showcase-${index}`] ? 'showcase--visible' : ''}`}
+                    className={`
+            showcase 
+            showcase--${section.alignment} 
+            showcase--${section.theme}
+            showcase--accent-${section.accent}
+            ${isVisible[`showcase-${index}`] ? 'showcase--visible' : ''}
+        `}
                     aria-labelledby={`showcase-title-${index}`}
+                    data-section={section.id}
                 >
-                    {/* Background */}
+                    {/* Layered Background System */}
                     <div className="showcase__bg">
-                        {isVisible[`showcase-${index}`] && (
-                            <img
-                                src={VertiPort}
-                                alt=""
-                                className="showcase__bg-image"
-                                loading="lazy"
-                                decoding="async"
-                            />
-                        )}
-                        <div className="showcase__overlay" />
+                        {/* Base Gradient */}
+                        <div className="showcase__bg-gradient" />
+
+                        {/* Image Layer - NO OVERLAY */}
+                        <div className="showcase__bg-image-wrapper">
+                            {isVisible[`showcase-${index}`] && (
+                                <img
+                                    src={section.image}
+                                    alt=""
+                                    className="showcase__bg-image"
+                                    loading="lazy"
+                                    decoding="async"
+                                />
+                            )}
+                        </div>
+
+                        {/* Animated Particles/Grid */}
+                        <div className="showcase__bg-grid">
+                            {[...Array(20)].map((_, i) => (
+                                <div
+                                    key={i}
+                                    className="showcase__bg-grid-line"
+                                    style={{ '--line-index': i }}
+                                />
+                            ))}
+                        </div>
+
+                        {/* Floating Orbs */}
+                        <div className="showcase__bg-orbs">
+                            <div className="showcase__bg-orb showcase__bg-orb--1" />
+                            <div className="showcase__bg-orb showcase__bg-orb--2" />
+                            <div className="showcase__bg-orb showcase__bg-orb--3" />
+                        </div>
+
+                        {/* Noise Texture */}
+                        <div className="showcase__bg-noise" />
                     </div>
 
+                    {/* Main Container */}
                     <div className="showcase__container">
+                        {/* Left Vertical Indicator */}
+                        <div className="showcase__side-indicator">
+                            <div className="showcase__side-line" />
+                            <span className="showcase__side-label">{section.subtitle}</span>
+                            <div className="showcase__side-dot" />
+                        </div>
+
+                        {/* Content - Full Width Now */}
                         <div className="showcase__content">
-                            <span className="showcase__subtitle">{section.subtitle}</span>
+                            {/* Animated Label */}
+                            <div className="showcase__label">
+                                <span className="showcase__label-line" />
+                                <span className="showcase__label-text">{section.subtitle}</span>
+                                <span className="showcase__label-badge">
+                                    {String(index + 1).padStart(2, '0')}
+                                </span>
+                            </div>
+
+                            {/* Title with Animated Lines */}
                             <h2 id={`showcase-title-${index}`} className="showcase__title">
                                 {section.title.split('\n').map((line, i) => (
-                                    <span key={i} className="showcase__title-line">{line}</span>
+                                    <span
+                                        key={i}
+                                        className="showcase__title-line"
+                                        style={{ '--line-delay': `${i * 0.1}s` }}
+                                    >
+                                        <span className="showcase__title-text">{line}</span>
+                                        <span className="showcase__title-highlight" />
+                                    </span>
                                 ))}
                             </h2>
-                            <p className="showcase__description">{section.description}</p>
 
-                            {/* Mini Stats */}
-                            {section.stats && (
-                                <div className="showcase__stats">
-                                    {section.stats.map((stat, i) => (
-                                        <div key={i} className="showcase__stat">
-                                            <span className="showcase__stat-value">
-                                                {stat.value}
-                                                <span className="showcase__stat-unit">{stat.unit}</span>
-                                            </span>
-                                            <span className="showcase__stat-label">{stat.label}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
+                            {/* Description */}
+                            <p className="showcase__description">
+                                {section.description}
+                            </p>
                         </div>
                     </div>
 
-                    {/* Section Index */}
-                    <span className="showcase__index">
-                        {String(index + 1).padStart(2, '0')}
-                    </span>
+                    {/* Large Index Number */}
+                    <div className="showcase__index">
+                        <span className="showcase__index-number">
+                            {String(index + 1).padStart(2, '0')}
+                        </span>
+                        <span className="showcase__index-total">
+                            / {String(product.showcaseSections.length).padStart(2, '0')}
+                        </span>
+                    </div>
+
+                    {/* Scroll Indicator (First section only) */}
+                    {index === 0 && (
+                        <div className="showcase__scroll-hint">
+                            <span className="showcase__scroll-text">Scroll to explore</span>
+                            <div className="showcase__scroll-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <path d="M12 5v14M5 12l7 7 7-7" />
+                                </svg>
+                            </div>
+                        </div>
+                    )}
                 </section>
             ))}
 
