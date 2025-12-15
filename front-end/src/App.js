@@ -24,7 +24,6 @@ function App() {
         {activeSection === 'company' ? <CompanySection /> : null}
         {activeSection === 'masterplan' ? <MasterplanSection /> : null}
       </main>
-      <Footer />
     </div>
   );
 }

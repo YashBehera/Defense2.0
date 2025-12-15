@@ -5,7 +5,7 @@ const Header = ({
   sections = [], 
   activeSection = '', 
   onNavClick = () => {}, 
-  ctaText = "Get Started",
+  ctaText = "Contact Us",
   onCtaClick = () => {}
 }) => {
   const [isScrolled, setIsScrolled] = useState(false);

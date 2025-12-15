@@ -139,13 +139,14 @@ const ProductSection = () => {
                 title: 'India Is Choking\nOn Its Own Growth',
                 description: 'Every day, millions of Indians lose hours stuck in traffic. Mumbai and Bangalore commuters spend 90+ minutes one way. That\'s not transportation — it\'s time theft.',
                 alignment: 'left',
+                layout: 'stacked', // or 'split-left', 'split-right', 'fullbleed'
                 stats: [
                     { value: '90', unit: '+min', label: 'Daily Commute' },
                     { value: '₹1.5L', unit: 'Cr', label: 'Annual Loss' },
                     { value: '0', unit: '%', label: 'Sky Utilized' }
                 ],
-                image: TrafficChaos, // Import your image
-                theme: 'dark',
+                image: TrafficChaos,
+                theme: 'light',  // ← WHITE (1st)
                 accent: 'red'
             },
             {
@@ -154,13 +155,14 @@ const ProductSection = () => {
                 title: 'The Sky Was Always \nThe Answer',
                 description: 'While roads overflow and metros crowd, an entire dimension remains empty. Hive opens the sky — turning 2-hour commutes into 20-minute flights.',
                 alignment: 'right',
+                layout: 'stacked',
                 stats: [
                     { value: '6', unit: 'x', label: 'Faster' },
                     { value: '20', unit: 'min', label: 'Avg Flight' },
                     { value: '500', unit: '+hrs', label: 'Saved Yearly' }
                 ],
-                image: SkyFreedom, // Import your image
-                theme: 'light',
+                image: SkyFreedom,
+                theme: 'dark',  // ← BLACK (2nd)
                 accent: 'blue'
             },
             {
@@ -169,13 +171,14 @@ const ProductSection = () => {
                 title: 'Your Flying Car\nOne Tap Away',
                 description: 'Book like Ola. Fly like the future. Our app connects you to the nearest Hive in minutes. Step onto a vertiport, step off at your destination. That simple.',
                 alignment: 'right',
+                layout: 'stacked',
                 stats: [
                     { value: '5', unit: 'min', label: 'Avg Pickup' },
                     { value: '50', unit: '+', label: 'Vertiports' },
                     { value: '24', unit: '/7', label: 'Availability' }
                 ],
-                image: AppExperience, // Import your image
-                theme: 'gradient',
+                image: AppExperience,
+                theme: 'light',  // ← WHITE (3rd)
                 accent: 'cyan'
             },
             {
@@ -184,13 +187,14 @@ const ProductSection = () => {
                 title: 'Reclaim Your Life\nOwn Your Time',
                 description: 'This isn\'t just about getting from A to B. It\'s about getting your life back. More time with family. More productive hours. More living, less waiting.',
                 alignment: 'right',
+                layout: 'stacked',
                 stats: [
                     { value: '2', unit: 'hrs', label: 'Given Back Daily' },
                     { value: '730', unit: 'hrs', label: 'Per Year' },
                     { value: '∞', unit: '', label: 'Possibilities' }
                 ],
-                image: FutureVision, // Import your image
-                theme: 'dark',
+                image: FutureVision,
+                theme: 'dark',  // ← BLACK (4th)
                 accent: 'gold'
             }
         ],
@@ -248,10 +252,10 @@ const ProductSection = () => {
             },
         ],
         timeline: [
-            { year: '2023', title: 'Design Complete', description: 'Finalized aerodynamic design and systems architecture', status: 'completed' },
-            { year: '2024', title: 'Prototype Testing', description: 'Ground and flight testing of full-scale prototype', status: 'current' },
-            { year: '2025', title: 'DGCA Certification', description: 'Type certification and regulatory approval', status: 'upcoming' },
-            { year: '2026', title: 'Commercial Launch', description: 'First commercial operations begin', status: 'upcoming' },
+            { year: '2025', title: 'Design Complete', description: 'Finalized aerodynamic design and systems architecture', status: 'completed' },
+            { year: '2026', title: 'Prototype Testing', description: 'Ground and flight testing of full-scale prototype', status: 'current' },
+            { year: '2027', title: 'DGCA Certification', description: 'Type certification and regulatory approval', status: 'upcoming' },
+            { year: 'To be Announced', title: 'Commercial Launch', description: 'First commercial operations begin', status: 'upcoming' },
         ],
         trustBadges: [
             { icon: 'shield', label: 'DGCA Certified', description: 'Meeting all aviation safety standards' },
@@ -683,315 +687,6 @@ const ProductSection = () => {
                 <div className="hero__accent hero__accent--br" aria-hidden="true" />
             </section>
 
-            {/* ==================== SAFETY SECTION ==================== */}
-            <section
-                ref={el => sectionRefs.current.safety = el}
-                className={`safety ${isVisible.safety ? 'safety--visible' : ''}`}
-                aria-labelledby="safety-title"
-            >
-                {/* Background Elements */}
-                <div className="safety__bg">
-                    <div className="safety__bg-gradient" />
-                    <div className="safety__bg-grid" />
-                    <div className="safety__bg-glow" />
-                </div>
-
-                {/* Floating Safety Badge */}
-                <div className="safety__floating-badge">
-                    <div className="safety__floating-badge-inner">
-                        <span className="safety__floating-badge-icon">
-                            {renderIcon('shield')}
-                        </span>
-                        <span className="safety__floating-badge-text">Certified Safe</span>
-                    </div>
-                </div>
-
-                <div className="safety__container">
-                    {/* Left Content */}
-                    <div className="safety__left">
-                        {/* Section Header */}
-                        <div className="safety__header">
-                            <div className="safety__label">
-                                <span className="safety__label-dot" />
-                                <span className="safety__label-text">Safety First</span>
-                            </div>
-                            <h2 id="safety-title" className="safety__title">
-                                <span className="safety__title-line">Redundant</span>
-                                <span className="safety__title-line">
-                                    <span className="safety__title-highlight">Safety</span> Systems
-                                </span>
-                            </h2>
-                            <p className="safety__description">
-                                In case of primary system failure, the backup system seamlessly
-                                activates, ensuring multiple layers of protection for every flight.
-                            </p>
-                        </div>
-
-                        {/* Main Stats Cards */}
-                        <div className="safety__cards">
-                            {product.safetyStats.slice(0, 3).map((stat, index) => (
-                                <div
-                                    key={index}
-                                    className="safety-card"
-                                    style={{ '--index': index }}
-                                    tabIndex={0}
-                                >
-                                    {/* Card Number */}
-                                    <span className="safety-card__number">
-                                        {String(index + 1).padStart(2, '0')}
-                                    </span>
-
-                                    {/* Left Section - Icon */}
-                                    <div className="safety-card__icon-area">
-                                        <div className="safety-card__icon-bg">
-                                            <div className="safety-card__icon">
-                                                {renderIcon(stat.icon)}
-                                            </div>
-                                        </div>
-                                        <svg className="safety-card__icon-ring" viewBox="0 0 100 100">
-                                            <circle
-                                                cx="50" cy="50" r="46"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                strokeWidth="1"
-                                                strokeDasharray="289"
-                                                strokeDashoffset="289"
-                                                className="safety-card__icon-ring-circle"
-                                            />
-                                        </svg>
-                                    </div>
-
-                                    {/* Middle Section - Content */}
-                                    <div className="safety-card__body">
-                                        <div className="safety-card__header">
-                                            <span className="safety-card__label">{stat.label}</span>
-                                            <span className="safety-card__badge">Active</span>
-                                        </div>
-                                        <p className="safety-card__desc">{stat.description}</p>
-                                    </div>
-
-                                    {/* Right Section - Value */}
-                                    <div className="safety-card__value-area">
-                                        <div className="safety-card__value-container">
-                                            <span className="safety-card__value">
-                                                {isVisible.safety ? (
-                                                    <CountUpNumber
-                                                        end={stat.value}
-                                                        duration={1500}
-                                                        isActive={isVisible.safety}
-                                                    />
-                                                ) : stat.value}
-                                            </span>
-                                            <span className="safety-card__value-x">×</span>
-                                        </div>
-                                        <span className="safety-card__unit">{stat.unit}</span>
-
-                                        {/* Mini Progress */}
-                                        <div className="safety-card__meter">
-                                            {[...Array(3)].map((_, i) => (
-                                                <div
-                                                    key={i}
-                                                    className={`safety-card__meter-bar ${i < stat.value ? 'safety-card__meter-bar--active' : ''}`}
-                                                    style={{ '--bar-index': i }}
-                                                />
-                                            ))}
-                                        </div>
-                                    </div>
-
-                                    {/* Hover Gradient */}
-                                    <div className="safety-card__gradient" />
-
-                                    {/* Bottom Accent Line */}
-                                    <div className="safety-card__accent" />
-                                </div>
-                            ))}
-                        </div>
-
-                        {/* Additional Stats Row */}
-                        <div className="safety__mini-stats">
-                            {product.safetyStats.slice(3).map((stat, index) => (
-                                <div
-                                    key={index}
-                                    className="safety-mini"
-                                    style={{ '--index': index + 3 }}
-                                    tabIndex={0}
-                                >
-                                    <div className="safety-mini__icon-wrapper">
-                                        <div className="safety-mini__icon">
-                                            {renderIcon(stat.icon)}
-                                        </div>
-                                        <div className="safety-mini__icon-pulse" />
-                                    </div>
-                                    <div className="safety-mini__content">
-                                        <div className="safety-mini__row">
-                                            <span className="safety-mini__value">{stat.value}×</span>
-                                            <span className="safety-mini__label">{stat.label}</span>
-                                        </div>
-                                        <div className="safety-mini__bar">
-                                            <div
-                                                className="safety-mini__bar-fill"
-                                                style={{ '--progress': `${(stat.value / 3) * 100}%` }}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="safety-mini__arrow">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                            <path d="M7 17L17 7M17 7H7M17 7V17" />
-                                        </svg>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-
-                        {/* CTA */}
-                        <div className="safety__cta">
-                            <button className="safety__cta-btn">
-                                <span>View Safety Report</span>
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                    <path d="M7 17L17 7M17 7H7M17 7V17" />
-                                </svg>
-                            </button>
-                            <span className="safety__cta-note">DGCA Compliant • ISO Certified</span>
-                        </div>
-                    </div>
-
-                    {/* Right Visual */}
-                    <div className="safety__right">
-                        <div className="safety__visual">
-                            {/* Central Shield */}
-                            <div className="safety__shield">
-                                <svg viewBox="0 0 200 240" className="safety__shield-svg">
-                                    <defs>
-                                        <linearGradient id="safetyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                            <stop offset="0%" stopColor="#c41e3a" stopOpacity="1" />
-                                            <stop offset="50%" stopColor="#e63946" stopOpacity="0.8" />
-                                            <stop offset="100%" stopColor="#c41e3a" stopOpacity="0.6" />
-                                        </linearGradient>
-                                        <filter id="safetyGlow" x="-50%" y="-50%" width="200%" height="200%">
-                                            <feGaussianBlur stdDeviation="8" result="blur" />
-                                            <feMerge>
-                                                <feMergeNode in="blur" />
-                                                <feMergeNode in="SourceGraphic" />
-                                            </feMerge>
-                                        </filter>
-                                        <clipPath id="shieldClip">
-                                            <path d="M100 15 L175 50 L175 125 C175 170 100 215 100 215 C100 215 25 170 25 125 L25 50 L100 15Z" />
-                                        </clipPath>
-                                    </defs>
-
-                                    {/* Outer Shield */}
-                                    <path
-                                        d="M100 10 L180 48 L180 128 C180 178 100 225 100 225 C100 225 20 178 20 128 L20 48 L100 10Z"
-                                        className="safety__shield-outer"
-                                        stroke="url(#safetyGradient)"
-                                        strokeWidth="1.5"
-                                        fill="none"
-                                    />
-
-                                    {/* Middle Shield */}
-                                    <path
-                                        d="M100 25 L165 55 L165 120 C165 162 100 202 100 202 C100 202 35 162 35 120 L35 55 L100 25Z"
-                                        className="safety__shield-middle"
-                                        stroke="url(#safetyGradient)"
-                                        strokeWidth="1"
-                                        strokeDasharray="6 4"
-                                        fill="none"
-                                    />
-
-                                    {/* Inner Shield Fill */}
-                                    <path
-                                        d="M100 40 L150 65 L150 115 C150 148 100 182 100 182 C100 182 50 148 50 115 L50 65 L100 40Z"
-                                        className="safety__shield-inner"
-                                        fill="rgba(196, 30, 58, 0.08)"
-                                        stroke="url(#safetyGradient)"
-                                        strokeWidth="0.5"
-                                    />
-
-                                    {/* Animated scan line */}
-                                    <g clipPath="url(#shieldClip)">
-                                        <line
-                                            x1="20" y1="0" x2="180" y2="0"
-                                            stroke="url(#safetyGradient)"
-                                            strokeWidth="2"
-                                            className="safety__shield-scan"
-                                        />
-                                    </g>
-                                </svg>
-
-                                {/* Center Icon */}
-                                <div className="safety__shield-center">
-                                    <div className="safety__shield-center-icon">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                            <path d="M9 12l2 2 4-4" />
-                                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                                        </svg>
-                                    </div>
-                                    <div className="safety__shield-center-pulse" />
-                                    <div className="safety__shield-center-pulse safety__shield-center-pulse--delay" />
-                                </div>
-
-                                {/* Orbiting Elements */}
-                                <div className="safety__shield-orbit safety__shield-orbit--1">
-                                    <div className="safety__shield-orbit-dot" />
-                                </div>
-                                <div className="safety__shield-orbit safety__shield-orbit--2">
-                                    <div className="safety__shield-orbit-dot" />
-                                </div>
-                                <div className="safety__shield-orbit safety__shield-orbit--3">
-                                    <div className="safety__shield-orbit-dot" />
-                                </div>
-
-                                {/* Floating Labels */}
-                                <div className="safety__shield-labels">
-                                    <div className="safety__shield-label safety__shield-label--1">
-                                        <span className="safety__shield-label-dot" />
-                                        <span className="safety__shield-label-text">Flight Control</span>
-                                    </div>
-                                    <div className="safety__shield-label safety__shield-label--2">
-                                        <span className="safety__shield-label-dot" />
-                                        <span className="safety__shield-label-text">Power System</span>
-                                    </div>
-                                    <div className="safety__shield-label safety__shield-label--3">
-                                        <span className="safety__shield-label-dot" />
-                                        <span className="safety__shield-label-text">Navigation</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Background Glow */}
-                            <div className="safety__visual-glow" />
-
-                            {/* Connection Lines */}
-                            <svg className="safety__visual-lines" viewBox="0 0 400 400">
-                                <line x1="200" y1="200" x2="50" y2="80" className="safety__visual-line" />
-                                <line x1="200" y1="200" x2="350" y2="100" className="safety__visual-line" />
-                                <line x1="200" y1="200" x2="80" y2="320" className="safety__visual-line" />
-                                <line x1="200" y1="200" x2="320" y2="300" className="safety__visual-line" />
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Bottom Marquee */}
-                <div className="safety__marquee">
-                    <div className="safety__marquee-track">
-                        {[...Array(3)].map((_, i) => (
-                            <div key={i} className="safety__marquee-content">
-                                <span>Triple Redundancy</span>
-                                <span className="safety__marquee-dot" />
-                                <span>Fail-Safe Systems</span>
-                                <span className="safety__marquee-dot" />
-                                <span>Real-Time Monitoring</span>
-                                <span className="safety__marquee-dot" />
-                                <span>Emergency Protocols</span>
-                                <span className="safety__marquee-dot" />
-                                <span>DGCA Certified</span>
-                                <span className="safety__marquee-dot" />
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
 
             {/* ==================== FEATURES SECTION - HORIZONTAL SCROLL ==================== */}
             <section
@@ -1230,9 +925,6 @@ const ProductSection = () => {
                                     <div className="feature-card__corner feature-card__corner--bl" />
                                     <div className="feature-card__corner feature-card__corner--br" />
                                 </div>
-
-                                {/* Hover Shine Effect */}
-                                <div className="feature-card__shine" />
                             </article>
                         ))}
                     </div>
@@ -1424,40 +1116,6 @@ const ProductSection = () => {
                         </p>
                     </header>
 
-                    {/* Tech Cards */}
-                    <div className="specs__highlights">
-                        {product.techHighlights.map((tech, index) => (
-                            <article
-                                key={tech.id}
-                                className="tech-card"
-                                style={{ '--delay': `${index * 0.15}s` }}
-                                tabIndex={0}
-                            >
-                                <div className="tech-card__header">
-                                    <div className="tech-card__icon">
-                                        {renderIcon(tech.icon)}
-                                    </div>
-                                    <div className="tech-card__title-group">
-                                        <h3 className="tech-card__title">{tech.title}</h3>
-                                        <p className="tech-card__description">{tech.description}</p>
-                                    </div>
-                                </div>
-                                <div className="tech-card__stats">
-                                    {tech.stats.map((stat, i) => (
-                                        <div key={i} className="tech-card__stat">
-                                            <span className="tech-card__stat-value">
-                                                {stat.value}
-                                                <span className="tech-card__stat-unit">{stat.unit}</span>
-                                            </span>
-                                            <span className="tech-card__stat-label">{stat.label}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                                <div className="tech-card__glow" />
-                            </article>
-                        ))}
-                    </div>
-
                     {/* Detailed Specs */}
                     <div className="specs__detailed">
                         <div className="specs__detailed-header">
@@ -1548,81 +1206,7 @@ const ProductSection = () => {
                 </div>
             </section>
 
-            {/* ==================== CTA SECTION ==================== */}
-            <section
-                ref={el => sectionRefs.current.cta = el}
-                className={`cta ${isVisible.cta ? 'cta--visible' : ''}`}
-                aria-labelledby="cta-title"
-            >
-                <div className="cta__bg">
-                    <div className="cta__bg-gradient" />
-                    <div className="cta__bg-pattern" />
-                </div>
 
-                <div className="cta__container">
-                    <div className="cta__content">
-                        <h2 id="cta-title" className="cta__title">
-                            Experience the <span className="text-accent">Future</span> of Flight
-                        </h2>
-                        <p className="cta__description">
-                            Be among the first to reserve your seat on the {product.name}
-                        </p>
-
-                        <div className="cta__actions">
-                            <button
-                                className="btn btn--primary btn--large"
-                                onClick={handleReserveClick}
-                            >
-                                <span>Reserve Now</span>
-                                {renderIcon('arrow', 'btn__icon')}
-                            </button>
-                            <button className="btn btn--secondary btn--large">
-                                <span>Contact Sales</span>
-                            </button>
-                        </div>
-
-                        {/* Trust Badges */}
-                        <div className="cta__trust">
-                            {product.trustBadges.map((badge, index) => (
-                                <div key={index} className="trust-badge">
-                                    <span className="trust-badge__icon">
-                                        {renderIcon(badge.icon)}
-                                    </span>
-                                    <span className="trust-badge__label">{badge.label}</span>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Newsletter */}
-                    <div className="cta__newsletter">
-                        <div className="newsletter">
-                            <div className="newsletter__content">
-                                <h3 className="newsletter__title">Stay Updated</h3>
-                                <p className="newsletter__description">
-                                    Get the latest news on our progress
-                                </p>
-                            </div>
-                            <form
-                                className="newsletter__form"
-                                onSubmit={handleNewsletterSubmit}
-                            >
-                                <input
-                                    type="email"
-                                    name="email"
-                                    className="newsletter__input"
-                                    placeholder="Enter your email"
-                                    aria-label="Email address"
-                                    required
-                                />
-                                <button type="submit" className="newsletter__btn">
-                                    Subscribe
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </section>
         </div>
     );
 };
