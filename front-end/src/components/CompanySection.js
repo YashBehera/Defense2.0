@@ -584,52 +584,6 @@ const CompanySection = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="company__cta">
-        <div className="company__container">
-          <motion.div
-            {...motionConfig}
-            className="company__cta-content"
-          >
-            <div className="company__cta-shapes">
-              <div className="company__cta-shape company__cta-shape--1" />
-              <div className="company__cta-shape company__cta-shape--2" />
-              <div className="company__cta-shape company__cta-shape--3" />
-            </div>
-
-            <div className="company__cta-inner">
-              <span className="company__label company__label--light">Join the Revolution</span>
-              <h2 className="company__cta-title">
-                Ready to shape the
-                <br />
-                future of mobility?
-              </h2>
-              <p className="company__cta-text">
-                Whether you're an investor, partner, or future passenger — 
-                we'd love to connect with you.
-              </p>
-              
-              <div className="company__cta-buttons">
-                <a href="/contact" className="company__btn company__btn--white">
-                  <span>Get in Touch</span>
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M5 12h14M12 5l7 7-7 7" />
-                  </svg>
-                </a>
-                <a href="/investors" className="company__btn company__btn--outline-light">
-                  <span>Investor Relations</span>
-                </a>
-              </div>
-
-              <div className="company__cta-logo">
-                <span className="company__logo-hive">hive</span>
-                <span className="company__logo-plus">+</span>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
       {/* Footer Tagline */}
       <section className="company__footer">
         <div className="company__container">

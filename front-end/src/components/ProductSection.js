@@ -134,22 +134,6 @@ const ProductSection = () => {
         ],
         showcaseSections: [
             {
-                id: 'problem',
-                subtitle: 'The Crisis',
-                title: 'India Is Choking\nOn Its Own Growth',
-                description: 'Every day, millions of Indians lose hours stuck in traffic. Mumbai and Bangalore commuters spend 90+ minutes one way. That\'s not transportation — it\'s time theft.',
-                alignment: 'left',
-                layout: 'stacked', // or 'split-left', 'split-right', 'fullbleed'
-                stats: [
-                    { value: '90', unit: '+min', label: 'Daily Commute' },
-                    { value: '₹1.5L', unit: 'Cr', label: 'Annual Loss' },
-                    { value: '0', unit: '%', label: 'Sky Utilized' }
-                ],
-                image: TrafficChaos,
-                theme: 'light',  // ← WHITE (1st)
-                accent: 'red'
-            },
-            {
                 id: 'solution',
                 subtitle: 'The Revolution',
                 title: 'The Sky Was Always \nThe Answer',
@@ -180,22 +164,6 @@ const ProductSection = () => {
                 image: AppExperience,
                 theme: 'light',  // ← WHITE (3rd)
                 accent: 'cyan'
-            },
-            {
-                id: 'future',
-                subtitle: 'The Vision',
-                title: 'Reclaim Your Life\nOwn Your Time',
-                description: 'This isn\'t just about getting from A to B. It\'s about getting your life back. More time with family. More productive hours. More living, less waiting.',
-                alignment: 'right',
-                layout: 'stacked',
-                stats: [
-                    { value: '2', unit: 'hrs', label: 'Given Back Daily' },
-                    { value: '730', unit: 'hrs', label: 'Per Year' },
-                    { value: '∞', unit: '', label: 'Possibilities' }
-                ],
-                image: FutureVision,
-                theme: 'dark',  // ← BLACK (4th)
-                accent: 'gold'
             }
         ],
         techHighlights: [
@@ -1038,21 +1006,6 @@ const ProductSection = () => {
                             {/* Subtitle / Description */}
                             <p className="showcase__subtitle">{section.description}</p>
 
-                            {/* Action Links */}
-                            <div className="showcase__actions">
-                                <a href="#" className="showcase__action">
-                                    Learn more
-                                    <svg className="showcase__action-arrow" viewBox="0 0 20 20" fill="none">
-                                        <path d="M7.5 4.5L13 10L7.5 15.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                    </svg>
-                                </a>
-                                <a href="#" className="showcase__action showcase__action--play">
-                                    <svg className="showcase__action-play-icon" viewBox="0 0 20 20" fill="currentColor">
-                                        <path d="M6.5 4.5v11l9-5.5-9-5.5z" />
-                                    </svg>
-                                    Watch the video
-                                </a>
-                            </div>
                         </div>
 
                         {/* Product Image */}
@@ -1092,69 +1045,6 @@ const ProductSection = () => {
                     )}
                 </section>
             ))}
-
-            {/* ==================== SPECS SECTION ==================== */}
-            <section
-                ref={el => sectionRefs.current.specs = el}
-                className={`specs ${isVisible.specs ? 'specs--visible' : ''}`}
-                aria-labelledby="specs-title"
-            >
-                <div className="specs__bg">
-                    <div className="specs__bg-pattern" />
-                    <div className="specs__bg-gradient" />
-                </div>
-
-                <div className="specs__container">
-                    {/* Section Header */}
-                    <header className="section-header">
-                        <span className="section-header__label">Specifications</span>
-                        <h2 id="specs-title" className="section-header__title">
-                            Technical Excellence
-                        </h2>
-                        <p className="section-header__description">
-                            Engineering precision meets sustainable innovation
-                        </p>
-                    </header>
-
-                    {/* Detailed Specs */}
-                    <div className="specs__detailed">
-                        <div className="specs__detailed-header">
-                            <h3 className="specs__detailed-title">Full Specifications</h3>
-                            <button className="btn btn--outline btn--small">
-                                {renderIcon('download', 'btn__icon')}
-                                <span>Download PDF</span>
-                            </button>
-                        </div>
-
-                        <div className="specs__categories">
-                            {product.detailedSpecs.map((category, catIndex) => (
-                                <div
-                                    key={catIndex}
-                                    className="specs__category"
-                                    style={{ '--delay': `${catIndex * 0.1}s` }}
-                                >
-                                    <h4 className="specs__category-title">{category.category}</h4>
-                                    <div className="specs__category-items">
-                                        {category.specs.map((spec, specIndex) => (
-                                            <div
-                                                key={specIndex}
-                                                className="spec-item"
-                                                style={{ '--delay': `${(catIndex * 4 + specIndex) * 0.05}s` }}
-                                            >
-                                                <span className="spec-item__label">{spec.label}</span>
-                                                <span className="spec-item__value">
-                                                    {spec.value}
-                                                    <span className="spec-item__unit">{spec.unit}</span>
-                                                </span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            </section>
 
             {/* ==================== TIMELINE SECTION ==================== */}
             <section

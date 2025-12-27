@@ -1490,21 +1490,6 @@ html {
 }
 
 /* ==========================================
-     DARK MODE SUPPORT (Optional)
-     ========================================== */
-@media (prefers-color-scheme: dark) {
-    .company--auto-dark {
-        --hive-black: #f5f5f7;
-        --hive-gray-900: #e8e8ed;
-        --hive-gray-700: #a1a1a6;
-        --hive-gray-500: #86868b;
-        --hive-gray-300: #424245;
-        --hive-gray-100: #1d1d1f;
-        --hive-white: #000000;
-    }
-}
-
-/* ==========================================
      ADDITIONAL COMPONENT VARIATIONS
      ========================================== */
 
