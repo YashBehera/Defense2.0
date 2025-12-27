@@ -128,7 +128,7 @@ const Footer = () => {
               </p>
 
               <p className="hive-footer__description">
-                India's first urban air mobility platform. Making flying cars a reality for everyday commuters.
+                Urban air mobility platform. Making flying cars a reality for everyday commuters.
               </p>
 
               {/* Social Links */}

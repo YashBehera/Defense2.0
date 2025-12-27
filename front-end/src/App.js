@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import Header from './components/Header';
-import Hero from './components/Hero';
-import ProductSection from './components/ProductSection';
 import CompanySection from './components/CompanySection';
 import MasterplanSection from './components/MasterPlanSection.js';
 import Footer from './components/Footer';
@@ -24,6 +22,7 @@ function App() {
         {activeSection === 'company' ? <CompanySection /> : null}
         {activeSection === 'masterplan' ? <MasterplanSection /> : null}
       </main>
+      <Footer />
     </div>
   );
 }
