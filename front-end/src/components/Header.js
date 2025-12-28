@@ -1,18 +1,53 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import './Header.css';
 
-const Header = ({ 
-  sections = [], 
-  activeSection = '', 
-  onNavClick = () => {}, 
-  ctaText = "Contact Us",
-  onCtaClick = () => {}
-}) => {
+const Header = ({ ctaText = "Contact Us" }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const headerRef = useRef(null);
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  // Handle scroll
+  // Determine active section from current pathname
+  const getActiveSection = () => {
+    switch (location.pathname) {
+      case '/':
+        return 'Home';
+      case '/company':
+        return 'company';
+      case '/masterplan':
+        return 'masterplan';
+      default:
+        return 'Home';
+    }
+  };
+
+  const activeSection = getActiveSection();
+
+  const sections = [
+    { id: 'Home', name: 'Home', path: '/' },
+    { id: 'company', name: 'Company', path: '/company' },
+    { id: 'masterplan', name: 'Masterplan', path: '/masterplan' }
+  ];
+
+  // Handle CTA click
+  const handleCtaClick = () => {
+    navigate('/contact');
+    setIsMobileMenuOpen(false);
+  };
+
+  // Handle navigation
+  const handleNavClick = useCallback((path) => {
+    navigate(path);
+    setIsMobileMenuOpen(false);
+  }, [navigate]);
+
+  const toggleMobileMenu = useCallback(() => {
+    setIsMobileMenuOpen(prev => !prev);
+  }, []);
+
+  // Handle scroll for header style
   useEffect(() => {
     let ticking = false;
     const handleScroll = () => {
@@ -28,7 +63,7 @@ const Header = ({
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Lock body scroll
+  // Lock body scroll when mobile menu open
   useEffect(() => {
     if (isMobileMenuOpen) {
       document.body.style.overflow = 'hidden';
@@ -40,7 +75,7 @@ const Header = ({
     };
   }, [isMobileMenuOpen]);
 
-  // Escape key handler
+  // Escape key closes menu
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
@@ -51,7 +86,7 @@ const Header = ({
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Close on resize
+  // Close menu on resize (desktop)
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth > 992) {
@@ -60,15 +95,6 @@ const Header = ({
     };
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [isMobileMenuOpen]);
-
-  const handleNavClick = useCallback((sectionId) => {
-    onNavClick(sectionId);
-    setIsMobileMenuOpen(false);
-  }, [onNavClick]);
-
-  const toggleMobileMenu = useCallback(() => {
-    setIsMobileMenuOpen(prev => !prev);
   }, []);
 
   // Logo Component
@@ -89,18 +115,14 @@ const Header = ({
         className={`nav ${isScrolled ? 'nav--scrolled' : ''} ${isMobileMenuOpen ? 'nav--open' : ''}`}
       >
         <div className="nav__wrapper">
-          {/* Logo */}
-          <a 
-            href="/" 
+          {/* Logo - go to home */}
+          <button 
             className="nav__brand"
-            aria-label="Hive Plus - Home"
-            onClick={(e) => {
-              e.preventDefault();
-              handleNavClick('home');
-            }}
+            onClick={() => handleNavClick('/')}
+            aria-label="Hive+ - Home"
           >
             <Logo />
-          </a>
+          </button>
 
           {/* Center Navigation */}
           <nav className="nav__menu" aria-label="Main navigation">
@@ -109,7 +131,7 @@ const Header = ({
                 <li key={section.id} className="nav__item">
                   <button
                     className={`nav__link ${activeSection === section.id ? 'nav__link--active' : ''}`}
-                    onClick={() => handleNavClick(section.id)}
+                    onClick={() => handleNavClick(section.path)}
                     aria-current={activeSection === section.id ? 'page' : undefined}
                   >
                     {section.name}
@@ -128,7 +150,7 @@ const Header = ({
               </svg>
             </button>
 
-            <button className="nav__cta" onClick={onCtaClick}>
+            <button className="nav__cta" onClick={handleCtaClick}>
               {ctaText}
             </button>
 
@@ -170,7 +192,9 @@ const Header = ({
         <div className="nav-mobile__container">
           {/* Mobile Header */}
           <div className="nav-mobile__header">
-            <Logo className="nav__logo--mobile" />
+            <button onClick={() => handleNavClick('/')} className="nav__logo--mobile">
+              <Logo />
+            </button>
             <button 
               className="nav-mobile__close"
               onClick={() => setIsMobileMenuOpen(false)}
@@ -193,7 +217,7 @@ const Header = ({
                 >
                   <button
                     className={`nav-mobile__link ${activeSection === section.id ? 'nav-mobile__link--active' : ''}`}
-                    onClick={() => handleNavClick(section.id)}
+                    onClick={() => handleNavClick(section.path)}
                     aria-current={activeSection === section.id ? 'page' : undefined}
                   >
                     <span className="nav-mobile__link-index">{String(index + 1).padStart(2, '0')}</span>
@@ -211,10 +235,7 @@ const Header = ({
 
           {/* Mobile Footer */}
           <div className="nav-mobile__footer">
-            <button className="nav-mobile__cta" onClick={() => {
-              onCtaClick();
-              setIsMobileMenuOpen(false);
-            }}>
+            <button className="nav-mobile__cta" onClick={handleCtaClick}>
               <span>{ctaText}</span>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M5 12h14M12 5l7 7-7 7"/>

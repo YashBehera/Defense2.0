@@ -2,7 +2,6 @@ import React, {useEffect,useRef} from 'react';
 import './MasterPlanSection.css';
 
 const MasterPlanSection = () => {
-
   const sectionRef = useRef(null);
 
   useEffect(() => {
@@ -121,6 +120,7 @@ const MasterPlanSection = () => {
 
   return (
     <section className="masterplan-section" ref={sectionRef}>
+      
       
       {/* Hero Header */}
       <header className="masterplan-hero">
