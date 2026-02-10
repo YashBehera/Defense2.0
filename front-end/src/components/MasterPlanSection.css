@@ -378,7 +378,7 @@
      VISION SECTION WITH ANIMATIONS
      ======================================== */
   .vision-section {
-    padding: var(--spacing-2xl) var(--spacing-md);
+    padding: var(--spacing-md) var(--spacing-md);
     background-color: var(--color-black);
     position: relative;
     overflow: hidden;
@@ -478,7 +478,7 @@
      PHASES SECTION WITH ANIMATIONS
      ======================================== */
   .phases-section {
-    padding: var(--spacing-2xl) var(--spacing-md);
+    padding: var(--spacing-md) var(--spacing-md);
     background-color: var(--color-white);
   }
   
@@ -899,7 +899,7 @@
      GLOBAL REACH SECTION WITH ANIMATIONS
      ======================================== */
   .global-section {
-    padding: var(--spacing-2xl) var(--spacing-md);
+    padding: var(--spacing-md) var(--spacing-md);
     background: var(--color-background);
   }
   
@@ -914,7 +914,7 @@
     grid-template-columns: repeat(4, 1fr);
     gap: var(--spacing-md);
     max-width: 1400px;
-    margin: 0 auto var(--spacing-xl) auto;
+    margin: 0 auto var(--spacing-md) auto;
   }
   
   .global-card {
@@ -1229,7 +1229,7 @@
      FEATURES SECTION WITH ANIMATIONS
      ======================================== */
   .features-section {
-    padding: var(--spacing-2xl) var(--spacing-md);
+    padding: 0;
     background: var(--color-background);
   }
   

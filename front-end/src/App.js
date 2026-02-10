@@ -3,8 +3,8 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-route
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Home from './pages/Home.js';
-import CompanySection from './components/CompanySection';
-import MasterplanSection from './components/MasterPlanSection';
+import Company from './pages/Company';
+import Team from './pages/Team';
 import ContactPage from './components/ContactPage';
 import ScrollToTop from './components/ScrollToTop.js';
 
@@ -16,6 +16,7 @@ const MainLayout = () => {
   const pathnameToSectionId = {
     '/': 'Home',
     '/company': 'company',
+    '/team': 'team',
     '/masterplan': 'masterplan',
     '/contact': 'Home' // optional: keep Home active on contact, or add 'contact' to sections
   };
@@ -23,23 +24,23 @@ const MainLayout = () => {
   const activeSection = pathnameToSectionId[location.pathname] || 'Home';
 
   const sections = [
-    { id: 'Home', name: 'Home' },
-    { id: 'company', name: 'Company' },
-    { id: 'masterplan', name: 'Masterplan' }
+    { id: 'Home', name: 'Home', path: '/' },
+    { id: 'company', name: 'Company', path: '/company' },
+    { id: 'team', name: 'Team', path: '/team' }
   ];
 
   return (
     <div className="App">
-      <Header 
-        sections={sections} 
-        activeSection={activeSection} 
+      <Header
+        sections={sections}
+        activeSection={activeSection}
         ctaText="Contact Us"
       />
       <main>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/company" element={<CompanySection />} />
-          <Route path="/masterplan" element={<MasterplanSection />} />
+          <Route path="/company" element={<Company />} />
+          <Route path="/team" element={<Team />} />
           <Route path="/contact" element={<ContactPage />} />
           {/* Optional: 404 fallback */}
           <Route path="*" element={<Home />} />
@@ -53,7 +54,7 @@ const MainLayout = () => {
 function App() {
   return (
     <Router>
-      <ScrollToTop/>
+      <ScrollToTop />
       <MainLayout />
     </Router>
   );

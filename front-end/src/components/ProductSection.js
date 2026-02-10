@@ -53,7 +53,6 @@ const ProductSection = () => {
         playing: false,
         error: false
     });
-    const [scrollProgress, setScrollProgress] = useState(0);
     const [isMobile, setIsMobile] = useState(false);
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
@@ -64,6 +63,8 @@ const ProductSection = () => {
     const featureInterval = useRef(null);
     const featurePaused = useRef(false);
     const rafRef = useRef(null);
+    const featuresTrackRef = useRef(null);
+    const progressBarRef = useRef(null);
 
     // Continuing ProductSection.jsx from product data...
 
@@ -248,9 +249,11 @@ const ProductSection = () => {
     // Scroll progress tracker
     useEffect(() => {
         const handleScroll = () => {
+            if (!progressBarRef.current) return;
             const scrolled = window.scrollY;
             const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-            setScrollProgress(Math.min(scrolled / maxScroll, 1));
+            const progress = Math.min(scrolled / maxScroll, 1);
+            progressBarRef.current.style.transform = `scaleX(${progress})`;
         };
 
         window.addEventListener('scroll', handleScroll, { passive: true });
@@ -365,6 +368,35 @@ const ProductSection = () => {
 
         return () => clearInterval(featureInterval.current);
     }, [product.featureCards.length]);
+
+    // Scroll-based active card detection for mobile
+    useEffect(() => {
+        if (!isMobile || !featuresTrackRef.current) return;
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        const index = Number(entry.target.getAttribute('data-index'));
+                        if (!isNaN(index)) {
+                            setActiveFeature(index);
+                            // Pause auto-rotation when user is interacting via scroll
+                            featurePaused.current = true;
+                        }
+                    }
+                });
+            },
+            {
+                root: featuresTrackRef.current,
+                threshold: 0.6
+            }
+        );
+
+        const cards = featuresTrackRef.current.children;
+        Array.from(cards).forEach((card) => observer.observe(card));
+
+        return () => observer.disconnect();
+    }, [isMobile]);
 
     // Render safety icon
     const renderIcon = useCallback((iconType, className = '') => {
@@ -510,8 +542,9 @@ const ProductSection = () => {
         <div className="product-page">
             {/* Progress Bar */}
             <div
+                ref={progressBarRef}
                 className="scroll-progress"
-                style={{ transform: `scaleX(${scrollProgress})` }}
+                style={{ transform: 'scaleX(0)' }}
                 aria-hidden="true"
             />
 
@@ -604,35 +637,6 @@ const ProductSection = () => {
                         <p className="hero__tagline">{product.heroSubtitle}</p>
 
                     </div>
-                </div>
-
-                {/* Bottom Stats Bar */}
-                <div className="hero__stats">
-                    {product.specs.map((spec, index) => (
-                        <div
-                            key={index}
-                            className="hero__stat"
-                            style={{ '--index': index }}
-                        >
-                            <div className="hero__stat-icon">
-                                {renderIcon(spec.icon)}
-                            </div>
-                            <div className="hero__stat-content">
-                                <span className="hero__stat-value">
-                                    <CountUpNumber
-                                        end={spec.value}
-                                        duration={2000}
-                                        isActive={isVisible.hero}
-                                    />
-                                    <span className="hero__stat-unit">{spec.unit}</span>
-                                </span>
-                                <span className="hero__stat-label">{spec.label}</span>
-                            </div>
-                            <div className="hero__stat-bar">
-                                <div className="hero__stat-bar-fill" />
-                            </div>
-                        </div>
-                    ))}
                 </div>
 
                 {/* Scroll CTA */}
@@ -735,15 +739,15 @@ const ProductSection = () => {
                     onMouseEnter={() => featurePaused.current = true}
                     onMouseLeave={() => featurePaused.current = false}
                 >
-                    <div className="features__track">
+                    <div className="features__track" ref={featuresTrackRef}>
                         {product.featureCards.map((feature, index) => (
                             <article
                                 key={feature.id}
                                 className={`feature-card ${activeFeature === index ? 'feature-card--active' : ''
                                     } ${index < activeFeature ? 'feature-card--past' : ''}`}
                                 style={{ '--index': index }}
+                                data-index={index}
                                 onClick={() => setActiveFeature(index)}
-                                onMouseEnter={() => setActiveFeature(index)}
                                 tabIndex={0}
                                 role="button"
                                 aria-pressed={activeFeature === index}
@@ -855,24 +859,6 @@ const ProductSection = () => {
                                                 <span>App Controlled</span>
                                             </div>
                                         </div>
-
-                                        {/* Actions */}
-                                        <div className="feature-card__actions">
-                                            <button className="feature-card__cta">
-                                                <span className="feature-card__cta-text">Learn More</span>
-                                                <span className="feature-card__cta-icon">
-                                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                                        <path d="M5 12h14M12 5l7 7-7 7" />
-                                                    </svg>
-                                                </span>
-                                                <span className="feature-card__cta-bg" />
-                                            </button>
-                                            <button className="feature-card__secondary" aria-label="Watch demo">
-                                                <svg viewBox="0 0 24 24" fill="currentColor">
-                                                    <polygon points="5 3 19 12 5 21 5 3" />
-                                                </svg>
-                                            </button>
-                                        </div>
                                     </div>
 
                                     {/* Progress Indicator */}
@@ -895,72 +881,6 @@ const ProductSection = () => {
                                 </div>
                             </article>
                         ))}
-                    </div>
-                </div>
-
-                {/* Thumbnail Navigation */}
-                <div className="features__thumbnails">
-                    <div className="features__thumbnails-track">
-                        {product.featureCards.map((feature, index) => (
-                            <button
-                                key={index}
-                                className={`features__thumbnail ${activeFeature === index ? 'features__thumbnail--active' : ''
-                                    }`}
-                                onClick={() => setActiveFeature(index)}
-                                aria-label={`Go to ${feature.title}`}
-                            >
-                                <div className="features__thumbnail-image">
-                                    <img src={feature.image} alt="" />
-                                </div>
-                                <div className="features__thumbnail-info">
-                                    <span className="features__thumbnail-badge">{feature.badge}</span>
-                                    <span className="features__thumbnail-title">{feature.title}</span>
-                                </div>
-                                <div className="features__thumbnail-indicator" />
-                            </button>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Bottom Info Bar - UPDATED */}
-                <div className="features__info-bar">
-                    <div className="features__info-item">
-                        <div className="features__info-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                                <circle cx="12" cy="12" r="10" />
-                                <path d="M12 6v6l4 2" />
-                            </svg>
-                        </div>
-                        <div className="features__info-text">
-                            <span className="features__info-value">90+ Min</span>
-                            <span className="features__info-label">Saved Daily</span>
-                        </div>
-                    </div>
-                    <div className="features__info-divider" />
-                    <div className="features__info-item">
-                        <div className="features__info-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                                <path d="M12 2v20M2 12h20" />
-                                <circle cx="12" cy="12" r="4" />
-                            </svg>
-                        </div>
-                        <div className="features__info-text">
-                            <span className="features__info-value">₹1.5L Cr</span>
-                            <span className="features__info-label">Annual Loss Solved</span>
-                        </div>
-                    </div>
-                    <div className="features__info-divider" />
-                    <div className="features__info-item">
-                        <div className="features__info-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                                <rect x="5" y="2" width="14" height="20" rx="2" />
-                                <path d="M12 18h.01" />
-                            </svg>
-                        </div>
-                        <div className="features__info-text">
-                            <span className="features__info-value">Tap & Fly</span>
-                            <span className="features__info-label">App Booking</span>
-                        </div>
                     </div>
                 </div>
             </section>
@@ -1045,58 +965,6 @@ const ProductSection = () => {
                     )}
                 </section>
             ))}
-
-            {/* ==================== TIMELINE SECTION ==================== */}
-            <section
-                ref={el => sectionRefs.current.timeline = el}
-                className={`timeline ${isVisible.timeline ? 'timeline--visible' : ''}`}
-                aria-labelledby="timeline-title"
-            >
-                <div className="timeline__container">
-                    {/* Section Header */}
-                    <header className="section-header">
-                        <span className="section-header__label">Roadmap</span>
-                        <h2 id="timeline-title" className="section-header__title">Our Journey</h2>
-                        <p className="section-header__description">
-                            From concept to commercial reality
-                        </p>
-                    </header>
-
-                    {/* Timeline */}
-                    <div className="timeline__track">
-                        <div className="timeline__line">
-                            <div className="timeline__line-progress" />
-                        </div>
-
-                        <div className="timeline__items">
-                            {product.timeline.map((item, index) => (
-                                <article
-                                    key={index}
-                                    className={`timeline-item timeline-item--${item.status}`}
-                                    style={{ '--delay': `${index * 0.15}s` }}
-                                >
-                                    <div className="timeline-item__marker">
-                                        {item.status === 'completed' && renderIcon('check')}
-                                        {item.status === 'current' && <div className="timeline-item__pulse" />}
-                                    </div>
-                                    <div className="timeline-item__content">
-                                        <span className="timeline-item__year">{item.year}</span>
-                                        <h3 className="timeline-item__title">{item.title}</h3>
-                                        <p className="timeline-item__description">{item.description}</p>
-                                        <span className="timeline-item__status">
-                                            {item.status === 'completed' && 'Completed'}
-                                            {item.status === 'current' && 'In Progress'}
-                                            {item.status === 'upcoming' && 'Upcoming'}
-                                        </span>
-                                    </div>
-                                </article>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-
         </div>
     );
 };

@@ -120,23 +120,6 @@ const MasterPlanSection = () => {
 
   return (
     <section className="masterplan-section" ref={sectionRef}>
-      
-      
-      {/* Hero Header */}
-      <header className="masterplan-hero">
-        <div className="hero-content">
-          <h1 className="hero-headline">
-            The future of flight.
-            <br />
-            <span className="hero-headline-accent">Mapped out.</span>
-          </h1>
-          <p className="hero-subheadline">
-            A strategic vision to transform urban mobility across the globe — 
-            connecting cities, countries, and continents through revolutionary eVTOL technology.
-          </p>
-        </div>
-      </header>
-
       {/* Vision Statement */}
       <div className="vision-section">
         <div className="vision-container">
@@ -179,53 +162,6 @@ const MasterPlanSection = () => {
         </div>
       </div>
 
-      {/* Timeline Visual */}
-      <div className="timeline-section">
-        <div className="timeline-container">
-          <div className="timeline-line"></div>
-          <div className="timeline-markers">
-            <div className="timeline-marker">
-              <div className="marker-dot active"></div>
-              <div className="marker-year">2024</div>
-              <div className="marker-label">Launch</div>
-            </div>
-            <div className="timeline-marker">
-              <div className="marker-dot"></div>
-              <div className="marker-year">2026</div>
-              <div className="marker-label">Expand</div>
-            </div>
-            <div className="timeline-marker">
-              <div className="marker-dot"></div>
-              <div className="marker-year">2029</div>
-              <div className="marker-label">Integrate</div>
-            </div>
-            <div className="timeline-marker">
-              <div className="marker-dot"></div>
-              <div className="marker-year">2032</div>
-              <div className="marker-label">Scale</div>
-            </div>
-            <div className="timeline-marker">
-              <div className="marker-dot"></div>
-              <div className="marker-year">2035</div>
-              <div className="marker-label">Transform</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Stats Section */}
-      <div className="stats-section">
-        <div className="stats-grid">
-          {stats.map((stat, index) => (
-            <div className="stat-item" key={index}>
-              <div className="stat-number">{stat.number}</div>
-              <div className="stat-label">{stat.label}</div>
-              <div className="stat-sublabel">{stat.sublabel}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-
       {/* Global Reach Section */}
       <div className="global-section">
         <div className="global-header">
@@ -249,72 +185,6 @@ const MasterPlanSection = () => {
               </ul>
             </div>
           ))}
-        </div>
-      </div>
-
-      {/* Quote Section */}
-      <div className="quote-section">
-        <blockquote className="quote-block">
-          <p className="quote-text">
-            "The sky is not the limit. It's just the beginning."
-          </p>
-          <footer className="quote-footer">
-            <span className="quote-source">Fly Hive Technologies</span>
-          </footer>
-        </blockquote>
-      </div>
-
-      {/* Features List */}
-      <div className="features-section">
-        <div className="features-header">
-          <span className="section-eyebrow">What Sets Us Apart</span>
-          <h2 className="section-title">Built for<br />tomorrow.</h2>
-        </div>
-
-        <div className="features-grid">
-          <div className="feature-item">
-            <div className="feature-icon">
-              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" strokeWidth="1.5"/>
-                <path d="M12 6V12L16 14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-              </svg>
-            </div>
-            <h4 className="feature-title">Time Efficiency</h4>
-            <p className="feature-description">Reduce travel time by up to 80% compared to ground transportation.</p>
-          </div>
-          <div className="feature-item">
-            <div className="feature-icon">
-              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2L3 7V17L12 22L21 17V7L12 2Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M12 22V12" stroke="currentColor" strokeWidth="1.5"/>
-                <path d="M12 12L3 7" stroke="currentColor" strokeWidth="1.5"/>
-                <path d="M12 12L21 7" stroke="currentColor" strokeWidth="1.5"/>
-              </svg>
-            </div>
-            <h4 className="feature-title">Zero Emissions</h4>
-            <p className="feature-description">100% electric propulsion for sustainable urban air mobility.</p>
-          </div>
-          <div className="feature-item">
-            <div className="feature-icon">
-              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" strokeWidth="1.5"/>
-                <path d="M8 12L11 15L16 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </div>
-            <h4 className="feature-title">Safety First</h4>
-            <p className="feature-description">Redundant systems and autonomous capabilities for maximum safety.</p>
-          </div>
-          <div className="feature-item">
-            <div className="feature-icon">
-              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="1.5"/>
-                <path d="M3 9H21" stroke="currentColor" strokeWidth="1.5"/>
-                <path d="M9 21V9" stroke="currentColor" strokeWidth="1.5"/>
-              </svg>
-            </div>
-            <h4 className="feature-title">Smart Integration</h4>
-            <p className="feature-description">Seamless connectivity with existing transportation networks.</p>
-          </div>
         </div>
       </div>
 

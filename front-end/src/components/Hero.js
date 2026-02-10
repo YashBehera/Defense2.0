@@ -4,7 +4,6 @@ import AirTaxi1 from '../assets/AirTaxi1.jpeg';
 
 const Hero = () => {
     const [isLoaded, setIsLoaded] = useState(false);
-    const [scrollProgress, setScrollProgress] = useState(0);
     const [isMobile, setIsMobile] = useState(false);
     const [isReducedMotion, setIsReducedMotion] = useState(false);
 
@@ -55,7 +54,9 @@ const Hero = () => {
             if (!heroRef.current) return;
             const rect = heroRef.current.getBoundingClientRect();
             const progress = Math.min(Math.max(-rect.top / rect.height, 0), 1);
-            setScrollProgress(progress);
+            if (heroRef.current) {
+                heroRef.current.style.setProperty('--scroll-progress', progress);
+            }
         };
 
         window.addEventListener('scroll', handleScroll, { passive: true });
@@ -66,7 +67,7 @@ const Hero = () => {
         <section
             ref={heroRef}
             className={`hero-archer ${isLoaded ? 'hero-archer--loaded' : ''} ${isMobile ? 'hero-archer--mobile' : ''} ${isReducedMotion ? 'hero-archer--reduced-motion' : ''}`}
-            style={{ '--scroll-progress': scrollProgress }}
+            style={{ '--scroll-progress': 0 }}
             aria-label="Hero section"
             role="region"
         >
@@ -101,7 +102,7 @@ const Hero = () => {
                                 </span>
                             </span>
                         </h1>
-                        
+
                     </div>
                 </div>
             </div>
@@ -111,15 +112,6 @@ const Hero = () => {
                 <div className="hero-archer__bottom-container">
                     {/* Quick Stats */}
                     <div className="hero-archer__stats" role="list" aria-label="Aircraft specifications">
-                        <div className="hero-archer__stat" role="listitem">
-                            <span className="hero-archer__stat-value">150+</span>
-                            <span className="hero-archer__stat-label">mph</span>
-                        </div>
-                        <div className="hero-archer__stat-divider" aria-hidden="true"></div>
-                        <div className="hero-archer__stat" role="listitem">
-                            <span className="hero-archer__stat-value">60</span>
-                            <span className="hero-archer__stat-label">mile range</span>
-                        </div>
                         <div className="hero-archer__stat-divider" aria-hidden="true"></div>
                         <div className="hero-archer__stat" role="listitem">
                             <span className="hero-archer__stat-value">100%</span>
@@ -127,31 +119,7 @@ const Hero = () => {
                         </div>
                     </div>
 
-                    {/* Announcement */}
-                    <div className="hero-archer__announcement">
-                        <span className="hero-archer__announcement-badge" aria-label="New announcement">
-                            New
-                        </span>
-                        <span className="hero-archer__announcement-text">
-                            FAA Certification Progress Update
-                        </span>
-                        <a
-                            href="#news"
-                            className="hero-archer__announcement-link"
-                            aria-label="Read more about FAA Certification Progress Update"
-                        >
-                            Read More
-                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                                <path
-                                    d="M7 17L17 7M17 7H7M17 7V17"
-                                    stroke="currentColor"
-                                    strokeWidth="2"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                />
-                            </svg>
-                        </a>
-                    </div>
+
                 </div>
             </div>
 

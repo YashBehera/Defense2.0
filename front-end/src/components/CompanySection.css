@@ -245,10 +245,9 @@
      ========================================== */
 .company__hero {
     position: relative;
-    min-height: 100vh;
     display: flex;
     align-items: center;
-    padding: var(--space-32) 0 var(--space-24);
+    padding: var(--space-4) 0 var(--space-16);
     overflow: hidden;
 }
 
@@ -385,7 +384,7 @@
 
 @media (max-width: 768px) {
     .company__hero {
-        padding: var(--space-24) 0 var(--space-16);
+        padding: var(--space-4) 0 var(--space-16);
     }
 
     .company__hero-cta {
@@ -457,21 +456,16 @@
      ========================================== */
 .company__vision {
     position: relative;
-    padding: var(--space-32) 0;
+    padding: var(--space-8) 0;
     background-color: var(--hive-white);
-    overflow: hidden;
+    /* overflow: hidden; Removed to prevent scroll issues */
 }
 
-.company__vision-layout {
-    display: grid;
-    grid-template-columns: 1fr 1.2fr;
-    gap: var(--space-16);
-    align-items: start;
-}
+/* ... */
 
 .company__vision-header {
-    position: sticky;
-    top: var(--space-24);
+    position: static !important;
+    /* top: var(--space-24); */
 }
 
 .company__vision-content {
@@ -582,7 +576,7 @@
      MARKET SECTION
      ========================================== */
 .company__market {
-    padding: var(--space-32) 0;
+    padding: var(--space-8) 0;
     background-color: var(--hive-gray-100);
 }
 
@@ -753,7 +747,7 @@
      BUSINESS MODEL SECTION
      ========================================== */
 .company__business {
-    padding: var(--space-32) 0;
+    padding: var(--space-8) 0;
     background-color: var(--hive-white);
 }
 
@@ -1089,10 +1083,7 @@
     margin-bottom: var(--space-12);
 }
 
-.company__dgca-header {
-    position: sticky;
-    top: var(--space-24);
-}
+
 
 .company__dgca-intro {
     font-size: 1rem;
