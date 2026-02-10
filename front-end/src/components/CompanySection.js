@@ -15,16 +15,7 @@ const fadeInUpVariants = {
   }
 };
 
-const fadeInVariants = {
-  initial: { opacity: 0 },
-  animate: {
-    opacity: 1,
-    transition: {
-      duration: 1,
-      ease: [0.25, 0.1, 0.25, 1]
-    }
-  }
-};
+
 
 const staggerContainer = {
   initial: {},
@@ -57,12 +48,7 @@ const CompanySection = () => {
     variants: fadeInUpVariants,
   };
 
-  const stats = [
-    { value: "$150B", label: "Market by 2035", suffix: "" },
-    { value: "4+", label: "Hours lost in traffic daily", suffix: "hrs" },
-    { value: "15", label: "Minute commute vs 90", suffix: "min" },
-    { value: "₹500", label: "Starting price per ride", suffix: "" }
-  ];
+
 
   const visionPoints = [
     "India's first human-carrying electric flying vehicle (eVTOL)",
@@ -73,78 +59,11 @@ const CompanySection = () => {
 
 
 
-  const businessPhases = [
-    {
-      number: "01",
-      title: "Prototype & IP",
-      description: "Build and patent the manned eVTOL platform — establish as India's first scalable aerial mobility startup.",
-      icon: "◈"
-    },
-    {
-      number: "02",
-      title: "B2G & B2B Model",
-      description: "Offer prototypes for defense, rescue, and logistics to generate early revenue.",
-      icon: "◉"
-    },
-    {
-      number: "03",
-      title: "Air Taxi Network",
-      description: "Launch FlyHive stations in Tier-1 cities. Booking via SkyApp — ₹500–₹1500 per ride.",
-      icon: "◎"
-    },
-    {
-      number: "04",
-      title: "Global Expansion",
-      description: "License design to foreign operators. Earn through royalties + export partnerships.",
-      icon: "◇"
-    }
-  ];
 
-  const executionPlan = [
-    {
-      year: "2025",
-      title: "Working Prototype",
-      milestone: "Year 1",
-      items: [
-        "Build and test 1-2 passenger eVTOL",
-        "Capture demo videos & flight data",
-        "Sign MOU with rooftop partners"
-      ],
-      status: "current"
-    },
-    {
-      year: "2026",
-      title: "Certification",
-      milestone: "Year 2",
-      items: [
-        "Begin DGCA certification process",
-        "Develop SkyApp platform",
-        "Launch first SkyPort setup"
-      ],
-      status: "upcoming"
-    },
-    {
-      year: "2027",
-      title: "Commercial Ops",
-      milestone: "Year 3",
-      items: [
-        "Start paid test routes",
-        "Generate first revenue",
-        "Strategic partnerships"
-      ],
-      status: "upcoming"
-    }
-  ];
 
-  const dgcaSteps = [
-    { step: "01", text: "Apply under DGCA AEAC No. 01/2024 for VTOL aircraft" },
-    { step: "02", text: "Get \"Permit to Fly – Experimental\" after ground & tethered tests" },
-    { step: "03", text: "Partner with IIT/DRDO test corridors for certification support" },
-    { step: "04", text: "Begin type certification (CAR 21) after successful test flights" },
-    { step: "05", text: "Ensure battery, safety & redundancy compliance per DGCA norms" },
-    { step: "06", text: "File for production certificate post-type approval" },
-    { step: "07", text: "Align with MoCA UAM Sandbox Policy 2024" }
-  ];
+
+
+
 
 
 

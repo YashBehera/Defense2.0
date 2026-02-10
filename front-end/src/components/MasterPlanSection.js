@@ -1,4 +1,4 @@
-import React, {useEffect,useRef} from 'react';
+import React, { useEffect, useRef } from 'react';
 import './MasterPlanSection.css';
 
 const MasterPlanSection = () => {
@@ -38,8 +38,8 @@ const MasterPlanSection = () => {
       regions: ['India', 'UAE', 'Southeast Asia'],
       icon: (
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M22 2L11 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M22 2L11 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       )
     },
@@ -51,9 +51,9 @@ const MasterPlanSection = () => {
       regions: ['Europe', 'Middle East', 'Africa'],
       icon: (
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5"/>
-          <path d="M2 12H22" stroke="currentColor" strokeWidth="1.5"/>
-          <path d="M12 2C14.5 4.5 16 8 16 12C16 16 14.5 19.5 12 22C9.5 19.5 8 16 8 12C8 8 9.5 4.5 12 2Z" stroke="currentColor" strokeWidth="1.5"/>
+          <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5" />
+          <path d="M2 12H22" stroke="currentColor" strokeWidth="1.5" />
+          <path d="M12 2C14.5 4.5 16 8 16 12C16 16 14.5 19.5 12 22C9.5 19.5 8 16 8 12C8 8 9.5 4.5 12 2Z" stroke="currentColor" strokeWidth="1.5" />
         </svg>
       )
     },
@@ -65,10 +65,10 @@ const MasterPlanSection = () => {
       regions: ['Americas', 'Asia-Pacific', 'Global'],
       icon: (
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M17 21V19C17 16.7909 15.2091 15 13 15H5C2.79086 15 1 16.7909 1 19V21" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-          <circle cx="9" cy="7" r="4" stroke="currentColor" strokeWidth="1.5"/>
-          <path d="M23 21V19C22.9986 17.1771 21.765 15.5857 20 15.13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-          <path d="M16 3.13C17.7699 3.58317 19.0078 5.17799 19.0078 7.005C19.0078 8.83201 17.7699 10.4268 16 10.88" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+          <path d="M17 21V19C17 16.7909 15.2091 15 13 15H5C2.79086 15 1 16.7909 1 19V21" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+          <circle cx="9" cy="7" r="4" stroke="currentColor" strokeWidth="1.5" />
+          <path d="M23 21V19C22.9986 17.1771 21.765 15.5857 20 15.13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+          <path d="M16 3.13C17.7699 3.58317 19.0078 5.17799 19.0078 7.005C19.0078 8.83201 17.7699 10.4268 16 10.88" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
         </svg>
       )
     },
@@ -80,9 +80,9 @@ const MasterPlanSection = () => {
       regions: ['Worldwide'],
       icon: (
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       )
     }
@@ -111,12 +111,7 @@ const MasterPlanSection = () => {
     }
   ];
 
-  const stats = [
-    { number: '50+', label: 'Cities', sublabel: 'Connected by 2030' },
-    { number: '25', label: 'Countries', sublabel: 'Across 4 continents' },
-    { number: '1M+', label: 'Passengers', sublabel: 'Annual capacity goal' },
-    { number: '2035', label: 'Vision', sublabel: 'Mass transit reality' }
-  ];
+
 
   return (
     <section className="masterplan-section" ref={sectionRef}>
@@ -125,7 +120,7 @@ const MasterPlanSection = () => {
         <div className="vision-container">
           <div className="vision-label">Our Vision</div>
           <h2 className="vision-statement">
-            We believe the sky belongs to everyone. Our masterplan is more than a roadmap — 
+            We believe the sky belongs to everyone. Our masterplan is more than a roadmap —
             it's a commitment to making aerial transportation accessible, sustainable, and global.
           </h2>
         </div>
@@ -137,7 +132,7 @@ const MasterPlanSection = () => {
           <span className="section-eyebrow">Strategic Roadmap</span>
           <h2 className="section-title">Four phases.<br />One destination.</h2>
           <p className="section-description">
-            Every great journey begins with a single step. Ours begins with a vision 
+            Every great journey begins with a single step. Ours begins with a vision
             that spans a decade and circles the globe.
           </p>
         </div>
@@ -168,7 +163,7 @@ const MasterPlanSection = () => {
           <span className="section-eyebrow">Global Reach</span>
           <h2 className="section-title">Everywhere.<br />For everyone.</h2>
           <p className="section-description">
-            Our expansion strategy spans four continents, bringing next-generation 
+            Our expansion strategy spans four continents, bringing next-generation
             air mobility to cities and communities around the world.
           </p>
         </div>

@@ -2,62 +2,15 @@ import React, { useState } from 'react';
 import './Footer.css';
 
 const Footer = () => {
-  const [email, setEmail] = useState('');
-  const [isSubscribed, setIsSubscribed] = useState(false);
+
+
   const [isHovered, setIsHovered] = useState(null);
 
-  const handleSubscribe = (e) => {
-    e.preventDefault();
-    if (email) {
-      setIsSubscribed(true);
-      setTimeout(() => setIsSubscribed(false), 3000);
-      setEmail('');
-    }
-  };
 
-  const currentYear = new Date().getFullYear();
 
-  const footerLinks = {
-    product: {
-      title: 'Product',
-      links: [
-        { name: 'How It Works', href: '#how-it-works' },
-        { name: 'Book a Flight', href: '#book' },
-        { name: 'Vertiports', href: '#vertiports' },
-        { name: 'Pricing', href: '#pricing' },
-        { name: 'Safety', href: '#safety' },
-      ],
-    },
-    company: {
-      title: 'Company',
-      links: [
-        { name: 'About Us', href: '#about' },
-        { name: 'Our Team', href: '#team' },
-        { name: 'Careers', href: '#careers', badge: "We're Hiring" },
-        { name: 'Press Kit', href: '#press' },
-        { name: 'Blog', href: '#blog' },
-      ],
-    },
-    resources: {
-      title: 'Resources',
-      links: [
-        { name: 'Help Center', href: '#help' },
-        { name: 'Partner With Us', href: '#partners' },
-        { name: 'Investor Relations', href: '#investors' },
-        { name: 'API Documentation', href: '#api' },
-        { name: 'Community', href: '#community' },
-      ],
-    },
-    legal: {
-      title: 'Legal',
-      links: [
-        { name: 'Privacy Policy', href: '#privacy' },
-        { name: 'Terms of Service', href: '#terms' },
-        { name: 'Cookie Policy', href: '#cookies' },
-        { name: 'Licenses', href: '#licenses' },
-      ],
-    },
-  };
+
+
+
 
   const socialLinks = [
     {

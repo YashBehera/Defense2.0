@@ -69,7 +69,6 @@ const Hero = () => {
             className={`hero-archer ${isLoaded ? 'hero-archer--loaded' : ''} ${isMobile ? 'hero-archer--mobile' : ''} ${isReducedMotion ? 'hero-archer--reduced-motion' : ''}`}
             style={{ '--scroll-progress': 0 }}
             aria-label="Hero section"
-            role="region"
         >
             {/* Full Background Image */}
             <div className="hero-archer__media">
