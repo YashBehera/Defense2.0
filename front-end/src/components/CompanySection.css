@@ -80,7 +80,6 @@
         padding: 0 var(--space-6);
     }
 }
-
 /* Selection */
 .company ::selection {
     background-color: var(--hive-red-light);
