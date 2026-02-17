@@ -1,42 +1,43 @@
 import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import './Team.css';
+import DaljeetImg from '../assets/daljeet.JPG';
+import HarmeetImg from '../assets/harmeet.JPG';
+import NikhilImg from '../assets/nikhil.JPG';
+import KrishImg from '../assets/krish.JPG';
 
 const Team = () => {
     useEffect(() => {
         window.scrollTo(0, 0);
     }, []);
 
-    const founders = [
-        {
-            name: "KRISH CHANDHOK",
-            role: "Founder CEO",
-            image: "https://via.placeholder.com/400x500",
-            bio: "Visionary leader driving the future of urban air mobility."
-        }
-    ];
-
-    const advisors = [
-        {
-            name: "Mr. Nikhil Gupta",
-            role: "International Strategist & Board Observer",
-            image: "https://via.placeholder.com/300x300",
-            bio: "Ex. Marwari Catalysts, JITO Angel Network, Kitara Capital & Kotak Mahindra Bank. I am an angel investor, an accelerator, an Alternative Investment Fund Manager, mentor, a wealth manager for close to 3 decades and am currently setting up a CAT II AIF. I serve as a member on several Investment Committees of Incubators, Funds & communities to further work extensively towards nuturing innovation & entrepreneurship. My interests lie in conducting workshops on investments & also have been on several podcasts to narrate the same. I believe in sharing knowledge and hence am a visiting faculty teaching investments and fund raising as a subject to students."
-        }
-    ];
-
-    const directors = [
+    const teamMembers = [
         {
             name: "Daljeet Chandhok",
-            role: "Director",
-            image: "https://via.placeholder.com/300x300",
-            bio: "Strategic leadership and operational excellence."
+            role: "Founder & Director",
+            image: DaljeetImg,
+            imagePosition: "object-top", // Shift photo down (show top)
+            bio: "25+ years of systems architecture and enterprise transformation leadership. Leads FlyHive's overall strategy, capital structuring, regulatory roadmap, and platform execution alongside global strategic advisors."
         },
         {
             name: "Harmeet Kaur",
-            role: "Director",
-            image: "https://via.placeholder.com/300x300",
-            bio: "Driving organizational growth and culture."
+            role: "Founder & Director",
+            image: HarmeetImg,
+            imagePosition: "object-top", // Shift photo down (show top)
+            bio: "Expert in Digital Campaign Strategy, PR, and Strategic Marketing. Guides brand positioning, communication architecture, and leads FlyHive's market narrative and ecosystem engagement."
+        },
+        {
+            name: "Nikhil Gupta",
+            role: "International Strategic Advisor",
+            image: NikhilImg,
+            imagePosition: "object-center",
+            bio: "Global strategist with strong GCC institutional networks and investor engagement. Advises on capital structuring, cross-border positioning, and long-term expansion strategy."
+        },
+        {
+            name: "Krish Chandhok",
+            role: "Founding Technical Architect\n(Designate CTO)",
+            image: KrishImg,
+            imagePosition: "object-top", // Shift photo down (show top)
+            bio: "Aerospace systems research & simulation-driven architecture. Will lead technical division upon legal eligibility."
         }
     ];
 
@@ -63,94 +64,59 @@ const Team = () => {
     };
 
     return (
-        <div className="team-page pt-12 pb-12 bg-white">
-            <div className="max-w-7xl mx-auto px-6">
+        <div className="team-page pt-20 pb-20 bg-white">
+            <div className="max-w-[1400px] mx-auto px-6">
 
                 {/* Header */}
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8 }}
-                    className="text-center mb-12"
+                    className="text-left mb-16"
                 >
-                    <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 tracking-tight">
-                        Meet the Minds<br />Behind the Mission
+                    <h1 className="text-4xl md:text-5xl font-light text-gray-800 tracking-wide">
+                        Leadership & Strategic Advisory
                     </h1>
-                    <p className="text-xl text-gray-500 max-w-2xl mx-auto">
-                        A diverse team of engineers, aviators, and visionaries united by a single goal:
-                        redefining urban mobility.
-                    </p>
                 </motion.div>
 
-                {/* Founders Section */}
-                <section className="mb-16">
-                    <h2 className="text-3xl font-semibold text-gray-900 mb-12 text-center">Founders</h2>
-                    <motion.div
-                        variants={containerVariants}
-                        initial="hidden"
-                        whileInView="visible"
-                        viewport={{ once: true }}
-                        className="flex flex-wrap justify-center gap-8 max-w-4xl mx-auto"
-                    >
-                        {founders.map((founder, index) => (
-                            <motion.div key={index} variants={itemVariants} className="flex flex-col items-center text-center">
-                                <div className="w-full aspect-[4/5] overflow-hidden rounded-2xl mb-6 bg-gray-100">
-                                    <img src={founder.image} alt={founder.name} className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" />
-                                </div>
-                                <h3 className="text-2xl font-bold text-gray-900">{founder.name}</h3>
-                                <p className="text-blue-600 font-medium mb-3">{founder.role}</p>
-                                <p className="text-gray-500 leading-relaxed">{founder.bio}</p>
-                            </motion.div>
-                        ))}
-                    </motion.div>
-                </section>
+                {/* Team Grid */}
+                <motion.div
+                    variants={containerVariants}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true }}
+                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12"
+                >
+                    {teamMembers.map((member, index) => (
+                        <motion.div key={index} variants={itemVariants} className="flex flex-col items-center text-center">
 
-                {/* Strategic Advisors */}
-                <section className="mb-16">
-                    <h2 className="text-3xl font-semibold text-gray-900 mb-12 text-center">Strategic Advisors</h2>
-                    <motion.div
-                        variants={containerVariants}
-                        initial="hidden"
-                        whileInView="visible"
-                        viewport={{ once: true }}
-                        className="flex flex-wrap justify-center gap-8 max-w-4xl mx-auto"
-                    >
-                        {advisors.map((advisor, index) => (
-                            <motion.div key={index} variants={itemVariants} className="flex flex-col items-center text-center">
-                                <div className="w-40 h-40 overflow-hidden rounded-full mb-6 bg-gray-100">
-                                    <img src={advisor.image} alt={advisor.name} className="w-full h-full object-cover" />
-                                </div>
-                                <h3 className="text-xl font-bold text-gray-900">{advisor.name}</h3>
-                                <p className="text-blue-600 font-medium mb-3">{advisor.role}</p>
-                                <p className="text-gray-500 text-sm leading-relaxed max-w-md">{advisor.bio}</p>
-                            </motion.div>
-                        ))}
-                    </motion.div>
-                </section>
+                            {/* Circular Image */}
+                            <div className="w-48 h-48 md:w-56 md:h-56 rounded-full overflow-hidden mb-8 border-4 border-white shadow-lg">
+                                <img
+                                    src={member.image}
+                                    alt={member.name}
+                                    className={`w-full h-full object-cover ${member.imagePosition || 'object-center'} hover:scale-110 transition-transform duration-500`}
+                                />
+                            </div>
 
-                {/* Directors */}
-                <section>
-                    <h2 className="text-3xl font-semibold text-gray-900 mb-12 text-center">Directors</h2>
-                    <motion.div
-                        variants={containerVariants}
-                        initial="hidden"
-                        whileInView="visible"
-                        viewport={{ once: true }}
-                        className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto"
-                    >
-                        {directors.map((director, index) => (
-                            <motion.div key={index} variants={itemVariants} className="flex flex-col items-center text-center">
-                                <div className="w-40 h-40 overflow-hidden rounded-full mb-6 bg-gray-100">
-                                    <img src={director.image} alt={director.name} className="w-full h-full object-cover" />
-                                </div>
-                                <h3 className="text-xl font-bold text-gray-900">{director.name}</h3>
-                                <p className="text-blue-600 font-medium mb-3">{director.role}</p>
-                                <p className="text-gray-500 text-sm leading-relaxed max-w-md">{director.bio}</p>
-                            </motion.div>
-                        ))}
-                    </motion.div>
-                </section>
+                            {/* Name */}
+                            <h3 className="text-2xl font-light text-gray-800 mb-2">
+                                {member.name}
+                            </h3>
 
+                            {/* Role */}
+                            <p className="text-gray-500 text-lg mb-6 font-light whitespace-pre-line">
+                                {member.role}
+                            </p>
+
+                            {/* Bio */}
+                            <p className="text-gray-500 text-sm leading-relaxed font-light max-w-xs mx-auto">
+                                {member.bio}
+                            </p>
+
+                        </motion.div>
+                    ))}
+                </motion.div>
             </div>
         </div>
     );
