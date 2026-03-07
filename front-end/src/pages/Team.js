@@ -13,7 +13,7 @@ const Team = () => {
     const teamMembers = [
         {
             name: "Daljeet Chandhok",
-            role: "Founder & Director",
+            role: "Director",
             image: DaljeetImg,
             imagePosition: "object-top", // Shift photo down (show top)
             bio: "25+ years of systems architecture and enterprise transformation leadership. Leads FlyHive's overall strategy, capital structuring, regulatory roadmap, and platform execution alongside global strategic advisors."
