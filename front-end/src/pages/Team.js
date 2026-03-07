@@ -20,7 +20,7 @@ const Team = () => {
         },
         {
             name: "Harmeet Kaur",
-            role: "Founder & Director",
+            role: "Director",
             image: HarmeetImg,
             imagePosition: "object-top", // Shift photo down (show top)
             bio: "Expert in Digital Campaign Strategy, PR, and Strategic Marketing. Guides brand positioning, communication architecture, and leads FlyHive's market narrative and ecosystem engagement."
