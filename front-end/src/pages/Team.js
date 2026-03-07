@@ -34,7 +34,7 @@ const Team = () => {
         },
         {
             name: "Krish Chandhok",
-            role: "Founding Technical Architect\n(Designate CTO)",
+            role: "Co Founder & CEO",
             image: KrishImg,
             imagePosition: "object-top", // Shift photo down (show top)
             bio: "Aerospace systems research & simulation-driven architecture. Will lead technical division upon legal eligibility."
