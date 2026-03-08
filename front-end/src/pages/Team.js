@@ -12,18 +12,11 @@ const Team = () => {
 
     const teamMembers = [
         {
-            name: "Daljeet Chandhok",
-            role: "Director",
-            image: DaljeetImg,
+            name: "Krish Chandhok",
+            role: "Founder & CEO",
+            image: KrishImg,
             imagePosition: "object-top", // Shift photo down (show top)
-            bio: "25+ years of systems architecture and enterprise transformation leadership. Leads FlyHive's overall strategy, capital structuring, regulatory roadmap, and platform execution alongside global strategic advisors."
-        },
-        {
-            name: "Harmeet Kaur",
-            role: "Director",
-            image: HarmeetImg,
-            imagePosition: "object-top", // Shift photo down (show top)
-            bio: "Expert in Digital Campaign Strategy, PR, and Strategic Marketing. Guides brand positioning, communication architecture, and leads FlyHive's market narrative and ecosystem engagement."
+            bio: "Aerospace systems research & simulation-driven architecture. Will lead technical division upon legal eligibility."
         },
         {
             name: "Nikhil Gupta",
@@ -33,12 +26,20 @@ const Team = () => {
             bio: "Global strategist with strong GCC institutional networks and investor engagement. Advises on capital structuring, cross-border positioning, and long-term expansion strategy."
         },
         {
-            name: "Krish Chandhok",
-            role: "Co Founder & CEO",
-            image: KrishImg,
+            name: "Harmeet Kaur",
+            role: "Director",
+            image: HarmeetImg,
             imagePosition: "object-top", // Shift photo down (show top)
-            bio: "Aerospace systems research & simulation-driven architecture. Will lead technical division upon legal eligibility."
+            bio: "Expert in Digital Campaign Strategy, PR, and Strategic Marketing. Guides brand positioning, communication architecture, and leads FlyHive's market narrative and ecosystem engagement."
+        },
+        {
+            name: "Daljeet Chandhok",
+            role: "Director",
+            image: DaljeetImg,
+            imagePosition: "object-top", // Shift photo down (show top)
+            bio: "25+ years of systems architecture and enterprise transformation leadership. Leads FlyHive's overall strategy, capital structuring, regulatory roadmap, and platform execution alongside global strategic advisors."
         }
+     
     ];
 
     const containerVariants = {
