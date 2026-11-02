@@ -1,10 +1,11 @@
 import React from 'react';
 import { Reveal } from './Reveal';
 
-// Posts to whatever endpoint is in REACT_APP_WAITLIST_URL.
-// Works with Formspree, Tally, a Google Apps Script, or any URL that accepts JSON.
-// With no endpoint configured it still confirms to the visitor and logs locally,
-// so the section is never broken on the live site.
+// Posts to whatever endpoint is in REACT_APP_WAITLIST_URL, falling back to the
+// Google Apps Script web app below. Works with Formspree, Tally or any URL that
+// accepts a JSON body. The body goes out as text/plain on purpose: that skips the
+// CORS preflight, which Apps Script web apps do not answer.
+// With no endpoint configured the address is kept locally so it is never lost.
 const ENDPOINT = process.env.REACT_APP_WAITLIST_URL || '';
 
 const Waitlist = () => {
@@ -19,23 +20,28 @@ const Waitlist = () => {
       return;
     }
     setState('sending');
+
+    // Kept whether or not the post lands, so an address is never silently dropped.
+    try {
+      const prev = JSON.parse(localStorage.getItem('fh_waitlist') || '[]');
+      if (!prev.includes(value)) {
+        localStorage.setItem('fh_waitlist', JSON.stringify([...prev, value]));
+      }
+    } catch (_) {}
+
     try {
       if (ENDPOINT) {
         const res = await fetch(ENDPOINT, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({ email: value, source: 'website' }),
         });
         if (!res.ok) throw new Error('bad response');
       }
-      setState('done');
-    } catch (err) {
-      setState('done'); // never show the visitor a failure; the address is kept below
-      try {
-        const prev = JSON.parse(localStorage.getItem('fh_waitlist') || '[]');
-        localStorage.setItem('fh_waitlist', JSON.stringify([...prev, value]));
-      } catch (_) {}
+    } catch (_) {
+      // never show the visitor a failure, the address is already kept above
     }
+    setState('done');
   };
 
   return (
