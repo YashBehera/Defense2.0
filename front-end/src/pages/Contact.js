@@ -155,10 +155,6 @@ export default function Contact() {
               <p>FlyHive Technologies Pvt Ltd</p>
             </div>
             <div>
-              <span className="k">Recognition</span>
-              <p>DPIIT certificate DIPP262989, aeronautics, aerospace and defence</p>
-            </div>
-            <div>
               <span className="k">Email</span>
               <p>
                 <a href="mailto:info@flyhivetechnologies.com">info@flyhivetechnologies.com</a>

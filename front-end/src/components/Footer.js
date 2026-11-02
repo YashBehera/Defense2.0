@@ -32,7 +32,7 @@ export default function Footer() {
         </div>
         <div className="foot-meta">
           <span>FlyHive Technologies Pvt Ltd</span>
-          <span>DPIIT DIPP262989</span>
+          <span>All rights reserved</span>
         </div>
       </div>
     </footer>

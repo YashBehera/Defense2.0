@@ -427,9 +427,8 @@ export function Company() {
         </h2>
         <Reveal delay={0.1}>
           <p className="lede">
-            Recognised by the Ministry of Commerce and Industry under aeronautics, aerospace
-            and defence. DPIIT certificate DIPP262989. Founded by Krish Chandhok, who has been
-            building things that fly since he was nine.
+            FlyHive Technologies is a private limited company building the aircraft and the
+            stations for a city airline, and intending to fly them itself.
           </p>
         </Reveal>
         <div className="people">

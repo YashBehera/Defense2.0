@@ -18,17 +18,19 @@ export default function Nav() {
 
   return (
     <nav className={solid || pathname !== '/' ? 'nav solid' : 'nav'}>
-      <Link to="/" aria-label="FlyHive Technologies, home">
-        <img src={logo} alt="FlyHive" />
-      </Link>
-      <div className="nav-right">
-        <NavLink className="nav-link" to="/team">Team</NavLink>
-        <NavLink className="nav-link" to="/contact">Contact</NavLink>
-        {pathname === '/' ? (
-          <a className="btn" href={waitlistTo}>Join the waitlist</a>
-        ) : (
-          <Link className="btn" to={waitlistTo}>Join the waitlist</Link>
-        )}
+      <div className="nav-in wrap">
+        <Link to="/" aria-label="FlyHive Technologies, home">
+          <img src={logo} alt="FlyHive" />
+        </Link>
+        <div className="nav-right">
+          <NavLink className="nav-link" to="/team">Team</NavLink>
+          <NavLink className="nav-link" to="/contact">Contact</NavLink>
+          {pathname === '/' ? (
+            <a className="btn" href={waitlistTo}>Join the waitlist</a>
+          ) : (
+            <Link className="btn" to={waitlistTo}>Join the waitlist</Link>
+          )}
+        </div>
       </div>
     </nav>
   );
