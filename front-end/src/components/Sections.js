@@ -3,6 +3,7 @@ import { motion, useScroll, useTransform, useMotionValueEvent } from 'framer-mot
 import { Link } from 'react-router-dom';
 import { Reveal, Words, Counter } from './Reveal';
 import { CityScene, CraftScene, NetworkScene } from './Scenes';
+import Skyline from './Skyline';
 import Waitlist from './Waitlist';
 
 import krish from '../assets/krish.JPG';
@@ -10,6 +11,8 @@ import daljeet from '../assets/daljeet.JPG';
 import harmeet from '../assets/harmeet.JPG';
 
 /* ================================================================= */
+
+const smallScreen = typeof window !== 'undefined' && window.innerWidth < 760;
 
 export function Hero() {
   const ref = useRef(null);
@@ -23,7 +26,7 @@ export function Hero() {
   return (
     <header className="hero" id="top" ref={ref}>
       <div className="hero-canvas">
-        <CityScene progress={scrollYProgress} />
+        {smallScreen ? <Skyline /> : <CityScene progress={scrollYProgress} />}
       </div>
 
       <motion.div className="wrap" style={{ y: typeY, opacity: typeFade }}>
@@ -374,7 +377,7 @@ export function Network() {
   });
 
   return (
-    <section className="stage" id="network" ref={ref} style={{ height: '280svh' }}>
+    <section className="stage" id="network" ref={ref}>
       <div className="pin">
         <div className="wrap">
           <div className="net-split">
