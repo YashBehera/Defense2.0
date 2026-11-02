@@ -123,29 +123,6 @@ function canopyGeometry() {
   return geo;
 }
 
-/* a helicopter style skid: forward, down, back, and up at the tail */
-function skidGeometry(side) {
-  const z = 0.62 * side;
-  const curve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(1.0, -0.5, z * 0.62),
-    new THREE.Vector3(1.05, -0.82, z),
-    new THREE.Vector3(0.55, -0.95, z),
-    new THREE.Vector3(-0.5, -0.95, z),
-    new THREE.Vector3(-1.0, -0.86, z),
-    new THREE.Vector3(-1.18, -0.6, z * 0.72),
-  ]);
-  return new THREE.TubeGeometry(curve, 44, 0.032, 10, false);
-}
-
-function strutGeometry(sx, sz) {
-  const curve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(sx * 0.42, -0.6, sz * 0.3),
-    new THREE.Vector3(sx * 0.58, -0.78, sz * 0.48),
-    new THREE.Vector3(sx * 0.62, -0.92, sz * 0.62),
-  ]);
-  return new THREE.TubeGeometry(curve, 18, 0.026, 8, false);
-}
-
 /* each boom: a slim tapered arm out to the motor nacelle */
 function Boom({ mx, my, ink }) {
   const sx = Math.sign(mx);
@@ -222,16 +199,6 @@ export default function Ct1({ ink = '#15161a', spin = 0.26, tilt = true }) {
   const g = useRef();
   const body = useMemo(() => hull(PROFILE), []);
   const glass = useMemo(canopyGeometry, []);
-  const skids = useMemo(() => [skidGeometry(1), skidGeometry(-1)], []);
-  const struts = useMemo(
-    () => [
-      strutGeometry(1, 1),
-      strutGeometry(1, -1),
-      strutGeometry(-1, 1),
-      strutGeometry(-1, -1),
-    ],
-    []
-  );
 
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime();
@@ -264,17 +231,6 @@ export default function Ct1({ ink = '#15161a', spin = 0.26, tilt = true }) {
       ))}
       {MOTORS.map(([mx, my, dir]) => (
         <Rotor key={`r${mx}${my}`} mx={mx} my={my} dir={dir} ink={ink} />
-      ))}
-
-      {skids.map((s, i) => (
-        <mesh key={`s${i}`} geometry={s}>
-          <meshStandardMaterial color={ink} metalness={0.6} roughness={0.3} />
-        </mesh>
-      ))}
-      {struts.map((s, i) => (
-        <mesh key={`t${i}`} geometry={s}>
-          <meshStandardMaterial color={ink} metalness={0.6} roughness={0.3} />
-        </mesh>
       ))}
     </group>
   );

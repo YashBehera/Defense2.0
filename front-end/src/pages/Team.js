@@ -2,7 +2,6 @@ import React from 'react';
 import { Reveal, Words } from '../components/Reveal';
 
 import krish from '../assets/krish.JPG';
-import nikhil from '../assets/nikhil.JPG';
 import harmeet from '../assets/harmeet.JPG';
 import daljeet from '../assets/daljeet.JPG';
 
@@ -27,13 +26,6 @@ const CREW = [
     role: 'Director',
     bio: "25+ years of systems architecture and enterprise transformation leadership. Leads FlyHive's overall strategy, capital structuring, regulatory roadmap, and platform execution alongside global strategic advisors.",
     focus: 'top',
-  },
-  {
-    photo: nikhil,
-    name: 'Nikhil Gupta',
-    role: 'International Strategic Advisor',
-    bio: 'Global strategist with strong GCC institutional networks and investor engagement. Advises on capital structuring, cross-border positioning, and long-term expansion strategy.',
-    focus: 'center',
   },
 ];
 

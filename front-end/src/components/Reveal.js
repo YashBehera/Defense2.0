@@ -3,6 +3,19 @@ import { motion, useInView } from 'framer-motion';
 
 const EASE = [0.22, 1, 0.36, 1];
 
+/* The mask that each word rises out of. Its box is only as tall as the line
+   box, so a g or a y would be clipped at the baseline. The padding opens the
+   box below the baseline and the negative margin takes that space back out of
+   the layout, so nothing moves. HIDDEN then has to clear the taller box. */
+const CLIP = {
+  display: 'inline-block',
+  overflow: 'hidden',
+  verticalAlign: 'bottom',
+  paddingBottom: '0.24em',
+  marginBottom: '-0.24em',
+};
+const HIDDEN = '135%';
+
 const reduced = () =>
   typeof window !== 'undefined' &&
   window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -62,14 +75,11 @@ export function Words({ text, className, delay = 0, onMount = false, stagger = 0
   return (
     <span ref={ref} className={className} style={{ display: 'block' }}>
       {words.map((w, i) => (
-        <span
-          key={i}
-          style={{ display: 'inline-block', overflow: 'hidden', verticalAlign: 'bottom' }}
-        >
+        <span key={i} style={CLIP}>
           <motion.span
             style={{ display: 'inline-block', willChange: 'transform' }}
-            initial={{ y: reduced() ? 0 : '108%' }}
-            animate={show ? { y: 0 } : { y: reduced() ? 0 : '108%' }}
+            initial={{ y: reduced() ? 0 : HIDDEN }}
+            animate={show ? { y: 0 } : { y: reduced() ? 0 : HIDDEN }}
             transition={{ duration: 0.95, delay: delay + i * stagger, ease: EASE }}
             dangerouslySetInnerHTML={{ __html: w + (i < words.length - 1 ? '&nbsp;' : '') }}
           />

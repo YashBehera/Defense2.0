@@ -8,7 +8,6 @@ import Waitlist from './Waitlist';
 import krish from '../assets/krish.JPG';
 import daljeet from '../assets/daljeet.JPG';
 import harmeet from '../assets/harmeet.JPG';
-import nikhil from '../assets/nikhil.JPG';
 
 /* ================================================================= */
 
@@ -301,7 +300,7 @@ export function Craft() {
   const blur = useTransform(
     scrollYProgress,
     [0, 0.35, 0.6, 1],
-    ['blur(17px)', 'blur(6px)', 'blur(8px)', 'blur(17px)']
+    ['blur(34px)', 'blur(17px)', 'blur(21px)', 'blur(34px)']
   );
   const scale = useTransform(scrollYProgress, [0, 0.5, 1], [1.08, 1, 1.05]);
 
@@ -414,7 +413,6 @@ const PEOPLE = [
   [krish, 'Krish Chandhok', 'Founder & CEO'],
   [daljeet, 'Daljeet Chandhok', 'Director'],
   [harmeet, 'Harmeet Kaur', 'Director'],
-  [nikhil, 'Nikhil Gupta', 'International Strategic Advisor'],
 ];
 
 export function Company() {
