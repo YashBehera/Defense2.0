@@ -20,7 +20,7 @@
   --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
 
   --gutter:clamp(20px,5vw,64px);
-  --band:clamp(104px,15vh,200px);
+  --band:clamp(84px,11vh,152px);
   --ease:cubic-bezier(.22,1,.36,1);
 
   color-scheme:light;
@@ -593,7 +593,7 @@ a{color:inherit}
 
 .close-band{
   text-align:left;
-  padding-block:clamp(120px,20vh,230px);
+  padding-block:clamp(104px,16vh,190px);
 }
 .close-band .display{max-width:15ch}
 
@@ -694,3 +694,66 @@ a{color:inherit}
   .stage .pin{height:auto;position:relative;padding-block:clamp(72px,10vh,120px)}
   .net-copy .statement{max-width:none}
 }
+
+/* ---------- the two missing pieces ---------- */
+
+.gaps{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+  gap:1px;
+  background:var(--line);
+  border:1px solid var(--line);
+  margin-top:clamp(44px,6vw,76px);
+}
+.gap-card{
+  background:var(--white);
+  padding:clamp(28px,3.4vw,42px);
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+.band.paper .gap-card{background:var(--paper)}
+.gap-card .n{
+  font-family:var(--mono);
+  font-size:10.5px;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:var(--accent);
+}
+.gap-card h3{
+  margin:0;
+  font-family:var(--display);
+  font-size:clamp(21px,2.1vw,28px);
+  font-weight:600;
+  letter-spacing:-.028em;
+  line-height:1.12;
+  max-width:18ch;
+}
+.gap-card p{
+  margin:0;
+  font-size:15.5px;
+  line-height:1.56;
+  color:var(--ink-2);
+  max-width:46ch;
+}
+.gap-svg{
+  width:100%;
+  height:auto;
+  margin-top:auto;
+  padding-top:22px;
+}
+.gap-svg .gl{
+  font-family:var(--mono);
+  font-size:9px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  fill:var(--ink-3);
+}
+.gap-svg .gv{
+  font-family:var(--mono);
+  font-size:10px;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  fill:var(--ink-2);
+}
+.gap-svg .red{fill:var(--accent)}

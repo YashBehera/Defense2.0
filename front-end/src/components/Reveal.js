@@ -17,8 +17,10 @@ export function Reveal({ children, delay = 0, y = 26, onMount = false, className
 
   useEffect(() => {
     if (onMount) {
-      const id = requestAnimationFrame(() => setMounted(true));
-      return () => cancelAnimationFrame(id);
+      // a timer, not rAF: rAF never fires while the tab is in the background,
+      // which would leave the hero blank until the visitor focused it
+      const id = setTimeout(() => setMounted(true), 0);
+      return () => clearTimeout(id);
     }
     return undefined;
   }, [onMount]);
@@ -46,8 +48,10 @@ export function Words({ text, className, delay = 0, onMount = false, stagger = 0
 
   useEffect(() => {
     if (onMount) {
-      const id = requestAnimationFrame(() => setMounted(true));
-      return () => cancelAnimationFrame(id);
+      // a timer, not rAF: rAF never fires while the tab is in the background,
+      // which would leave the hero blank until the visitor focused it
+      const id = setTimeout(() => setMounted(true), 0);
+      return () => clearTimeout(id);
     }
     return undefined;
   }, [onMount]);

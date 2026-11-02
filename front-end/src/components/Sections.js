@@ -189,11 +189,57 @@ export function Gap() {
         </h2>
         <Reveal delay={0.1}>
           <p className="lede">
-            Flying a person fifteen kilometres was solved decades ago. What does not exist is
-            an aircraft cheap enough to run a trip that short, and anywhere inside a city to
-            land one. So we are building both.
+            Flying a person fifteen kilometres was solved decades ago. Helicopters have done it
+            since before anyone reading this was born. What has never existed is an aircraft
+            cheap enough to run a trip that short, and anywhere inside a city to land one.
           </p>
         </Reveal>
+
+        <div className="gaps">
+          <Reveal className="gap-card" delay={0.06} y={22}>
+            <span className="n">Missing 01</span>
+            <h3>An aircraft worth sending fifteen kilometres</h3>
+            <p>
+              A helicopter costs more to put in the air for seven minutes than anybody will pay
+              for the seat. Everything built since has chased long routes at airport prices,
+              because that is the only trip the cost per hour survives.
+            </p>
+            <svg viewBox="0 0 300 92" className="gap-svg" aria-hidden="true">
+              <text x="0" y="12" className="gl">Cost per seat, a 15 km hop</text>
+              <rect x="0" y="26" width="244" height="13" fill="var(--ink-3)" />
+              <text x="252" y="37" className="gv">Helicopter</text>
+              <rect x="0" y="52" width="58" height="13" fill="var(--accent)" />
+              <text x="66" y="63" className="gv red">What it has to cost</text>
+              <line x1="0" y1="80" x2="300" y2="80" stroke="var(--line)" />
+            </svg>
+          </Reveal>
+
+          <Reveal className="gap-card" delay={0.14} y={22}>
+            <span className="n">Missing 02</span>
+            <h3>Somewhere in the city to put it down</h3>
+            <p>
+              An airport thirty kilometres out is not a station. The trip only works if you can
+              walk to where it starts, which means ordinary ground stations sitting where people
+              already are, built and used the way metro stations are.
+            </p>
+            <svg viewBox="0 0 300 92" className="gap-svg" aria-hidden="true">
+              <g fill="var(--paper-2)" stroke="var(--line-2)">
+                <rect x="2" y="20" width="52" height="30" />
+                <rect x="60" y="20" width="36" height="30" />
+                <rect x="2" y="56" width="36" height="28" />
+                <rect x="44" y="56" width="52" height="28" />
+                <rect x="140" y="20" width="44" height="30" />
+                <rect x="190" y="20" width="52" height="30" />
+                <rect x="140" y="56" width="52" height="28" />
+                <rect x="198" y="56" width="44" height="28" />
+                <rect x="248" y="20" width="50" height="64" />
+              </g>
+              <rect x="102" y="20" width="32" height="64" fill="var(--accent-wash)" stroke="var(--accent)" />
+              <circle cx="118" cy="52" r="7" fill="var(--accent)" />
+              <text x="102" y="12" className="gl red">Station</text>
+            </svg>
+          </Reveal>
+        </div>
       </div>
     </section>
   );
@@ -254,9 +300,9 @@ export function Craft() {
   const blur = useTransform(
     scrollYProgress,
     [0, 0.35, 0.6, 1],
-    ['blur(26px)', 'blur(10px)', 'blur(13px)', 'blur(26px)']
+    ['blur(17px)', 'blur(6px)', 'blur(8px)', 'blur(17px)']
   );
-  const scale = useTransform(scrollYProgress, [0, 0.5, 1], [1.12, 1, 1.08]);
+  const scale = useTransform(scrollYProgress, [0, 0.5, 1], [1.08, 1, 1.05]);
 
   return (
     <section className="band" id="aircraft" ref={ref}>
