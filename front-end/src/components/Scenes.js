@@ -1,4 +1,4 @@
-import React, { useRef, useMemo, useLayoutEffect } from 'react';
+import React, { useRef, useMemo, useState, useEffect, useLayoutEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import Ct1 from './Ct1';
@@ -14,6 +14,42 @@ const lowPower = () =>
   typeof window !== 'undefined' &&
   (window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
     window.innerWidth < 760);
+
+const phone = () => typeof window !== 'undefined' && window.innerWidth < 760;
+
+/* A scene costs nothing while nobody can see it. Without this all three
+   canvases draw every frame for the whole page, which is what makes a phone
+   crawl. Each one stops when it leaves the viewport and when the tab hides. */
+function useOnScreen(rootMargin = '150px') {
+  const ref = useRef(null);
+  const [on, setOn] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return undefined;
+
+    let seen = false;
+    const io = new IntersectionObserver(
+      ([e]) => {
+        seen = e.isIntersecting;
+        setOn(seen && !document.hidden);
+      },
+      { rootMargin }
+    );
+    io.observe(el);
+
+    const onVis = () => setOn(seen && !document.hidden);
+    document.addEventListener('visibilitychange', onVis);
+
+    return () => {
+      io.disconnect();
+      document.removeEventListener('visibilitychange', onVis);
+    };
+  }, [rootMargin]);
+
+  return [ref, on];
+}
+
 
 const read = (mv) => {
   const v = mv && typeof mv.get === 'function' ? mv.get() : 0;
@@ -134,15 +170,18 @@ function CityRig({ progress }) {
     void delta;
   });
 
-  return <group ref={group}><Blocks count={lowPower() ? 230 : 520} /></group>;
+  return <group ref={group}><Blocks count={phone() ? 150 : lowPower() ? 230 : 520} /></group>;
 }
 
 export function CityScene({ progress }) {
+  const [ref, on] = useOnScreen();
   return (
+    <div ref={ref} style={{ position: 'absolute', inset: 0 }}>
     <Canvas
-      dpr={[1, lowPower() ? 1.25 : 1.8]}
+      frameloop={on ? 'always' : 'never'}
+      dpr={phone() ? 1 : [1, lowPower() ? 1.25 : 1.8]}
       camera={{ fov: 42, position: [0, 8, 60], near: 0.1, far: 220 }}
-      gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
+      gl={{ antialias: !phone(), alpha: true, powerPreference: 'high-performance' }}
       style={{ background: 'transparent' }}
     >
       <fog attach="fog" args={['#ffffff', 42, 118]} />
@@ -156,6 +195,7 @@ export function CityScene({ progress }) {
         <meshBasicMaterial color="#f2f2f6" />
       </mesh>
     </Canvas>
+    </div>
   );
 }
 
@@ -164,11 +204,16 @@ export function CityScene({ progress }) {
 /* ------------------------------------------------------------------ */
 
 export function CraftScene() {
+  const [ref, on] = useOnScreen('60px');
+  // on a phone it renders at well under one pixel per pixel, which is most of
+  // the softness for almost none of the cost, so the CSS blur can be lighter
   return (
+    <div ref={ref} style={{ position: 'absolute', inset: 0 }}>
     <Canvas
-      dpr={[1, lowPower() ? 1.2 : 1.7]}
+      frameloop={on ? 'always' : 'never'}
+      dpr={phone() ? 0.45 : [1, lowPower() ? 1.2 : 1.7]}
       camera={{ fov: 30, position: [3.4, 2.4, 7.2] }}
-      gl={{ antialias: true, alpha: true }}
+      gl={{ antialias: !phone(), alpha: true }}
       style={{ background: 'transparent' }}
     >
       <hemisphereLight args={['#ffffff', '#b9b9c6', 1.4]} />
@@ -176,6 +221,7 @@ export function CraftScene() {
       <directionalLight position={[-6, 2, -4]} intensity={0.8} color="#ff9aa6" />
       <Ct1 />
     </Canvas>
+    </div>
   );
 }
 
@@ -209,7 +255,7 @@ function Districts() {
     let s = 77771;
     const rnd = () => ((s = (s * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff);
     const out = [];
-    for (let i = 0; i < 190; i++) {
+    for (let i = 0; i < (phone() ? 70 : 190); i++) {
       const a = rnd() * Math.PI * 2;
       const r = 1.4 + Math.sqrt(rnd()) * 9.6;
       const x = Math.cos(a) * r;
@@ -360,16 +406,20 @@ function Network({ progress }) {
 }
 
 export function NetworkScene({ progress }) {
+  const [ref, on] = useOnScreen('60px');
   return (
+    <div ref={ref} style={{ position: 'absolute', inset: 0 }}>
     <Canvas
-      dpr={[1, lowPower() ? 1.2 : 1.7]}
+      frameloop={on ? 'always' : 'never'}
+      dpr={phone() ? 1 : [1, lowPower() ? 1.2 : 1.7]}
       camera={{ fov: 34, position: [0, 5.6, 13.4] }}
-      gl={{ antialias: true, alpha: true }}
+      gl={{ antialias: !phone(), alpha: true }}
       style={{ background: 'transparent' }}
     >
       <hemisphereLight args={['#ffffff', '#d6d6e0', 2.1]} />
       <directionalLight position={[7, 13, 9]} intensity={1.25} />
       <Network progress={progress} />
     </Canvas>
+    </div>
   );
 }

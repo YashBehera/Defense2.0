@@ -297,10 +297,15 @@ export function Craft() {
     offset: ['start end', 'end start'],
   });
   // sharpens on approach, then softens again. it never resolves.
+  // a phone renders the scene at well under one pixel per pixel, so it arrives
+  // soft already and a heavy blur there costs a lot of frames for nothing
+  const soft = typeof window !== 'undefined' && window.innerWidth < 760;
   const blur = useTransform(
     scrollYProgress,
     [0, 0.35, 0.6, 1],
-    ['blur(34px)', 'blur(17px)', 'blur(21px)', 'blur(34px)']
+    soft
+      ? ['blur(13px)', 'blur(7px)', 'blur(9px)', 'blur(13px)']
+      : ['blur(34px)', 'blur(17px)', 'blur(21px)', 'blur(34px)']
   );
   const scale = useTransform(scrollYProgress, [0, 0.5, 1], [1.08, 1, 1.05]);
 
