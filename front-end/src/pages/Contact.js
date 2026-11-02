@@ -1,7 +1,10 @@
 import React from 'react';
 import { Reveal, Words } from '../components/Reveal';
 
-const ENDPOINT = process.env.REACT_APP_CONTACT_URL || process.env.REACT_APP_WAITLIST_URL || '';
+// the same sheet as the waitlist; the source field says which form it came from
+const SHEET = 'https://script.google.com/macros/s/AKfycbyyCYP7M--n5busx87V-_eG_hGkbcIlAAcfb0_G7FM4673po1tXw-s5LK00xRHPSbMtTg/exec';
+const ENDPOINT =
+  process.env.REACT_APP_CONTACT_URL || process.env.REACT_APP_WAITLIST_URL || SHEET;
 
 const REASONS = [
   ['Investors', 'For the deck, the numbers behind CT1 and the raise.', 'Investment'],

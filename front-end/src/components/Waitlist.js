@@ -1,12 +1,12 @@
 import React from 'react';
 import { Reveal, Words } from './Reveal';
 
-// Posts to whatever endpoint is in REACT_APP_WAITLIST_URL, falling back to the
-// Google Apps Script web app below. Works with Formspree, Tally or any URL that
-// accepts a JSON body. The body goes out as text/plain on purpose: that skips the
-// CORS preflight, which Apps Script web apps do not answer.
-// With no endpoint configured the address is kept locally so it is never lost.
-const ENDPOINT = process.env.REACT_APP_WAITLIST_URL || '';
+// The Google Apps Script web app behind the FLYHIVE WAITLIST sheet. It is not a
+// secret: anything the page posts with has to be in the page. The body goes out
+// as text/plain on purpose, which skips the CORS preflight that Apps Script web
+// apps do not answer. REACT_APP_WAITLIST_URL overrides it if it is ever moved.
+const SHEET = 'https://script.google.com/macros/s/AKfycbyyCYP7M--n5busx87V-_eG_hGkbcIlAAcfb0_G7FM4673po1tXw-s5LK00xRHPSbMtTg/exec';
+const ENDPOINT = process.env.REACT_APP_WAITLIST_URL || SHEET;
 
 const Waitlist = () => {
   const [email, setEmail] = React.useState('');
