@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import { motion, useScroll, useTransform, useMotionValueEvent } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { Reveal, Words, Counter } from './Reveal';
 import { CityScene, CraftScene, NetworkScene } from './Scenes';
 import Waitlist from './Waitlist';
@@ -444,6 +445,11 @@ export function Company() {
             </Reveal>
           ))}
         </div>
+        <Reveal delay={0.1}>
+          <div className="hero-foot">
+            <Link className="btn ghost" to="/team">Meet the team</Link>
+          </div>
+        </Reveal>
       </div>
     </section>
   );

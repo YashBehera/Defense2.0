@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import logo from '../assets/logo-light.png';
 
 export default function Footer() {
@@ -6,8 +7,12 @@ export default function Footer() {
     <footer className="foot">
       <div className="wrap">
         <div className="foot-in">
-          <img src={logo} alt="FlyHive Technologies" />
+          <Link to="/" aria-label="FlyHive Technologies, home">
+            <img src={logo} alt="FlyHive Technologies" />
+          </Link>
           <div className="foot-links">
+            <Link to="/team">Team</Link>
+            <Link to="/contact">Contact</Link>
             <a href="mailto:info@flyhivetechnologies.com">info@flyhivetechnologies.com</a>
             <a
               href="https://www.linkedin.com/company/flyhive-technologies"
