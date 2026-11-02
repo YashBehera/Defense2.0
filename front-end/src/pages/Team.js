@@ -15,13 +15,6 @@ const CREW = [
     focus: 'top',
   },
   {
-    photo: nikhil,
-    name: 'Nikhil Gupta',
-    role: 'International Strategic Advisor',
-    bio: 'Global strategist with strong GCC institutional networks and investor engagement. Advises on capital structuring, cross-border positioning, and long-term expansion strategy.',
-    focus: 'center',
-  },
-  {
     photo: harmeet,
     name: 'Harmeet Kaur',
     role: 'Director',
@@ -34,6 +27,13 @@ const CREW = [
     role: 'Director',
     bio: "25+ years of systems architecture and enterprise transformation leadership. Leads FlyHive's overall strategy, capital structuring, regulatory roadmap, and platform execution alongside global strategic advisors.",
     focus: 'top',
+  },
+  {
+    photo: nikhil,
+    name: 'Nikhil Gupta',
+    role: 'International Strategic Advisor',
+    bio: 'Global strategist with strong GCC institutional networks and investor engagement. Advises on capital structuring, cross-border positioning, and long-term expansion strategy.',
+    focus: 'center',
   },
 ];
 
