@@ -1,70 +1,42 @@
-# Getting Started with Create React App
+# FlyHive website
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Single scrolling page. Built with Create React App, framer-motion and lenis, which is
+what the previous site already used, so the build and deploy pipeline is unchanged.
 
-## Available Scripts
+## Run it
 
-In the project directory, you can run:
+    npm install
+    npm start        # http://localhost:3000
+    npm run build    # production build into build/
 
-### `npm start`
+## Deploy
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Push to the repo connected to Vercel. Build command `npm run build`, output `build`.
+Nothing else to configure.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## The waitlist
 
-### `npm test`
+The form posts JSON `{ email, source }` to whatever URL is in `REACT_APP_WAITLIST_URL`.
+Set it in Vercel under Project Settings, Environment Variables.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Easiest options, any of them work:
 
-### `npm run build`
+- **Tally** or **Formspree**: make a form, copy its endpoint URL, paste it in
+- **Google Sheet**: Apps Script web app that appends a row, deploy as "anyone", paste the URL
+- **Supabase**: an edge function or REST insert
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+With no URL set the form still confirms to the visitor and keeps addresses in their
+browser, so the section is never visibly broken. But nothing reaches you until the
+variable is set, so set it before you share the link anywhere.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Showing the signup count
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Deliberately not built. Turn it on only once the number is in the hundreds, because a
+small number does more harm than none.
 
-### `npm run eject`
+## What is deliberately not on this site
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- The aircraft. Four of the eight spec lines are blacked out on purpose
+- Any city or country
+- Any launch date
+- CT1. It is an unmanned tethered demonstrator and belongs in the investor deck
