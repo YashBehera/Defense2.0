@@ -1,22 +1,57 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Lenis from 'lenis';
 import Nav from './components/Nav';
 import Footer from './components/Footer';
-import Waitlist from './components/Waitlist';
-import { Hero, Problem, Gap, HowItWorks, Aircraft, Network, Company, Close } from './components/Sections';
+import {
+  Hero,
+  Problem,
+  Gap,
+  HowItWorks,
+  Craft,
+  Network,
+  Company,
+  Close,
+  Waitlist,
+} from './components/Sections';
 
-function App() {
-  React.useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const lenis = new Lenis({ duration: 1.05, smoothWheel: true });
-    let id;
-    const raf = (t) => { lenis.raf(t); id = requestAnimationFrame(raf); };
-    id = requestAnimationFrame(raf);
-    return () => { cancelAnimationFrame(id); lenis.destroy(); };
+export default function App() {
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
+
+    const lenis = new Lenis({
+      duration: 1.1,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smoothWheel: true,
+      touchMultiplier: 1.6,
+    });
+
+    let frame;
+    const raf = (time) => {
+      lenis.raf(time);
+      frame = requestAnimationFrame(raf);
+    };
+    frame = requestAnimationFrame(raf);
+
+    const jump = (e) => {
+      const a = e.target.closest('a[href^="#"]');
+      if (!a) return;
+      const el = document.querySelector(a.getAttribute('href'));
+      if (!el) return;
+      e.preventDefault();
+      lenis.scrollTo(el, { offset: -10 });
+    };
+    document.addEventListener('click', jump);
+
+    return () => {
+      cancelAnimationFrame(frame);
+      document.removeEventListener('click', jump);
+      lenis.destroy();
+    };
   }, []);
 
   return (
     <>
+      <a className="skip" href="#problem">Skip to main content</a>
       <Nav />
       <main>
         <Hero />
@@ -24,7 +59,7 @@ function App() {
         <Gap />
         <HowItWorks />
         <Waitlist />
-        <Aircraft />
+        <Craft />
         <Network />
         <Company />
         <Close />
@@ -33,5 +68,3 @@ function App() {
     </>
   );
 }
-
-export default App;

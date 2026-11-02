@@ -1,26 +1,35 @@
 import React from 'react';
-import logo from '../assets/logo-dark.png';
+import logo from '../assets/logo-light.png';
 
-const Footer = () => (
-  <footer className="footer">
-    <div className="wrap inner">
-      <div>
-        <img className="flogo" src={logo} alt="FlyHive" />
-        <div className="co">FlyHive Technologies Pvt Ltd</div>
-        <div className="meta">
-          Recognised by the Ministry of Commerce and Industry under aeronautics,
-          aerospace and defence. DPIIT certificate DIPP262989.
-          <br />
-          &copy; {new Date().getFullYear()}
+export default function Footer() {
+  return (
+    <footer className="foot">
+      <div className="wrap">
+        <div className="foot-in">
+          <img src={logo} alt="FlyHive Technologies" />
+          <div className="foot-links">
+            <a href="mailto:info@flyhivetechnologies.com">info@flyhivetechnologies.com</a>
+            <a
+              href="https://www.linkedin.com/company/flyhive-technologies"
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              LinkedIn
+            </a>
+            <a
+              href="https://www.instagram.com/flyhive.technologies"
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              Instagram
+            </a>
+          </div>
+        </div>
+        <div className="foot-meta">
+          <span>FlyHive Technologies Pvt Ltd</span>
+          <span>DPIIT DIPP262989</span>
         </div>
       </div>
-      <div className="links">
-        <a href="mailto:info@flyhivetechnologies.com">info@flyhivetechnologies.com</a>
-        <a href="https://www.linkedin.com/company/flyhive-technologies-pvt-ltd/" target="_blank" rel="noreferrer">LinkedIn</a>
-        <a href="https://www.instagram.com/flyhive_technologies/" target="_blank" rel="noreferrer">Instagram</a>
-      </div>
-    </div>
-  </footer>
-);
-
-export default Footer;
+    </footer>
+  );
+}

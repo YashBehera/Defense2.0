@@ -1,5 +1,5 @@
 import React from 'react';
-import { Reveal } from './Reveal';
+import { Reveal, Words } from './Reveal';
 
 // Posts to whatever endpoint is in REACT_APP_WAITLIST_URL, falling back to the
 // Google Apps Script web app below. Works with Formspree, Tally or any URL that
@@ -45,12 +45,12 @@ const Waitlist = () => {
   };
 
   return (
-    <section className="band waitlist" id="waitlist">
+    <section className="band wl" id="waitlist">
       <div className="wrap">
         <Reveal>
           <span className="eyebrow">Be first</span>
-          <h2 className="statement">
-            The first flights will not be a public launch.
+          <h2 className="statement wide">
+            <Words text="The first flights will not be a public launch." />
           </h2>
         </Reveal>
 
